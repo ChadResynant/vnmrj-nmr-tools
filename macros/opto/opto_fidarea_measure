@@ -1,0 +1,24 @@
+//
+// Copyright NRMFAM and University of WI 2022. All rights reserved.
+//
+//   initially developed by Barry DeZonia in the fall of 2022
+
+$port = ''
+shell('echo $OPTO_PORT'):$port
+$portVal = 30811
+if ($port <> '') then
+  format($port,5,0):$portVal
+endif
+
+dfid
+
+clear
+fidarea
+  
+fidarea:$area
+ 
+// Send area value back to optimizer app
+
+write('net', '127.0.0.1', $portVal, '%.5f', $area)
+
+return

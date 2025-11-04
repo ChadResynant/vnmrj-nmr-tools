@@ -1,0 +1,82 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+.venv/
+*.egg-info/
+dist/
+build/
+
+# NMR Data Files
+*.fid
+*.dat
+*.DTA
+*.DSC
+fid
+log
+text
+*.REC
+*.SPC
+*.RS
+*.ft*
+acqfil/
+datdir/
+
+# OpenVNMRJ/VNMRJ System Files
+*.bkup.*
+global.bkup*
+global
+global1
+*.lock_*
+persistence/
+studies/
+exp[0-9]*/
+exp[0-9][0-9]*/
+exp[0-9][0-9][0-9]*/
+.vnmrjlog*
+VnmrjMsgLog
+cmdHistory
+.DISPLAY
+
+# Compiled Pulse Sequences
+*.o
+*.a
+dps*.c
+x_*.c
+
+# OPTO Job Output
+*.out
+*.err
+opto_output/
+
+# Temporary files
+*.tmp
+*.temp
+*~
+*.swp
+*.swo
+.DS_Store
+
+# Editor files
+.vscode/
+.idea/
+*.sublime-*
+
+# Archives
+*.tar.gz
+*.zip
+*.tar
+*.bz2
+
+# Logs
+*.log
+
+# OS files
+Thumbs.db
+
+# Test data (keep examples small)
+test_data/large_datasets/
