@@ -208,18 +208,19 @@ void pulsesequence() {
     double tPAR;
     tPAR = getval("tPAR");
     tPAR = roundoff(tPAR,4.0*getval("pwX90")*4095/getval("aXpar"));
-
-    duty = 4.0e-6 + getval("pwH90") + getval("tHX") + d2 + getval("ad") + getval("rd") + at;
+    tRF = getval("tRF");
+    
+    duty = 4.0e-6 + getval("pwH90") + getval("tHX") + d2 + getval("ad") + getval("rd") + at + tRF;
     // Dutycycle Protection
     if (strcmp(echo,"n") != 0) {
         duty += getval("tECHO");
     }
     if ((strcmp(mMix, "rad") == 0) || (strcmp(mMix, "paris") == 0)) {
-        duty += 2.0*getval("pwX90");
+        duty += 2.0*getval("pwX90") + (getval("aHmix")/4095) * (getval("aHmix")/4095) * getval("tXmix") ;
         duty = duty/(duty + d1 + getval("tXmix") + 4.0e-6);
     }
     else if (strcmp(mMix, "c7") == 0) {
-        duty += 2.0*getval("pwX90"); 
+        duty += 2.0*getval("pwX90") ; 
         if (strcmp(dqf_flag,"2") == 0) {
             duty += c7ref.t;
         }
@@ -229,7 +230,7 @@ void pulsesequence() {
         duty = duty/(duty + d1 + 4.0e-6 + 2.0*getval("tZF"));
     }
     else if (strcmp(mMix, "c6") == 0) {
-        duty += 2.0*getval("pwX90");
+        duty += 2.0*getval("pwX90") ;
         if (strcmp(dqf_flag,"2") == 0) {
             duty += c6ref.t;
         }
@@ -239,7 +240,7 @@ void pulsesequence() {
         duty = duty/(duty + d1 + 4.0e-6 + 2.0*getval("tZF"));
     }
     else if (strcmp(mMix, "spc5") == 0) {
-        duty += 2.0*getval("pwX90");
+        duty += 2.0*getval("pwX90") ;
         if (!strcmp(dqf_flag,"2")) {
             duty += spc5ref.t;
         }
@@ -260,9 +261,12 @@ void pulsesequence() {
         duty += 2*getval("tZF") + getval("tXr2t_in") + getval("tXr2t_mix") + getval("tXr2t_out") + 2.0*getval("pwX90");
         duty = duty/(duty + d1 + 4.0e-6);
     }
-    if (duty > 0.1) {
-        abort_message("Duty cycle %.1f%% >10%%. Abort!\n", duty*100);
+    if (duty > 0.05) {
+        abort_message("Duty cycle %.1f%% >5%%. Check d1, d2, tRF, at, tXmix. Abort!\n", duty*100);
     }
+    else {
+        printf("Duty cycle %.1f%% < 5%%. Safe to proceed. Good luck! \n", duty*100);
+        } 
 
     // Create Phasetables
     settable(phH90,16,table1);
