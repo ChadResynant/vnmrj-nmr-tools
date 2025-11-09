@@ -163,19 +163,21 @@ void pulsesequence() {
     }
 
     // Dutycycle Protection
-    double total_proton_on_time = pwH90 + getval("tHX") + 4 * pwX90 + 
+    // H-detected sequence: Low-power H decoupling during acquisition allows 15% duty cycle
+    // See SAFETY_STANDARDS.md Section 6: Power-Dependent Duty Cycle Limits
+    double total_proton_on_time = pwH90 + getval("tHX") + 4 * pwX90 +
                                   getval("tconst2") + getval("tconst") + getval("tXH");
     if (!strcmp(CT3,"y")) {
         total_proton_on_time += 2*pwH90;
     }
-    
-    double cycle_time = 4e-6 + getval("d1") + total_proton_on_time + tmd3 + tmd2 + 
-                        2*getval("hst") + 2*getval("hstconst") + 
+
+    double cycle_time = 4e-6 + getval("d1") + total_proton_on_time + tmd3 + tmd2 +
+                        2*getval("hst") + 2*getval("hstconst") +
                         getval("qHpxy")*2*getval("pwHpxy") + getval("ad") + getval("rd") + at;
     double duty = total_proton_on_time / cycle_time;
 
-    if (duty > 0.1) {
-        printf("Duty cycle %.1f%% >10%%. Abort!\n", duty*100);
+    if (duty > 0.15) {
+        printf("Duty cycle %.1f%% >15%%. Abort!\n", duty*100);
         psg_abort(1);
     }
 

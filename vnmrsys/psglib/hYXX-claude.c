@@ -225,7 +225,9 @@ void pulsesequence() {
         if (Ndelay_c < 0) {  Ndelay_c = 0.0; }
     }
 
-    // Dutycycle Protection  CMR 8/7/18 must be calculated after actual d3 value is computed by NUS schedule 
+    // Dutycycle Protection  CMR 8/7/18 must be calculated after actual d3 value is computed by NUS schedule
+    // C-detected sequence: Standard 5% duty cycle limit for high-power C decoupling
+    // See SAFETY_STANDARDS.md Section 1: Duty Cycle Limits
     if(!strcmp(ctN,"n")){
         duty = 4.0e-6 + getval("pwY90") + getval("pwH90") + getval("tHY") + d2 +
         getval("tYX") + d3 + 2.0*getval("pwX90") + getval("ad") +
@@ -239,8 +241,8 @@ void pulsesequence() {
     }
 
     duty = duty/(duty + d1 + 4.0e-6);
-    if (duty > 0.1) {
-        printf("Duty cycle %.1f%% >10%%. Abort!\n", duty*100);
+    if (duty > 0.05) {
+        printf("Duty cycle %.1f%% >5%%. Abort!\n", duty*100);
         abort_message("ABORT: duty cycle error");
     }
 

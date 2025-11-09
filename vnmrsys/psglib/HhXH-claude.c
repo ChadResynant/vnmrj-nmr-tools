@@ -145,12 +145,14 @@ void pulsesequence() {
     }
 
     // Dutycycle Protection
-    duty = 4.0e-6 + 3*getval("pwH90") + getval("tHX") + getval("tconst_N") + 
+    // H-detected sequence: Low-power H decoupling during acquisition allows 15% duty cycle
+    // See SAFETY_STANDARDS.md Section 6: Power-Dependent Duty Cycle Limits
+    duty = 4.0e-6 + 3*getval("pwH90") + getval("tHX") + getval("tconst_N") +
            getval("tXH") + t1Hecho + t2Hecho + getval("ad") + getval("rd") + at;
 
     duty = duty/(duty + d1 + 4.0e-6);
-    if (duty > 0.1) {
-        printf("Duty cycle %.1f%% >10%%. Abort!\n", duty*100);
+    if (duty > 0.15) {
+        printf("Duty cycle %.1f%% >15%%. Abort!\n", duty*100);
         psg_abort(1);
     }
 
