@@ -178,22 +178,26 @@ void pulsesequence() {
     tPAR = roundoff(tPAR,4.0*getval("pwX90")*4095/getval("aXpar"));
 
     // Calculate duty cycle using consolidated function
-    // C-detected sequence: Standard 5% duty cycle limit for high-power C decoupling
-    // See SAFETY_STANDARDS.md Section 1: Duty Cycle Limits
     duty = 4.0e-6 + getval("pwH90") + getval("tHX") + d2 + getval("ad") + getval("rd") + at;
-
+    
     // Dutycycle Protection
     if (strcmp(echo,"n") != 0) {
         duty += getval("tECHO");
     }
-
+    
     // Only calculate mixing duty cycle if mixing is enabled
     if (strcmp(mMix, "n") != 0) {
         duty = calculate_mixing_duty_cycle(&mixing, duty, duty + getval("d1") + 4.0e-6);
     } else {
         duty = duty/(duty + getval("d1") + 4.0e-6);
     }
-
+    
+    // 5% duty cycle limit for C-detected sequences (high-power decoupling on X channel)
+    // NOTE: Future enhancement should make duty cycle power-dependent:
+    //   - High-power decoupling (>50 kHz): 5% limit (current conservative assumption)
+    //   - Medium-power decoupling (20-50 kHz): could allow 7-10%
+    //   - Low-power decoupling (<20 kHz): could allow 10-15%
+    //   This requires integrating decoupling power (aH, aY) into duty cycle calculation
     if (duty > 0.05) {
         abort_message("Duty cycle %.1f%% >5%%. Abort!\n", duty*100);
     }

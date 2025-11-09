@@ -384,11 +384,17 @@ void pulsesequence() {
    printf("\ndutyon is %.1f ms ",dutyon*1000);
    duty = dutyon/(dutyon + d1 + 4.0e-6);
    printf("duty is %.1f%%  ",duty*100);
-   if (duty > 0.2) {
-      printf("Duty cycle %.1f%% >20%%. Abort!\n", duty*100);
+   // 5% duty cycle limit for C-detected sequences (high-power decoupling on X channel)
+   // NOTE: Future enhancement should make duty cycle power-dependent:
+   //   - High-power decoupling (>50 kHz): 5% limit (current conservative assumption)
+   //   - Medium-power decoupling (20-50 kHz): could allow 7-10%
+   //   - Low-power decoupling (<20 kHz): could allow 10-15%
+   //   This requires integrating decoupling power and sequence type into duty cycle calculation
+   if (duty > 0.05) {
+      printf("Duty cycle %.1f%% >5%%. Abort!\n", duty*100);
       psg_abort(1);
   }
-  else {      printf("Duty cycle %.1f%% <20%%. All good!\n", duty*100);  }
+  else {      printf("Duty cycle %.1f%% <5%%. All good!\n", duty*100);  }
 
 
 // Create Phasetables 

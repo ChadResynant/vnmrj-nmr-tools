@@ -73,7 +73,14 @@ void pulsesequence() {
     
     // Initialize validation with 2D-appropriate limits
     NMRValidation validator = init_nmr_validation();
-    set_duty_limit(&validator, 0.1);                    // 10% duty cycle limit
+
+    // 5% duty cycle limit for C-detected sequences (high-power decoupling on X channel)
+    // NOTE: Future enhancement should make duty cycle power-dependent:
+    //   - High-power decoupling (>50 kHz): 5% limit (current conservative assumption)
+    //   - Medium-power decoupling (20-50 kHz): could allow 7-10%
+    //   - Low-power decoupling (<20 kHz): could allow 10-15%
+    //   This requires integrating decoupling power (aH, aY) into duty cycle calculation
+    set_duty_limit(&validator, 0.05);                   // 5% duty cycle limit
     set_evolution_limit(&validator, 10e-3);             // 10 ms evolution limit
     
     // Get basic pulse parameters
