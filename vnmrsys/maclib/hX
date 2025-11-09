@@ -1,4 +1,5 @@
 seqfil = 'hX'
+layout = 'hX'
 banner('Resetting hX for HC(N) mode operation \\
 Default parameters \\
 WARNING: software pwr levels set to 63 \\

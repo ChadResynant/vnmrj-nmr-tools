@@ -1,0 +1,364 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<!--
+  hX PulseSequence Tab
+  Cross-polarization, echo, and pulse sequence control parameters
+-->
+<template name="PulseSequence" element="pages" type="acquisition" >
+  <group size="750 350"
+    style="Heading1"
+    label="Pulse Sequence"
+    vq="panellevel"
+    show="$SHOW=(panellevel&gt;0)"
+    border="None"
+    side="Top"
+    justify="Left"
+    tab="yes"
+    enable="no"
+    reference="PulseSequence"
+    useref="no"
+    subtype="Basic"
+    expanded="yes"
+    >
+
+    <!-- Sequence Flags -->
+    <group loc="10 10" size="250 90"
+      style="Heading2"
+      label="Sequence Control"
+      border="Etched"
+      side="Top"
+      justify="Left"
+      tab="no"
+      enable="no"
+      useref="no"
+      subtype="Basic"
+      >
+      <check loc="10 20" size="150 20"
+        style="Label1"
+        label="Use Cross-Polarization"
+        vq="cp"
+        vc="cp='$VALUE'"
+        vc2="cp='n'"
+        set="$VALUE=(cp='y')"
+        tooltip="Enable H to X cross-polarization"
+        />
+
+      <check loc="10 45" size="150 20"
+        style="Label1"
+        label="X Flip (Direct Excite)"
+        vq="flip"
+        vc="flip='$VALUE'"
+        vc2="flip='n'"
+        set="$VALUE=(flip='y')"
+        tooltip="Use direct X excitation instead of CP"
+        />
+
+      <label loc="10 70" size="80 20"
+        style="Label1"
+        label="Echo Mode"
+        justify="Left"
+        />
+      <menu loc="100 70" size="120 20"
+        style="PlainText"
+        label="menu"
+        vq="echo"
+        vc="parunits('set','echo','$VALUE')"
+        set="$VALUE=echo"
+        bg="VJBackground"
+        editable="No"
+        >
+        <mlabel
+          label="none"
+          chval="n"
+          />
+        <mlabel
+          label="hard echo"
+          chval="hard"
+          />
+        <mlabel
+          label="soft echo"
+          chval="soft"
+          />
+      </menu>
+    </group>
+
+    <!-- Cross-Polarization HX -->
+    <group loc="10 110" size="480 220"
+      style="Heading2"
+      label="Cross-Polarization (H → X)"
+      vq="cp"
+      show="$SHOW=(cp='y')"
+      border="Etched"
+      side="Top"
+      justify="Left"
+      tab="no"
+      enable="no"
+      useref="no"
+      subtype="Basic"
+      >
+      <label loc="10 20" size="120 20"
+        style="Heading3"
+        label="CP Shape"
+        justify="Left"
+        />
+      <menu loc="140 20" size="100 20"
+        style="PlainText"
+        vq="shHX"
+        vc="parunits('set','shHX','$VALUE')"
+        set="$VALUE=shHX"
+        editable="No"
+        tooltip="Ramped, linear, or tangent CP"
+        >
+        <mlabel label="ramp" chval="ramp" />
+        <mlabel label="linear" chval="linear" />
+        <mlabel label="tangent" chval="tangent" />
+      </menu>
+
+      <label loc="10 50" size="120 20"
+        style="Label1"
+        label="Contact Time (tHX)"
+        justify="Left"
+        />
+      <entry loc="140 50" size="80 20"
+        style="PlainText"
+        vq="tHX"
+        vc="tHX=$VALUE"
+        set="$VALUE=tHX"
+        digits="3"
+        tooltip="H to X cross-polarization contact time"
+        />
+      <label loc="230 50" size="30 20"
+        style="Label1"
+        label="ms"
+        />
+
+      <label loc="10 80" size="120 20"
+        style="Heading3"
+        label="H Channel"
+        justify="Left"
+        />
+      <label loc="10 105" size="120 20"
+        style="Label1"
+        label="Amplitude (aHhx)"
+        justify="Left"
+        />
+      <entry loc="140 105" size="80 20"
+        style="PlainText"
+        vq="aHhx"
+        vc="aHhx=$VALUE"
+        set="$VALUE=aHhx"
+        digits="0"
+        />
+      <label loc="230 105" size="60 20"
+        style="Label1"
+        label="(0-4095)"
+        />
+
+      <label loc="10 130" size="120 20"
+        style="Label1"
+        label="Ramp (bHX)"
+        justify="Left"
+        />
+      <entry loc="140 130" size="80 20"
+        style="PlainText"
+        vq="bHX"
+        vc="bHX=$VALUE"
+        set="$VALUE=bHX"
+        digits="3"
+        />
+
+      <label loc="270 80" size="120 20"
+        style="Heading3"
+        label="X Channel"
+        justify="Left"
+        />
+      <label loc="270 105" size="120 20"
+        style="Label1"
+        label="Amplitude (aXhx)"
+        justify="Left"
+        />
+      <entry loc="360 105" size="80 20"
+        style="PlainText"
+        vq="aXhx"
+        vc="aXhx=$VALUE"
+        set="$VALUE=aXhx"
+        digits="0"
+        />
+
+      <label loc="270 130" size="120 20"
+        style="Label1"
+        label="Ramp (dHX)"
+        justify="Left"
+        />
+      <entry loc="360 130" size="80 20"
+        style="PlainText"
+        vq="dHX"
+        vc="dHX=$VALUE"
+        set="$VALUE=dHX"
+        digits="3"
+        />
+
+      <label loc="270 155" size="120 20"
+        style="Label1"
+        label="Offset (ofHX)"
+        justify="Left"
+        />
+      <entry loc="360 155" size="80 20"
+        style="PlainText"
+        vq="ofHX"
+        vc="ofHX=$VALUE"
+        set="$VALUE=ofHX"
+        digits="1"
+        />
+      <label loc="445 155" size="30 20"
+        style="Label1"
+        label="Hz"
+        />
+
+      <label loc="10 160" size="250 20"
+        style="Label3"
+        label="Tip: Match Hartmann-Hahn condition"
+        justify="Left"
+        />
+      <label loc="10 180" size="250 20"
+        style="Label3"
+        label="aHhx × pwH90 ≈ aXhx × pwX90"
+        justify="Left"
+        />
+    </group>
+
+    <!-- Echo Parameters -->
+    <group loc="500 110" size="240 220"
+      style="Heading2"
+      label="Echo Refocusing"
+      vq="echo"
+      show="$SHOW=(echo!='n')"
+      border="Etched"
+      side="Top"
+      justify="Left"
+      tab="no"
+      enable="no"
+      useref="no"
+      subtype="Basic"
+      >
+      <label loc="10 20" size="100 20"
+        style="Label1"
+        label="Echo Time"
+        justify="Left"
+        />
+      <entry loc="120 20" size="80 20"
+        style="PlainText"
+        vq="tECHO"
+        vc="tECHO=$VALUE"
+        set="$VALUE=tECHO"
+        digits="3"
+        tooltip="Rotor-synchronized echo delay"
+        />
+      <label loc="205 20" size="30 20"
+        style="Label1"
+        label="ms"
+        />
+
+      <label loc="10 45" size="100 20"
+        style="Label1"
+        label="Max Echo Time"
+        justify="Left"
+        />
+      <entry loc="120 45" size="80 20"
+        style="PlainText"
+        vq="tECHOmax"
+        vc="tECHOmax=$VALUE"
+        set="$VALUE=tECHOmax"
+        digits="3"
+        />
+      <label loc="205 45" size="30 20"
+        style="Label1"
+        label="ms"
+        />
+
+      <!-- Hard Echo -->
+      <group loc="0 75" size="240 70"
+        vq="echo"
+        show="$SHOW=(echo='hard')"
+        >
+        <label loc="10 0" size="100 20"
+          style="Label1"
+          label="Echo Amplitude"
+          justify="Left"
+          />
+        <entry loc="120 0" size="80 20"
+          style="PlainText"
+          vq="aXecho"
+          vc="aXecho=$VALUE"
+          set="$VALUE=aXecho"
+          digits="0"
+          />
+
+        <label loc="10 25" size="100 20"
+          style="Label1"
+          label="Echo Pulse Width"
+          justify="Left"
+          />
+        <entry loc="120 25" size="80 20"
+          style="PlainText"
+          vq="pwXecho"
+          vc="pwXecho=$VALUE"
+          set="$VALUE=pwXecho"
+          digits="2"
+          />
+        <label loc="205 25" size="30 20"
+          style="Label1"
+          label="µs"
+          />
+      </group>
+
+      <!-- Soft Echo -->
+      <group loc="0 75" size="240 100"
+        vq="echo"
+        show="$SHOW=(echo='soft')"
+        >
+        <label loc="10 0" size="100 20"
+          style="Label1"
+          label="Shape Amplitude"
+          justify="Left"
+          />
+        <entry loc="120 0" size="80 20"
+          style="PlainText"
+          vq="aXshp1"
+          vc="aXshp1=$VALUE"
+          set="$VALUE=aXshp1"
+          digits="0"
+          />
+
+        <label loc="10 25" size="100 20"
+          style="Label1"
+          label="Shape Width"
+          justify="Left"
+          />
+        <entry loc="120 25" size="80 20"
+          style="PlainText"
+          vq="pwXshp1"
+          vc="pwXshp1=$VALUE"
+          set="$VALUE=pwXshp1"
+          digits="2"
+          />
+        <label loc="205 25" size="30 20"
+          style="Label1"
+          label="µs"
+          />
+
+        <label loc="10 50" size="100 20"
+          style="Label1"
+          label="Waveform"
+          justify="Left"
+          />
+        <entry loc="120 50" size="80 20"
+          style="PlainText"
+          vq="wvXshp1"
+          vc="wvXshp1='$VALUE'"
+          set="$VALUE=wvXshp1"
+          />
+      </group>
+    </group>
+
+  </group>
+</template>
