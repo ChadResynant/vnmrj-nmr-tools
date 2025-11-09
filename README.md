@@ -76,6 +76,7 @@ Platform-agnostic NMR parameter optimization using Bayesian methods.
 - Magic angle setting
 - Real-time monitoring with stripchart utility
 - Multi-pass optimization strategies
+- **NEW**: Automated workflow orchestration engine
 
 **Quick Start**:
 ```bash
@@ -87,7 +88,24 @@ Platform-agnostic NMR parameter optimization using Bayesian methods.
 # - Bruker: bruker/topspin/docs/
 ```
 
-**Documentation**: See `opto/docs/` for comprehensive guides
+**Workflow Automation** (NEW):
+```python
+from opto.workflow_engine import WorkflowOrchestrator, WorkflowConfig
+
+# Run complete automated calibration
+workflow = WorkflowOrchestrator()
+results = workflow.run_calibration(WorkflowConfig(
+    nuclei=["1H", "13C", "15N"],
+    spinning_rate=20000,  # Hz
+    temperature=298,      # K
+    probe_id="1.6mm_HXY"
+))
+```
+
+**Documentation**:
+- User guides: `opto/docs/`
+- Workflow engine: `opto/docs/opto_frontend_design.md`
+- Reference parameters: `opto/examples/parameters/schanda_cp_parameters.md`
 
 ### BPHON - Biomolecular Proton Detection
 
@@ -203,6 +221,9 @@ This is a commercial repository for Resynant. Development coordination with NMRF
 **Version 2.0 (In Progress)**:
 - [x] Restructure repository for platform-agnostic organization
 - [x] Add OPTO stripchart utility
+- [x] Implement workflow automation engine with intelligent calibration
+- [x] Add Schanda group reference CP parameters
+- [x] Complete OPTO front-end design specification
 - [ ] Complete OPTO documentation (troubleshooting, workarounds)
 - [ ] Add default job files for common experiments
 - [ ] Document beta tester issues and resolutions
@@ -210,9 +231,10 @@ This is a commercial repository for Resynant. Development coordination with NMRF
 
 **Version 2.1 (Planned)**:
 - [ ] Bruker pulse sequence collection
-- [ ] Enhanced CP optimization with HH intelligence
+- [ ] Database integration for historical calibration data
+- [ ] Web frontend for workflow orchestration
+- [ ] Enhanced CP optimization with multiple local optima detection
 - [ ] Automated data saving for ML applications
-- [ ] Web interface for OPTO monitoring
 
 ## Support
 
