@@ -181,6 +181,11 @@ void pulsesequence() {
 
     // Dutycycle Protection
     // 5% duty cycle limit for C-detected sequences (high-power decoupling on X channel)
+    // NOTE: Future enhancement should make duty cycle power-dependent:
+    //   - High-power decoupling (>50 kHz): 5% limit (current conservative assumption)
+    //   - Medium-power decoupling (20-50 kHz): could allow 7-10%
+    //   - Low-power decoupling (<20 kHz): could allow 10-15%
+    //   This requires integrating decoupling power and sequence type into duty cycle calculation
     duty = 4.0e-6 + getval("pwY90") + getval("pwH90") + getval("tHY") + d2 +
     getval("tYX") + d3 + 2.0*getval("pwX90") + getval("ad") +
     getval("rd") + at + getval("tRF");

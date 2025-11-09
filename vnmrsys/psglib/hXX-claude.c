@@ -192,8 +192,14 @@ void pulsesequence() {
         duty = duty/(duty + getval("d1") + 4.0e-6);
     }
     
-    if (duty > 0.1) {
-        abort_message("Duty cycle %.1f%% >10%%. Abort!\n", duty*100);
+    // 5% duty cycle limit for C-detected sequences (high-power decoupling on X channel)
+    // NOTE: Future enhancement should make duty cycle power-dependent:
+    //   - High-power decoupling (>50 kHz): 5% limit (current conservative assumption)
+    //   - Medium-power decoupling (20-50 kHz): could allow 7-10%
+    //   - Low-power decoupling (<20 kHz): could allow 10-15%
+    //   This requires integrating decoupling power (aH, aY) into duty cycle calculation
+    if (duty > 0.05) {
+        abort_message("Duty cycle %.1f%% >5%%. Abort!\n", duty*100);
     }
 
     // Create Phasetables
