@@ -343,8 +343,9 @@ void pulsesequence() {
     }
 
     duty = duty/(duty + d1 + 4.0e-6);
-    if (duty > 0.1) {
-        printf("Duty cycle %.1f%% >10%%. Abort!\n", duty*100);
+    // 5% duty cycle limit for C-detected sequences (high-power decoupling on X channel)
+    if (duty > 0.05) {
+        printf("Duty cycle %.1f%% >5%%. Abort!\n", duty*100);
 	abort_message("ABORT: duty cycle error");
     }
     

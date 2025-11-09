@@ -180,13 +180,14 @@ void pulsesequence() {
     }
 
     // Dutycycle Protection
+    // 5% duty cycle limit for C-detected sequences (high-power decoupling on X channel)
     duty = 4.0e-6 + getval("pwY90") + getval("pwH90") + getval("tHY") + d2 +
     getval("tYX") + d3 + 2.0*getval("pwX90") + getval("ad") +
     getval("rd") + at + getval("tRF");
 
     duty = duty/(duty + d1 + 4.0e-6);
-    if (duty > 0.15) {
-        printf("Duty cycle %.1f%% >10%%. Abort!\n", duty*100);
+    if (duty > 0.05) {
+        printf("Duty cycle %.1f%% >5%%. Abort!\n", duty*100);
         psg_abort(1);
     }
 

@@ -384,11 +384,12 @@ void pulsesequence() {
    printf("\ndutyon is %.1f ms ",dutyon*1000);
    duty = dutyon/(dutyon + d1 + 4.0e-6);
    printf("duty is %.1f%%  ",duty*100);
-   if (duty > 0.2) {
-      printf("Duty cycle %.1f%% >20%%. Abort!\n", duty*100);
+   // 5% duty cycle limit for C-detected sequences (high-power decoupling on X channel)
+   if (duty > 0.05) {
+      printf("Duty cycle %.1f%% >5%%. Abort!\n", duty*100);
       psg_abort(1);
   }
-  else {      printf("Duty cycle %.1f%% <20%%. All good!\n", duty*100);  }
+  else {      printf("Duty cycle %.1f%% <5%%. All good!\n", duty*100);  }
 
 
 // Create Phasetables 
