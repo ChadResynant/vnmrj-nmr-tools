@@ -1,0 +1,10 @@
+create(‘blankmode’,’string’,’global’)
+blankmode=’u’
+create(‘probeConnect’,’string’,’global’)
+probeConnect='H1 C13 F19 N15'
+create(‘uselockref’,’string’,’global’)
+uselockref=’n’
+create(‘hipwrampenable’,’string’,’global’)
+hipwrampenable='yyyy'
+spintype='mas'
+

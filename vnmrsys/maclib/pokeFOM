@@ -1,0 +1,122 @@
+#  SolidsPack Version 8/14/07
+#  SIMPLEXER: pokeFOM (version 4)
+
+proc popup msg {
+    tk_messageBox -type ok -message $msg
+} 
+
+#
+# type will either be the string "ytry`" or the value of ROW_IDX
+#
+
+set tcPath [lindex $argv 0]
+set type [lindex $argv 1]
+set value [lindex $argv 2]
+
+set fd [open $tcPath r]
+
+gets $fd line
+   set vb $line
+   gets $fd line
+   set method  $line 
+   gets $fd line
+   set STATUS  $line 
+   gets $fd line
+   set POSITION  $line 
+   gets $fd line
+   set nDim  $line 
+   gets $fd line
+   set nMaxIter  $line
+   gets $fd line
+   set fTol  $line 
+   gets $fd line
+   set nCurrentIter  $line 
+   gets $fd line
+   for { set i 1} {$i <= [expr $nDim +1] } {incr i 1} {
+       set y($i) [lindex $line [expr $i - 1]]
+   }
+   for { set i 1} {$i <= [expr $nDim +1] } {incr i 1} {
+        gets $fd line
+        for {set j 1} {$j <= $nDim} {incr j 1} {
+            set p($i$j) [lindex $line [expr $j -1]]
+        }
+   }
+   gets $fd line
+   for { set i 1} {$i <= $nDim } {incr i 1} {
+       set psum($i) [lindex $line [expr $i - 1] ]
+   }
+   gets $fd line
+   for { set i 1} {$i <= $nDim } {incr i 1} {
+       set ptry($i) [lindex $line [expr $i - 1 ]]
+   }
+   gets $fd line
+   set inhi $line
+   gets $fd line
+   set ihi $line
+   gets $fd line
+   set ilo $line
+   gets $fd line
+   set ytry $line
+   gets $fd line
+   set ysave $line 
+   
+   
+   close $fd
+   
+   
+   if { $type == "ytry" } {
+    set ytry $value
+   } else {
+    set y($type) $value
+   }
+   
+   
+   set fd [open $tcPath w]
+    if {  ($STATUS == "FAIL_NO_FILE") || ($STATUS == "MAX_ITER_REACHED") \
+       || ($STATUS == "UNKNOWN_ERROR") } {
+        puts $fd $vb;
+        puts $fd $method
+        puts $fd $STATUS
+        close $fd
+        exit
+    }
+    puts $fd $vb
+    puts $fd $method
+    puts $fd $STATUS
+    puts $fd $POSITION
+    puts $fd $nDim
+    puts $fd $nMaxIter
+    puts $fd $fTol
+    puts $fd $nCurrentIter
+    for {set i 1} {$i <= [expr $nDim + 1] } { incr i 1 } { 
+        puts -nonewline $fd $y($i)
+        puts -nonewline $fd " "
+    }
+    puts $fd " "
+    for {set i 1} { $i <= [expr $nDim +1] } {incr i 1} {
+        for {set j 1} {$j <= $nDim} {incr j 1} {
+            puts -nonewline $fd $p($i$j)
+            puts -nonewline $fd " "
+        }
+        puts $fd " "
+    }
+    for {set i 1} {$i <= $nDim} {incr i 1} {
+        puts -nonewline $fd $psum($i)
+        puts -nonewline $fd " "
+    }
+    puts $fd " "
+    for {set i 1} {$i <= $nDim} {incr i 1} {
+        puts -nonewline $fd $ptry($i)
+        puts -nonewline $fd " "
+    }
+    puts $fd  " "
+    puts $fd $inhi
+    puts $fd $ihi
+    puts $fd $ilo
+    
+    puts $fd $ytry
+    puts $fd $ysave
+    close $fd
+    
+    exit
+    

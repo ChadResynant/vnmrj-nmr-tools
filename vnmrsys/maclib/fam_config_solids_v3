@@ -1,0 +1,50 @@
+"macro fam_config_solids_v2"
+"  setup new user account with proper defaults"
+"  first configure for 'AllSolids'"
+"  this macro will destroy and re-create all relevant globals"
+""
+exists('blankmode','parameter','global'):$tmp
+if $tmp > 0.5 then
+  destroy('blankmode','global')
+endif
+create('blankmode','string','global')
+blankmode='u'
+
+"probeConnect needs to reflect what channels are configured, e.g. 'H1 C13 F19 P31 N15'"
+exists('probeConnect','parameter','global'):$tmp
+if $tmp > 0.5 then
+  destroy('probeConnect','global')
+endif
+create('probeConnect','string','global')
+probeConnect='H1 C13 F19 N15'
+
+exists('uselockref','parameter','global'):$tmp
+if $tmp > 0.5 then
+  destroy('uselockref','global')
+endif
+create('uselockref','string','global')
+uselockref='n'
+
+"hipwrampenable needs as many y's as there are channels configured"
+
+exists('hipwrampenable','parameter','global'):$tmp
+if $tmp > 0.5 then
+  destroy('hipwrampenable','global')
+endif
+create('hipwrampenable','string','global')
+hipwrampenable='yyyy'
+
+//ampmode needs as many d's as there are channels configured
+"set to logical defaults for MAS"
+spintype='mas'
+probetype='mas'
+
+exists('ampmode','parameter','global'):$tmp
+if $tmp > 0.5 then
+  destroy('ampmode','global')
+endif
+create('ampmode','string','global')
+ampmode='dddd'
+
+"load hX and configure with reasonable parameters for testing"
+hX

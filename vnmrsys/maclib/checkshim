@@ -1,0 +1,4 @@
+if (z1 = 0 and x1 = 0 and y1 = 0) then
+    banner('Warning: your shims may be off', 'red')
+    dgs
+endif

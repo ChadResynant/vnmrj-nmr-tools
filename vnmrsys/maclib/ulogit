@@ -1,0 +1,22 @@
+"ulogit v 0.00"
+if ($# > 0) then
+if ($1 > 0) then
+banner('log in /tmp/ulogit.csv')
+write('file','/tmp/ulogit.csv','date & time,system,z0,temp,vtstat,vtset,speed,spinstat,spinset')
+else
+banner('log canceled')
+atcmd('ulogit','cancel')
+return
+endif
+endif
+readhw('status'):$status
+readhw('temp'):$temp,$vtstat,$set
+readhw('spin'):$speed,$spstat,$spinset
+readhw('z0'):$z0
+$date=''
+shell('date +%x,%T'):$date
+write('fileline','/tmp/ulogit.csv','%20s, %3.0f, %5.0f, ',$date,$status,$z0)
+write('fileline','/tmp/ulogit.csv','%5.2f,%5.2f,%5.2f, ',$temp,$vtstat,$set)
+write('file','/tmp/ulogit.csv','%5.2f,%5.2f,%5.2f',$speed,$spstat,$spinset)
+atcmd('ulogit',60,'start')
+

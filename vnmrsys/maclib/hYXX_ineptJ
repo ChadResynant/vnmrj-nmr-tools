@@ -1,0 +1,540 @@
+seqfil = 'hYXX_ineptJ'
+
+//---------------
+// cpHY elements
+//---------------
+
+exists('shHY','parameter'):$e
+if $e < 0.5 then
+    create('shHY','flag')
+    setvalue('shHY','t') 
+endif
+
+exists('toHY','parameter'):$e
+if $e < 0.5 then
+   create('toHY','flag')
+endif 
+setvalue('toHY','dec2')
+
+exists('frHY','parameter'):$e
+if $e < 0.5 then
+   create('frHY','flag')
+endif
+setvalue('frHY','dec')  
+
+exists('chHY','parameter'):$e
+if $e < 0.5 then
+   create('chHY','flag')
+   setvalue('chHY','to') 
+endif 
+
+exists('aHhy','parameter'):$e
+if $e < 0.5 then
+   create('aHhy','real')
+   setlimit('aHhy',4095,0,1)
+endif 
+
+exists('aYhy','parameter'):$e
+if $e < 0.5 then
+   create('aYhy','real')
+   setlimit('aYhy',4095,0,1)
+endif   
+
+exists('bHY','parameter'):$e
+if $e < 0.5 then
+   create('bHY','real')
+   setlimit('bHY',1000000,0,1.0e-6)
+endif 
+
+exists('dHY','parameter'):$e
+if $e < 0.5 then
+   create('dHY','real')
+   setlimit('dHY',4095,-4095,1)
+endif 
+
+exists('tHY','parameter'):$e
+if $e < 0.5 then
+   create('tHY','pulse')
+   setlimit('tHY',50000,1.0,0.0125)
+endif
+
+exists('ofHY','parameter'):$e
+if $e < 0.5 then
+    create('ofHY','frequency')
+endif  
+
+exists('initN','parameter'):$e
+if $e < 0.5 then
+    create('initN','flag')
+    setvalue('initN','inept')
+endif
+
+
+//------------------------------
+// Spin echo Elements
+//-----------------------------
+
+exists('techo','parameter'):$e
+if $e < 0.5 then
+   create('techo','pulse')
+   setlimit('techo',50000,0,0.0125)
+   setvalue('techo',2000)
+endif
+
+exists('tau1','parameter'):$e
+if $e < 0.5 then
+   create('tau1','pulse')
+   setlimit('tau1',50000,0,0.0125)
+   setvalue('tau1',10000)
+endif
+
+exists('tau2','parameter'):$e
+if $e < 0.5 then
+   create('tau2','pulse')
+   setlimit('tau2',50000,0,0.0125)
+   setvalue('tau2',6000)
+endif
+
+exists('tau3','parameter'):$e
+if $e < 0.5 then
+   create('tau3','pulse')
+   setlimit('tau3',50000,0,0.0125)
+   setvalue('tau3',3000)
+endif
+
+exists('tau4','parameter'):$e
+if $e < 0.5 then
+   create('tau4','pulse')
+   setlimit('tau4',50000,0,0.0125)
+   setvalue('tau4',3000)
+endif
+
+exists('tdqf','parameter'):$e
+if $e < 0.5 then
+   create('tdqf','pulse')
+   setlimit('tdqf',50000,0,0.0125)
+endif
+
+exists('tzf','parameter'):$e
+if $e < 0.5 then
+   create('tzf','pulse')
+   setlimit('tzf',50000,0,0.0125)
+   setvalue('tzf',100)
+endif
+
+exists('jflag','parameter'):$e
+if $e < 0.5 then
+   create('jflag','real')
+   setvalue('jflag',1)
+endif 
+
+//================================================
+// PBOX X Inversion Pulse
+//================================================
+
+exists('chXshp1','parameter'):$e
+if $e < 0.5 then
+   create('chXshp1','flag')
+endif 
+setvalue('chXshp1','obs')
+
+exists('wvXshp1','parameter'):$e
+if $e < 0.5 then
+   create('wvXshp1','flag')
+endif 
+setvalue('wvXshp1','gaus180')
+
+exists('ofXshp1','parameter'):$e
+if $e < 0.5 then
+   create('ofXshp1','frequency')
+endif 
+
+exists('aXshp1','parameter'):$e
+if $e < 0.5 then
+   create('aXshp1','real')
+   setlimit('aXshp1',4095,0,1)
+endif 
+
+exists('dbXshp1','parameter'):$e
+if $e < 0.5 then
+   create('dbXshp1','real')
+   setlimit('dbXshp1',63,-16,1)
+endif 
+
+exists('stXshp1','parameter'):$e
+if $e < 0.5 then
+   create('stXshp1','real')
+endif 
+
+exists('pwXshp1','parameter'):$e
+if $e < 0.5 then
+   create('pwXshp1','pulse')
+   setlimit('pwXshp1',8192,0,0.0125)
+endif 
+
+exists('phXshp1','parameter'):$e
+if $e < 0.5 then
+    create('phXshp1','real')
+    setlimit('phXshp1',180,-180,0.0)
+endif
+
+//=====================
+// Hevol decoupling options
+//======================
+
+exists('Hevolseq','parameter'):$e
+if $e < 0.5 then
+    create('Hevolseq','flag')
+    setvalue('Hevolseq','spinal')
+endif
+
+//-----------
+// tppm
+//-----------
+
+exists('aHevoltppm','parameter'):$e
+if $e < 0.5 then
+    create('aHevoltppm','real')
+    setlimit('aHevoltppm',4095,0,1)
+endif
+
+exists('pwHevoltppm','parameter'):$e
+if $e < 0.5 then
+    create('pwHevoltppm','pulse')
+    setlimit('pwHevoltppm',8192,0,0.0125)
+endif
+
+exists('phHevoltppm','parameter'):$e
+if $e < 0.5 then
+    create('phHevoltppm','real')
+    setlimit('phHevoltppm',180,-180,0.0438)
+endif
+
+exists('chHevoltppm','parameter'):$e
+if $e < 0.5 then
+   create('chHevoltppm','flag')
+endif
+setvalue('chHevoltppm','dec')
+
+
+//------------------------------
+//  spinal
+//------------------------------
+
+exists('aHevolspinal','parameter'):$e
+if $e < 0.5 then
+    create('aHevolspinal','real')
+    setlimit('aHevolspinal',4095,0,1)
+endif
+
+exists('pwHevolspinal','parameter'):$e
+if $e < 0.5 then
+    create('pwHevolspinal','pulse')
+    setlimit('pwHevolspinal',8192,0,0.0125)
+endif
+
+exists('phHevolspinal','parameter'):$e
+if $e < 0.5 then
+    create('phHevolspinal','real')
+    setlimit('phHevolspinal',180,-180,0.0438)
+endif
+
+exists('chHevolspinal','parameter'):$e
+if $e < 0.5 then
+   create('chHevolspinal','flag')
+endif
+setvalue('chHevolspinal','dec')
+
+exists('alpHevolspinal','parameter'):$e
+if $e < 0.5 then
+    create('alpHevolspinal','real')
+    setlimit('alpHevolspinal',180,-180,0.0)
+endif
+
+//==============================
+// Hmix Decoupling 
+//==============================
+
+exists('Hmixseq','parameter'):$e
+if $e < 0.5 then
+    create('Hmixseq','flag')
+    setvalue('Hmixseq','spinal')
+endif
+
+//-----------
+// mix tppm
+//-----------
+
+exists('aHmixtppm','parameter'):$e
+if $e < 0.5 then
+    create('aHmixtppm','real')
+    setlimit('aHmixtppm',4095,0,1)
+endif
+
+exists('pwHmixtppm','parameter'):$e
+if $e < 0.5 then
+    create('pwHmixtppm','pulse')
+    setlimit('pwHmixtppm',8192,0,0.0125)
+endif
+
+exists('phHmixtppm','parameter'):$e
+if $e < 0.5 then
+    create('phHmixtppm','real')
+    setlimit('phHmixtppm',180,-180,0.0438)
+endif
+
+exists('chHmixtppm','parameter'):$e
+if $e < 0.5 then
+   create('chHmixtppm','flag')
+endif
+setvalue('chHmixtppm','dec')
+
+//------------------------------
+//  mix spinal
+//------------------------------
+
+exists('aHmixspinal','parameter'):$e
+if $e < 0.5 then
+    create('aHmixspinal','real')
+    setlimit('aHmixspinal',4095,0,1)
+endif
+
+exists('pwHmixspinal','parameter'):$e
+if $e < 0.5 then
+    create('pwHmixspinal','pulse')
+    setlimit('pwHmixspinal',8192,0,0.0125)
+endif
+
+exists('phHmixspinal','parameter'):$e
+if $e < 0.5 then
+    create('phHmixspinal','real')
+    setlimit('phHmixspinal',180,-180,0.0438)
+endif
+
+exists('chHmixspinal','parameter'):$e
+if $e < 0.5 then
+   create('chHmixspinal','flag')
+endif
+setvalue('chHmixspinal','dec')
+
+exists('alpHmixspinal','parameter'):$e
+if $e < 0.5 then
+    create('alpHmixspinal','real')
+    setlimit('alpHmixspinal',180,-180,0.0)
+endif
+
+exists('maxt1','parameter'):$e
+if $e < 0.5 then
+   create('maxt1','pulse')
+   setlimit('maxt1',25000,0,0.0125)
+endif
+
+
+
+//------------------------------
+// Receiver Delays
+//------------------------------
+
+exists('rd','parameter'):$e
+if $e < 0.5 then
+   create('rd','pulse')
+   setlimit('rd',8192,0,0.0125)  
+endif 
+
+exists('ad','parameter'):$e
+if $e < 0.5 then
+   create('ad','pulse')
+   setlimit('ad',8192,0,0.0125)  
+endif
+
+exists('ddrtc','parameter'):$e
+if $e < 0.5 then
+   create('ddrtc','pulse')
+   setlimit('ddrtc',8192,0,0.0125)  
+endif
+
+//------------------------------
+// Spin Rate
+//------------------------------
+
+exists('srate','parameter'):$e
+if $e < 0.5 then
+   create('srate','frequency')
+endif 
+
+exists('hsrotor','parameter'):$e
+if $e < 0.5 then
+   create('hsrotor','flag') 
+endif
+
+//------------------------------
+// Basic Transmitter Properties
+//------------------------------
+
+exists('aX90','parameter'):$e
+if $e < 0.5 then
+   create('aX90','real')
+   setlimit('aX90',4095,0,1)  
+endif 
+
+exists('aH90','parameter'):$e
+if $e < 0.5 then
+   create('aH90','real')
+   setlimit('aH90',4095,0,1)  
+endif 
+
+exists('aY90','parameter'):$e
+if $e < 0.5 then
+   create('aY90','real')
+   setlimit('aY90',4095,0,1)  
+endif
+
+exists('aZ90','parameter'):$e
+if $e < 0.5 then
+   create('aZ90','real')
+   setlimit('aZ90',4095,0,1)  
+endif
+
+exists('pwX90','parameter'):$e
+if $e < 0.5 then
+   create('pwX90','pulse')
+   setlimit('pwX90',8192,0,0.0125)
+endif 
+
+exists('pwH90','parameter'):$e
+if $e < 0.5 then
+   create('pwH90','pulse')
+   setlimit('pwH90',8192,0,0.0125)
+endif 
+
+exists('pwY90','parameter'):$e
+if $e < 0.5 then
+   create('pwY90','pulse')
+   setlimit('pwY90',8192,0,0.0125)
+endif
+
+exists('pwZ90','parameter'):$e
+if $e < 0.5 then
+   create('pwZ90','pulse')
+   setlimit('pwZ90',8192,0,0.0125)
+endif
+
+//=====================
+// decoupling options
+//======================
+
+exists('Hseq','parameter'):$e
+if $e < 0.5 then
+    create('Hseq','flag')
+    setvalue('Hseq','spinal')
+endif
+
+//-----------
+// tppm
+//-----------
+
+exists('aHtppm','parameter'):$e
+if $e < 0.5 then
+    create('aHtppm','real')
+    setlimit('aHtppm',4095,0,1)
+endif
+
+exists('pwHtppm','parameter'):$e
+if $e < 0.5 then
+    create('pwHtppm','pulse')
+    setlimit('pwHtppm',8192,0,0.0125)
+endif
+
+exists('phHtppm','parameter'):$e
+if $e < 0.5 then
+    create('phHtppm','real')
+    setlimit('phHtppm',180,-180,0.0438)
+endif
+
+exists('chHtppm','parameter'):$e
+if $e < 0.5 then
+   create('chHtppm','flag')
+endif 
+setvalue('chHtppm','dec')
+
+//------------------------------
+//  spinal 
+//------------------------------
+
+exists('aHspinal','parameter'):$e
+if $e < 0.5 then
+    create('aHspinal','real')
+    setlimit('aHspinal',4095,0,1)
+endif
+
+exists('pwHspinal','parameter'):$e
+if $e < 0.5 then
+    create('pwHspinal','pulse')
+    setlimit('pwHspinal',8192,0,0.0125)
+endif
+
+exists('phHspinal','parameter'):$e
+if $e < 0.5 then
+    create('phHspinal','real')
+    setlimit('phHspinal',180,-180,0.0438)
+endif
+
+exists('chHspinal','parameter'):$e
+if $e < 0.5 then
+   create('chHspinal','flag')
+endif 
+setvalue('chHspinal','dec')
+
+exists('alpHspinal','parameter'):$e
+if $e < 0.5 then
+    create('alpHspinal','real')
+    setlimit('alpHspinal',180,-180,0.0)
+endif
+
+//------------------------------------------------
+//  Set Bit 14 for new parameters of the .par file 
+//------------------------------------------------
+
+//onepul uses the file created by settancpx and has no new parameters
+
+//------------------------------------------------
+//  Set the parameter templates
+//------------------------------------------------
+
+setprotect('dg','clear',4)
+$dg = '1:ACQUISITION:sw:1,at:6,np:0,d1:6,nt:0,ct:0,bs:0,'
+$dg = $dg + 'ss:0,rd:1,ad:1,ddrtc:1,rof3(rof3):1,gain:0,temp:0,srate:1;'
+$dg = $dg + '2(Hseq=\'tppm\'):TPPM:aHtppm:0,pwHtppm:1,phHtppm:2;'
+$dg = $dg + '2(Hseq=\'spinal\'):SPINAL:aHspinal:0,pwHspinal:1,phHspinal:2;'
+dg = $dg
+setprotect('dg','on',4)
+
+setprotect('dg2','clear',4)
+$dg2 = '1:OBSERVE:rfchval1,tn,sfrq:6,tof:1,tpwr:0,amplimval1:0,kWampval1:0,ampmodval1:0,aX90:0,pwX90:1;'
+$dg2=$dg2+'2:DECOUPLE:rfchval2,dn,dfrq:6,dof:1,dpwr:0,amplimval2:0,kWampval2:0,ampmodval2:0,aH90:0,pwH90:1;'
+$dg2=$dg2+'3:DECOUPLE2:rfchval3,dn2,dfrq2:6,dof2:1,dpwr2:0,amplimval3:0,kWampval3:0,ampmodval3:0,aY90:0,pwY90:1;'
+$dg2=$dg2+'4:DECOUPLE3:rfchval4,dn3,dfrq3:6,dof3:1,dpwr3:0,amplimval4:0,kWampval4:0,ampmodval4:0,aZ90:0,pwZ90:1;'
+dg2 = $dg2
+setprotect('dg2','on',4)
+
+setprotect('ap','clear',4)
+$ap = '1:SAMPLE:date,temp:1,srate:1,file;'
+$ap = $ap + '1:ACQUISITION:tn,sfrq:6,tof:1,tpwr:0,sw:1,at:6,np:0,d1:6,nt:0,ct:0,ss:0,rd:1,ad:1,aX90:0,pwX90:1;'
+$ap = $ap + '1(ni):2D ACQUISITION:d2:6,sw1:1,ni:0,phase:0;'
+$ap = $ap + '1:DECOUPLE:dn,dfrq:6,dof:1,dpwr:0,aH90:0,pwH90:1;'
+$ap = $ap + '1(dfrq2>0):DECOUPLE2:dn2,dfrq2:6,dof2:1,dpwr2:0,aY90:0,pwY90:1;'
+$ap = $ap + '1(dfrq3>0):DECOUPLE3:dn3,dfrq3:6,dof3:1,dpwr3:0,aZ90:0,pwZ90:1;'
+$ap = $ap + '1(Hseq=\'tppm\'):TPPM:aHtppm:0,pwHtppm:1,phHtppm:2;'
+$ap = $ap + '1(Hseq=\'spinal\'):SPINAL:aHspinal:0,pwHspinal:1,phHspinal:2;'
+$ap = $ap + '1:PROCESSING:fn:0,phfid:2,rp:2,lp:2,lsfrq(lsfrq):1,lb(lb):1,sb(sb):3,sbs(sb):3,'
+$ap = $ap + 'gf(gf):3,gfs(gf):3,lsfid(lsfid):0,wtfile(wtfile);'
+$ap = $ap + '1(ni):2D PROCESSING:fn1:0,phfid1:2,rp1:2,lp1:2,lsfrq1(lsfrq1):1,lb1(lb1):1,sb1(sb1):3,sbs1(sb1):3,'
+$ap = $ap + 'gf1(gf1):3,gfs1(gf1):3,lsfid1(lsfid1):0,wtfile1(wtfile1);'
+ap = $ap
+setvalue('ap',$ap,'processed')
+setprotect('ap','on',4)
+
+
+
+
+

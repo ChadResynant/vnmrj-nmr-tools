@@ -1,0 +1,385 @@
+//========================================
+//  SolidsPack Version 8/13/07
+//========================================
+//  SIMPLEXER: shimDriver
+
+//  shimDriver 
+//  Driver for shimming with Simplexer 
+
+//=======================================
+//     Create paths to files we will need 
+//=======================================
+
+    $macroPath = userdir + '/maclib/'
+    $asSetup = $macroPath + 'asSetUp'
+    $pokeFOM = $macroPath + 'pokeFOM'
+    $killFile = $macroPath + 'killFile'
+    $setMacroState = $macroPath + 'setMacroState'
+    $genTempCommun = $macroPath + 'genTempCommun'
+    $Simplexer = $macroPath + 'Simplexer'
+    $vnmrWish = '/vnmr/tcl/bin/vnmrWish'
+    
+    $thisExp = curexp
+    $communFile = $thisExp +'/tempCommun'
+    $minMaxFile = $thisExp + '/tempMinMax'
+    $curparFile = $thisExp + '/curpar'
+    $shimFile = $thisExp + '/tempShims'
+    $tempMethods = $thisExp + '/tempMethods'
+    $thisPseq = seqfil
+    $conparFile = '/vnmr/conpar'
+    $pseqFile = userdir + '/vnmrsys/seqlib' + $thisPseq
+    $macroStateFile = $thisExp + '/macroState'
+   
+// echo back commands for debugging CMR 6/8/22 //
+     write('line3','This experiment directory is:')
+     write('line3',$thisExp)
+     
+     
+//======================================
+// Construct the commands we will use   
+//======================================     
+    
+    $cmdasSetup = $vnmrWish + ' ' + $asSetup + ' ' + $thisExp 
+    $cmdGenTempCommun = $vnmrWish + ' ' + $genTempCommun + ' ' + $thisExp
+    $cmdSimplexer = $vnmrWish + ' ' + $Simplexer + ' ' + $communFile
+    $cmdPokeFOM = $vnmrWish + ' ' + $pokeFOM + ' ' + $communFile
+    $cmdSetMacroState = $vnmrWish + ' ' + $setMacroState + ' ' + $macroStateFile
+    $cmdKillFile = $vnmrWish + ' ' + $killFile
+
+// 
+// Synchronize curpar with expt display
+//    
+  
+    pad = 2
+    flush   
+  
+//=========================================
+//  Determine Macro State at Call Time
+//=========================================
+
+    if $# = 0
+    then                          
+        if shimset = 16        //check for RRI shim controller
+        then
+            exists('ldshimdelay','parameter'):$e
+            if ($e<0.5) 
+            then
+                create('ldshimdelay','delay')
+            endif
+            ldshimdelay = 15
+        endif
+        
+        $MACRO_STATE = 'START'
+        $ROW_IDX = 1
+        shell($cmdKillFile, $shimFile)
+        svs($shimFile)
+        shimnames:$sNames,$nShims
+        shell($cmdasSetup,$sNames)
+        lookup('file',$tempMethods)
+        lookup('readline'):$errorStatus
+
+        if $errorStatus = -999
+        then
+            wexp = ''
+            write('line3','%s','Abort Message Received from Setup')
+            return
+        endif
+
+        shell($cmdGenTempCommun)
+    else
+        $MACRO_STATE = $1
+        write('line3','%s',$MACRO_STATE)
+
+        if $MACRO_STATE = 'CONTINUE'
+        then
+            lookup('file',$macroStateFile)
+            lookup('readline'):$nDim
+            lookup('readline'):$MACRO_STATE
+            lookup('readline'):$ROW_IDX
+        else 
+            if $MACRO_STATE = 'NEXT_METHOD'
+            then
+                write('line3','%s','moving to next method')
+                shell($cmdKillFile, $shimFile)
+                svs($shimFile)
+                write('line3','%s','saved shim file')
+                shell($cmdGenTempCommun)
+                $MACRO_STATE = 'START'
+                $ROW_IDX = 1
+            else
+                write('line3','%s','Invalid macro state. Aborting')
+                wexp = ' '
+                wbs = ''
+                wnt = ''
+                werr = ''
+                return
+            endif
+        endif
+    endif
+  
+//=================================================      
+// If in write mode then compute fom and write 
+// it to tempCommun. Then call Simplex to generate 
+// the next guess 
+//==================================================
+ 
+    if ($MACRO_STATE = 'WRITE_SCAN')
+    then
+        // fid_display
+        dfid
+        fidarea:$fom
+        $fom = 100000.0/$fom
+        write('line3','%s %2.5f','fom = ',$fom)
+        shell($cmdPokeFOM,'ytry',$fom)
+        shell($cmdSimplexer)
+    endif 
+            
+    if ($MACRO_STATE = 'WRITE_ROW')
+    then
+        // fid_display
+        dfid
+        fidarea:$fom
+        $fom = 100000.0/$fom
+        write('line3','%s %2.5f','fom = ',$fom)
+        shell($cmdPokeFOM,$ROW_IDX,$fom)
+        if $ROW_IDX < ($nDim + 1)
+        then
+            $ROW_IDX = $ROW_IDX + 1
+        else
+            $ROW_IDX = 1
+            shell($cmdSimplexer)
+        endif
+    endif
+             
+//===================================================
+// Load the next guess and execute the experiment
+//===================================================
+
+  //6
+  //write('line3','%s %d','OK here ',$iDebug)
+  //$iDebug = $iDebug + 1
+
+//===================================================
+//  Read tempMinMax data.
+//===================================================
+
+    lookup('file',$minMaxFile)
+    nrecords($minMaxFile):$nLines
+    lookup('readline'):$fileType
+  
+    if  $fileType <> 'simplex_vars'
+    then 
+        write('line3','%s','Error on shim file read! Wrong file type in tempCommun')
+        return
+    endif
+    
+    $i = 1
+    while $i < $nLines
+    do
+        lookup('read',4):$a,$b,$c,$d
+        $var[$i] = $a 
+        $junk = $b 
+        $sMin[$i] = $c 
+        $sMax[$i] = $d      
+        $i = $i + 1
+    endwhile
+ 
+//==========================================
+// Read tempCommun to get current parameter set
+// and the state of the simplex optimization 
+//==========================================
+   
+    lookup('file',$communFile)
+    lookup('readline'):$vb
+    lookup('readline'):$method
+    lookup('readline'):$STATUS
+
+    if ($STATUS = 'FAIL_NO_FILE')
+    then 
+        write('error','Simplex Error: No Comunication File Found')
+        return 
+    endif
+        
+        
+    if $STATUS = 'MAX_ITER_REACHED'
+    then    
+        write('error','Simplex Error: Maximum iterations reached')
+        wexp = ''
+        wbs = ''
+        wnt = ''
+        werr = '' 
+        return 
+    endif
+        
+     
+    if $STATUS = 'UNKNOWN_ERROR'
+    then 
+        write('error','Simplex Error: Unknown Error')
+        write('error','Simplex Error: Maximum iterations reached')
+        wexp = ''
+        wbs = ''
+        wnt = ''
+        werr = '' 
+        return
+    endif
+             
+    lookup('readline'):$POSITION
+    lookup('readline'):$nDim
+    $m = $nDim + 1
+    lookup('readline'):$nMaxIter
+    lookup('readline'):$fTol
+    lookup('readline'):$nCurrentIter
+
+    $i = 1
+    while $i <= $m
+    do
+        lookup('read'):$tmp
+        $y[$i] = $tmp
+        $i = $i + 1
+    endwhile
+         
+    $iCount = 1
+    $i = 1 
+    while $i <= $m
+    do
+        $j = 1
+        while $j <= $nDim
+        do
+            lookup('read'):$tmp
+            $p[$iCount] = $tmp
+            $j = $j + 1
+            $iCount = $iCount + 1
+        endwhile
+
+        $i = $i + 1
+    endwhile
+               
+    $i = 1
+    while $i <= $nDim
+    do
+        lookup('read'):$tmp
+        $psum[$i] = $tmp
+        $i = $i + 1
+    endwhile
+
+    $i = 1
+    while $i <= $nDim
+    do
+        lookup('read'):$tmp
+        $ptry[$i] = $tmp
+        $i = $i + 1
+    endwhile
+        
+//dispense with eol from previous read
+        
+    lookup('readline')
+    lookup('readline'):$inhi
+    lookup('readline'):$ihi
+    lookup('readline'):$ilo
+    lookup('readline'):$ytry
+    lookup('readline'):$ysave
+             
+    if ($STATUS = 'CONVERGED')
+    then
+        write('line3','%s','Current Method Converged')
+        $i = 1
+        while $i <= $nDim
+        do
+            $temp = $p[$i]
+            $name = $var[$i]
+            sin($temp):$st
+            abs($st):$ast
+            $parVal = $sMin[$i] + $ast*( $sMax[$i] - $sMin[$i] )
+            $parVal = trunc($parVal + 0.5)
+            write('line3','%s %s %s %d','Setting ',$name,' to ',$parVal) 
+            sethw($name,$parVal,'nowait')
+            setvalue($name,$parVal)
+          //readhw($name)
+            $i = $i + 1
+        endwhile
+
+        wexp = 'shimDriver(`NEXT_METHOD`)'
+        write('line3','%s','LEAVING')
+//waste a scan
+        au('wait')
+        return
+    endif
+  
+    if ($STATUS = 'DONE')
+    then 
+        write('line3','%s','**** AUTOSHIM COMPLETE ***')
+        wexp = ''
+        shell($cmdKillFile, $communFile)
+        shell($cmdKillFile, $minMaxFile)
+        shell($cmdKillFile, $macroStateFile)
+        return
+    endif
+   
+//===============================================
+// If STATUS == 'INIT'  or 'RECOMPUTE_ALL'
+// we must perform nDim
+// experiments and write the results
+// Difference between the 2 status values is
+// relevant in the Simplexer script, not here
+//===============================================
+
+    if ($STATUS = 'INIT') or ($STATUS = 'RECOMPUTE_ALL')
+    then
+        $i = 1
+        $j = 1 + ($ROW_IDX - 1)*$nDim 
+        while $i <= $nDim
+        do
+            $temp = $p[$j]
+            $name = $var[$i]
+            sin($temp):$st
+            abs($st):$ast
+            $parVal =  $sMin[$i] + $ast*( $sMax[$i] - $sMin[$i] ) 
+            $parVal = trunc($parVal + 0.5)
+            write('line3','%s %s %s %d','Setting ',$name,' to ',$parVal) 
+            sethw($name,$parVal,'nowait')
+            $j = $j + 1
+            $i = $i + 1
+        endwhile
+
+        shell($cmdSetMacroState,$nDim,'WRITE_ROW',$ROW_IDX)
+        wexp = 'shimDriver(`CONTINUE`)'
+        wbs = ''
+        wnt = ''
+        werr = '' 
+        au('wait')
+        return  
+    endif
+  
+//==============================================
+// In the case of a simple loop the next guess
+// is contained in vector ptry
+//==============================================
+   
+    if ($STATUS = 'SINGLE_PASS')
+    then
+        $i = 1
+        while $i <= $nDim
+        do
+            $temp = $ptry[$i]
+            $name = $var[$i]
+            sin($temp):$st
+            abs($st):$ast
+            $parVal = $sMin[$i] + $ast*( $sMax[$i] - $sMin[$i] )
+            $parVal = trunc($parVal + 0.5)
+            write('line3','%s %s %s %d','Setting ',$name,' to ',$parVal) 
+            sethw($name,$parVal,'nowait')
+            $i = $i + 1
+        endwhile
+
+        shell($cmdSetMacroState,$nDim,'WRITE_SCAN',1)
+        wexp = 'shimDriver(`CONTINUE`)'
+        wbs = ''
+        wnt = ''
+        werr = '' 
+        au('wait')
+        return
+    endif
+   
+    write('error','Error in shimDriver. Unknown Simplexer STATUS')
+    wexp = ''
+    return

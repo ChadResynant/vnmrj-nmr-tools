@@ -1,0 +1,83 @@
+"***************************************************************"
+"setH2ref - calculate local lock frequency from the observed signal  "
+"reference.  This change is local to a single user and is overridden "
+"upon logout. The local lock frequency allows correct use of setfrq  "
+"with an unlocked spectrometer.  Optional arguments of setH2ref are  "                                    "$1 = reffrq and $2 = 'noset' or 'set'. setH2ref returns the lockfreq"
+"and the input reffrq. It sets the lockfreq if $2<>'noset'.  A setfrq"
+"is done, rfl and rfp are reset and cr is set at rfp.                "
+
+setprotect('z0','on',8,'global')
+
+solvent = 'd2o'
+format(solvent,'lower'):$solv
+if ($#>0) then 
+   $reffrq=$1
+else
+   $reffrq=reffrq
+endif
+
+"set gamma ratio for referenced nuclei"
+
+exists(userdir+'/nuctabref','file'):$e
+if $e then
+  $nucfil = userdir+'/nuctabref'
+else
+  $nucfil = systemdir+'/nuctabref'
+endif
+exists($nucfil,'file'):$e
+$locknuc='H2'
+$tnfreq=0 $lockref=0 $found=0
+$lit=''
+$refcmpd=''
+if $e then
+  lookup('file',$nucfil)
+  lookup('COMMENTEND',tn,'read'):$tnfreq,$found
+  if $found then
+    lookup('REF:','readline'):$refcmpd
+    lookup('LIT:','readline'):$lit
+  endif
+  lookup('file',$nucfil)
+  lookup('COMMENTEND',$locknuc,'read'):$lockref
+else
+  write('error','%s: could not open %s',$0,$nucfil)
+endif
+
+"calculate the lock reference - return for no nucleus or no solvent"
+
+if (($found=0)or($tnfreq=0)or($solv='none')or($solv='')) then
+  write('error','Error: Set the Nucleus and a Solvent other than "none"')
+  return(0.0,$reffrq)
+else
+  $lkreffrq = ($lockref/$tnfreq)*$reffrq
+endif
+  
+
+"set the lock frequency"
+
+ setvalue('lockfreq',$lkreffrq,'systemglobal')
+
+ if (probe = '') then 
+   probe = 'soliddefault'
+     write('line3', 'Set probe=\'soliddefault\' since it was null')
+ endif
+ $probefile = userdir+'/probes/'+probe
+ exists($probefile,'directory'):$e
+   if (not $e) then shell('mkdir '+$probefile) endif
+ $probefile = $probefile+'/lock'
+ exists($probefile,'file'):$e
+   if ($e) then 
+      lookup('file',$probefile) $date=''
+      lookup('skip',1,'read',1):$date  substr($date,1,8):$date
+      shell('mv '+$probefile+' '+$probefile+$date)
+   endif
+
+ write('reset',$probefile)                                 
+ write('file',$probefile,'time_complete %s                 
+z0_           %d                                           
+lockfreq_     %.9f',time_complete,z0_,lockfreq)            
+  "z0_ keeps the z0 value on completing the experiment"
+ 
+   write('line3','lockfreq: %.7f MHz',lockfreq)            
+
+
+

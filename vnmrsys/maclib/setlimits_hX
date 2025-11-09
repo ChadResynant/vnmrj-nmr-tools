@@ -1,0 +1,13 @@
+setlimit('pwH90',3,1.5,0.1)
+setlimit('pwX90',4,2,0.1)
+setlimit('pwY90',6,3,0.1)
+setlimit('aHhx',3200,1800,1)
+setlimit('aXhx',3500,1500,1)
+setlimit('dHX',500,-500,1)
+setlimit('bHX',500,1,1)
+setlimit('tHX',2000,200,1)
+setlimit('aHspinal',3000,2000,1)
+setlimit('pwHspinal',10,5,0.1)
+setlimit('phHspinal',20,0,1)
+setlimit('alpHspinal',20,0,1)
+

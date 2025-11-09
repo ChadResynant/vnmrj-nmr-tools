@@ -1,0 +1,257 @@
+# hXX Complete Refactor - Testing Checklist
+
+## Files Needed for Testing
+
+### Required Header Files:
+1. **biosolidevolution.h** - Evolution period system
+2. **biosolidcp.h** - Cross-polarization setup  
+3. **biosolidvalidation.h** - Parameter validation
+4. **biosolidmixing_simple.h** - Mixing sequences (if not already present)
+
+### Sequence File:
+- **hXX_complete_refactor.c** - The fully refactored sequence
+
+## Phase 1: Compilation Testing
+
+### Step 1: Backup and Setup
+```bash
+# Backup original
+cp hXX.c hXX_original.c
+
+# Install header files (choose appropriate location)
+cp *.h /your/sequence/directory/
+# OR place in common biosolid header location
+```
+
+### Step 2: Compilation Test
+```bash
+# Test compilation
+seqgen hXX_complete_refactor
+
+# Expected output:
+# - No compilation errors
+# - Sequence file created successfully
+# - Phase table setup messages
+```
+
+### Step 3: Basic Parameter Check
+```bash
+# Load sequence in vnmr/OpenVnmrJ
+# Check that all parameters are recognized
+# Verify no missing parameter errors
+```
+
+## Phase 2: Validation System Testing
+
+### Test 1: Duty Cycle Protection
+```
+# Set parameters that should trigger duty cycle error:
+d1 = 0.01          # Very short relaxation delay
+tXmix = 0.1        # Long mixing time
+cp = 'y'           # Enable CP
+mMix = 'rad'       # Enable mixing
+
+# Expected: "ABORT: Duty cycle XX% exceeds limit 10%"
+```
+
+### Test 2: Evolution Time Limits  
+```
+# Set very long evolution:
+ni = 1000
+sw1 = 1000         # Creates 1 second evolution time
+
+# Expected: "ABORT: Evolution time exceeds 10 ms limit"
+```
+
+### Test 3: Spinning Rate Validation
+```
+srate = 100        # Below minimum 500 Hz
+
+# Expected: "ABORT: Spinning rate 100 Hz < minimum 500 Hz"
+```
+
+### Test 4: Invalid Parameter Combinations
+```
+cp = 'maybe'       # Invalid cp value
+# Expected: "ABORT: cp parameter must be 'y' or 'n'"
+
+echo = 'n'
+mMix = 'n'         # No echo AND no mixing
+# Expected: "ABORT: Must enable either soft echo OR mixing"
+```
+
+## Phase 3: Functional Testing
+
+### Test 5: Basic 2D Correlation
+```
+# Safe parameters that should work:
+cp = 'n'           # Direct excitation
+echo = 'n'         # No echo  
+mMix = 'n'         # No mixing
+ni = 16            # Small 2D
+sw1 = 50000        # Reasonable SW
+d1 = 2.0           # Safe relaxation
+at = 0.010         # 10 ms acquisition
+```
+
+### Test 6: Cross-Polarization Mode
+```
+# Test CP functionality:
+cp = 'y'
+cpboth = 'n'
+tHX = 0.001        # 1 ms contact time
+aHhx = 50000       # H CP power
+aXhx = 50000       # X CP power
+```
+
+### Test 7: Evolution Period Testing
+```
+# Test different evolution times:
+ni = 32, sw1 = 50000    # Short evolution (0.6 ms)
+ni = 128, sw1 = 50000   # Medium evolution (2.5 ms) 
+ni = 256, sw1 = 50000   # Longer evolution (5.1 ms)
+
+# Compare spectra - should be identical to original sequence
+```
+
+## Phase 4: Advanced Feature Testing
+
+### Test 8: Mixing Sequences
+```
+# Test DARR mixing:
+mMix = 'rad'
+tXmix = 0.010      # 10 ms
+aHmix = 10000      # H mixing power
+
+# Test SPC5 mixing:
+mMix = 'spc5'
+aXspc5 = 50000     # X SPC5 power
+aHmixspc5 = 10000  # H decoupling during SPC5
+```
+
+### Test 9: Soft Pulse Echo
+```
+echo = 'soft'
+tECHO = 0.001      # 1 ms echo
+shp1X = 'name_of_shape'  # Soft pulse shape
+aXshp1 = 50000     # Soft pulse power
+```
+
+### Test 10: Combined Features
+```
+# All features enabled:
+cp = 'y'
+echo = 'soft'
+mMix = 'spc5'
+# Verify all work together correctly
+```
+
+## Phase 5: Validation Testing
+
+### Test 11: Spectrum Comparison
+```bash
+# Run identical experiments with:
+# 1. Original hXX.c
+# 2. hXX_complete_refactor.c
+
+# Compare:
+# - Signal intensity (should be identical)
+# - Peak positions (should be identical)  
+# - Phase (should be identical)
+# - Artifacts (should be identical)
+# - Noise level (should be identical)
+```
+
+### Test 12: Timing Verification
+```bash
+# Use oscilloscope to verify:
+# - RF pulse timing matches original
+# - Evolution periods are correct length
+# - CP contact times are accurate
+# - Mixing times are correct
+```
+
+### Test 13: Phase Cycling Verification
+```
+# Set ni = 16 (for 16 different d2 values)
+# Verify receiver phase cycles correctly
+# Check that States/TPPI works properly
+# Confirm hypercomplex mode if used
+```
+
+## Expected Results
+
+### ✅ Should Be Identical to Original:
+- [ ] **Spectrum quality** - Same S/N, resolution, artifacts
+- [ ] **Peak intensities** - Quantitatively identical 
+- [ ] **Phase behavior** - Same phasing characteristics
+- [ ] **Parameter compatibility** - All old parameters work
+
+### ✅ Should Be Improved:
+- [ ] **Error messages** - Much clearer and more helpful
+- [ ] **Parameter validation** - Catches problems early
+- [ ] **Code readability** - Much easier to understand
+- [ ] **Debugging** - Clear phase table organization
+
+### ✅ New Features:
+- [ ] **Comprehensive validation** - Prevents hardware damage
+- [ ] **Better duty cycle calculation** - More accurate protection
+- [ ] **Automatic rotor sync** - Consistent mixing timing
+- [ ] **Organized phases** - Easy to trace and modify
+
+## Troubleshooting Guide
+
+### Compilation Issues:
+```
+Error: biosolidevolution.h not found
+→ Check header file locations
+→ Verify #include paths
+
+Error: function 'execute_x_evolution_yz_decouple' undefined  
+→ Ensure biosolidevolution.h is properly included
+→ Check function name spelling
+```
+
+### Runtime Issues:
+```
+Error: More restrictive validation than original
+→ May indicate real problems original sequence ignored
+→ Check: d1 too short, evolution too long, duty cycle too high
+→ These are likely REAL issues that should be fixed
+
+Different spectrum than original
+→ Double-check phase table values match original
+→ Verify parameter names are identical
+→ Check that all sequence options work the same way
+```
+
+### Performance Issues:
+```
+Slower execution
+→ Should be same speed or faster
+→ Check for infinite loops in validation
+→ Verify mixing sequences compile correctly
+```
+
+## Success Criteria
+
+### Minimum Requirements:
+1. **Compiles without errors**
+2. **Basic 2D experiment works** 
+3. **Spectra match original sequence**
+4. **Parameter validation works**
+
+### Full Success:
+1. **All sequence modes work correctly**
+2. **Better error messages help users**
+3. **Code is much more maintainable**
+4. **Ready to apply to other sequences**
+
+## Next Steps After Successful Testing
+
+1. **Document any issues found and resolved**
+2. **Create final version with any needed adjustments**
+3. **Use as template for refactoring other sequences**
+4. **Train users on new error messages and validation**
+
+This systematic testing approach will give you confidence that the refactored version works correctly and provides real benefits over the original.

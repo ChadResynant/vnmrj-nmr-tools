@@ -1,0 +1,35 @@
+// AJN 08/2010 set up a resonable SPC5 condition
+// Macro assumes: That you've a hX cp condition
+
+banner('You must have a hX condition, check your aHspc5')
+
+// Set the pw's from the probe file
+hXX
+
+exists('tempSPC5','parameter'):$e
+if $e < 0.5 then
+    create('tempSPC5','real')
+endif  
+// Set a first guess cp condition based on srate
+
+mMix='spc5'
+
+//X at 5 wr
+tempSPC5=5*srate/1000
+tempSPC5=(tempSPC5/(1000/(pwX90*4)))
+aXspc5=4095*tempSPC5*(aX90/4095)
+
+pwXspc5=(pwX90*4)/(aXspc5/4095)
+//100 kHz 1H (will need to be optimized)
+tempSPC5=(1000/(pwH90*4))
+tempSPC5=(100/tempSPC5)
+aHmixspc5=tempSPC5*4095*(aH90/4095)
+
+tZF=1000000/srate
+
+qXspc5=20
+
+destroy('tempSPC5')
+
+
+

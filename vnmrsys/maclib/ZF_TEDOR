@@ -1,0 +1,516 @@
+seqfil = 'ZF_TEDOR'
+
+//------------------------------
+// Axis Assign and Bioref
+//------------------------------
+exists('axAssgn','parameter'):$e
+if $e < 0.5 then
+   create('axAssgn','flag')
+endif 
+setvalue('axAssgn','31')
+
+exists('bioref','parameter'):$e
+if $e < 0.5 then
+   create('bioref','flag')
+endif
+setvalue('bioref','y') 
+
+//-----------------------------
+//Additional 
+//----------------------------
+
+exists('aYredor','parameter'):$e
+if $e < 0.5 then
+   create('aYredor','real')
+   setlimit('aYredor',4095,0,1)
+endif
+
+exists('pwYredor','parameter'):$e
+if $e < 0.5 then
+   create('pwYredor','pulse')
+   setlimit('pwYredor',8192,0,0.0125)
+endif
+
+exists('aXredor','parameter'):$e
+if $e < 0.5 then
+   create('aXredor','real')
+   setlimit('aXredor',4095,0,1)
+endif
+
+exists('pwXredor','parameter'):$e
+if $e < 0.5 then
+   create('pwXredor','pulse')
+   setlimit('pwXredor',8192,0,0.0125)
+endif
+
+exists('aX180','parameter'):$e
+if $e < 0.5 then
+   create('aX180','real')
+   setlimit('aX180',4095,0,1)
+endif
+
+exists('pwX180','parameter'):$e
+if $e < 0.5 then
+   create('pwX180','pulse')
+   setlimit('pwX180',8192,0,0.0125)
+endif
+
+exists('nredor','parameter'):$e
+if $e < 0.5 then
+   create('nredor','real')
+   setlimit('nredor',100,0,1)
+   nredor=20
+endif
+
+exists('nredor_max','parameter'):$e
+if $e < 0.5 then
+   create('nredor_max','real')
+   setlimit('nredor_max',100,0,1)
+   nredor_max=20
+endif
+
+exists('tZF','parameter'):$e
+if $e < 0.5 then
+   create('tZF','pulse')
+   setlimit('tZF',40000,0,0.0125)
+endif
+
+exists('tZF2','parameter'):$e
+if $e < 0.5 then
+   create('tZF2','pulse')
+   setlimit('tZF2',40000,0,0.0125)
+endif
+
+exists('tedor_flag','parameter'):$e
+if $e < 0.5 then
+    create('tedor_flag','flag')
+    setvalue('tedor_flag','ZF')
+endif
+
+exists('gzlvl1','parameter'):$e
+if $e < 0.5 then
+   create('gzlvl1','real')
+endif
+
+exists('aHzf','parameter'):$e
+if $e < 0.5 then
+   create('aHzf','real')
+   setlimit('aHzf',4095,0,1)
+endif
+
+exists('tRF','parameter'):$e
+if $e < 0.5 then
+   create('tRF','pulse')
+   setlimit('tRF',50000,0.0,0.0125)
+endif
+
+exists('ZF_flag','parameter'):$e
+if $e < 0.5 then
+   create('ZF_flag','real')
+endif 
+//------------------------------
+// Spin Rate
+//------------------------------
+
+exists('srate','parameter'):$e
+if $e < 0.5 then
+   create('srate','frequency')
+endif 
+
+exists('srate_tedor','parameter'):$e
+if $e < 0.5 then
+   create('srate_tedor','frequency')
+   setvalue('srate_tedor',100)
+endif 
+
+exists('hsrotor','parameter'):$e
+if $e < 0.5 then
+   create('hsrotor','flag') 
+endif
+
+//------------------------------
+// Receiver Delays
+//------------------------------
+
+exists('rd','parameter'):$e
+if $e < 0.5 then
+   create('rd','pulse')
+   setlimit('rd',8192,0,0.0125)  
+endif 
+
+exists('ad','parameter'):$e
+if $e < 0.5 then
+   create('ad','pulse')
+   setlimit('ad',8192,0,0.0125)  
+endif
+
+exists('ddrtc','parameter'):$e
+if $e < 0.5 then
+   create('ddrtc','pulse')
+   setlimit('ddrtc',8192,0,0.0125)  
+endif
+
+//------------------------------
+// Basic Transmitter Properties
+//------------------------------
+
+exists('aX90','parameter'):$e
+if $e < 0.5 then
+   create('aX90','real')
+   setlimit('aX90',4095,0,1)  
+endif 
+
+exists('aH90','parameter'):$e
+if $e < 0.5 then
+   create('aH90','real')
+   setlimit('aH90',4095,0,1)  
+endif 
+
+exists('aY90','parameter'):$e
+if $e < 0.5 then
+   create('aY90','real')
+   setlimit('aY90',4095,0,1)  
+endif
+
+exists('aZ90','parameter'):$e
+if $e < 0.5 then
+   create('aZ90','real')
+   setlimit('aZ90',4095,0,1)  
+endif
+
+exists('pwX90','parameter'):$e
+if $e < 0.5 then
+   create('pwX90','pulse')
+   setlimit('pwX90',8192,0,0.0125)
+endif 
+
+exists('pwH90','parameter'):$e
+if $e < 0.5 then
+   create('pwH90','pulse')
+   setlimit('pwH90',8192,0,0.0125)
+endif 
+
+exists('pwY90','parameter'):$e
+if $e < 0.5 then
+   create('pwY90','pulse')
+   setlimit('pwY90',8192,0,0.0125)
+endif
+
+exists('pwZ90','parameter'):$e
+if $e < 0.5 then
+   create('pwZ90','pulse')
+   setlimit('pwZ90',8192,0,0.0125)
+endif
+
+//---------------
+// cpHX elements
+//---------------
+
+exists('shHX','parameter'):$e
+if $e < 0.5 then
+    create('shHX','flag')
+endif
+
+exists('toHX','parameter'):$e
+if $e < 0.5 then
+   create('toHX','flag')
+endif 
+setvalue('toHX','obs')
+
+exists('frHX','parameter'):$e
+if $e < 0.5 then
+   create('frHX','flag')
+endif
+setvalue('frHX','dec')  
+
+exists('chHX','parameter'):$e
+if $e < 0.5 then
+   create('chHX','flag')
+endif 
+
+exists('aHhx','parameter'):$e
+if $e < 0.5 then
+   create('aHhx','real')
+   setlimit('aHhx',4095,0,1)
+endif 
+
+exists('aXhx','parameter'):$e
+if $e < 0.5 then
+   create('aXhx','real')
+   setlimit('aXhx',4095,0,1)
+endif 
+
+exists('bHX','parameter'):$e
+if $e < 0.5 then
+   create('bHX','real')
+   setlimit('bHX',1000000,0,1.0e-6)
+endif 
+
+exists('dHX','parameter'):$e
+if $e < 0.5 then
+   create('dHX','real')
+   setlimit('dHX',4095,-4095,1)
+endif 
+
+exists('tHX','parameter'):$e
+if $e < 0.5 then
+   create('tHX','pulse')
+   setlimit('tHX',50000,0,0.0125)
+endif
+
+exists('ofHX','parameter'):$e
+if $e < 0.5 then
+    create('ofHX','frequency')
+endif  
+
+//==============================
+// decoupling options
+//==============================
+
+exists('Hseq','parameter'):$e
+if $e < 0.5 then
+    create('Hseq','flag')
+    Hseq='spinal'
+endif
+
+exists('Hredorseq','parameter'):$e
+if $e < 0.5 then
+    create('Hredorseq','flag')
+    Hredorseq='spinal'
+endif
+
+//-----------
+// tppm
+//-----------
+
+exists('aHtppm','parameter'):$e
+if $e < 0.5 then
+    create('aHtppm','real')
+    setlimit('aHtppm',4095,0,1)
+endif
+
+exists('pwHtppm','parameter'):$e
+if $e < 0.5 then
+    create('pwHtppm','pulse')
+    setlimit('pwHtppm',8192,0,0.0125)
+endif
+
+exists('phHtppm','parameter'):$e
+if $e < 0.5 then
+    create('phHtppm','real')
+    setlimit('phHtppm',180,-180,0.0438)
+endif
+
+exists('chHtppm','parameter'):$e
+if $e < 0.5 then
+   create('chHtppm','flag')
+endif 
+setvalue('chHtppm','dec')
+
+//------------------------------
+//  spinal 
+//------------------------------
+
+exists('aHspinal','parameter'):$e
+if $e < 0.5 then
+    create('aHspinal','real')
+    setlimit('aHspinal',4095,0,1)
+endif
+
+exists('pwHspinal','parameter'):$e
+if $e < 0.5 then
+    create('pwHspinal','pulse')
+    setlimit('pwHspinal',8192,0,0.0125)
+endif
+
+exists('phHspinal','parameter'):$e
+if $e < 0.5 then
+    create('phHspinal','real')
+    setlimit('phHspinal',180,-180,0.0438)
+endif
+
+exists('alpHspinal','parameter'):$e
+if $e < 0.5 then
+    create('alpHspinal','real')
+    setlimit('alpHspinal',180,-180,0.0438)
+endif
+
+exists('chHspinal','parameter'):$e
+if $e < 0.5 then
+   create('chHspinal','flag')
+endif 
+setvalue('chHspinal','dec')
+
+//-----------
+// mix tppm
+//-----------
+
+exists('aHredortppm','parameter'):$e
+if $e < 0.5 then
+    create('aHredortppm','real')
+    setlimit('aHredortppm',4095,0,1)
+endif
+
+exists('pwHredortppm','parameter'):$e
+if $e < 0.5 then
+    create('pwHredortppm','pulse')
+    setlimit('pwHredortppm',8192,0,0.0125)
+endif
+
+exists('phHredortppm','parameter'):$e
+if $e < 0.5 then
+    create('phHredortppm','real')
+    setlimit('phHredortppm',180,-180,0.0438)
+endif
+
+exists('chHredortppm','parameter'):$e
+if $e < 0.5 then
+   create('chHredortppm','flag')
+endif 
+setvalue('chHredortppm','dec')
+
+//------------------------------
+//  mix spinal 
+//------------------------------
+
+exists('aHredorspinal','parameter'):$e
+if $e < 0.5 then
+    create('aHredorspinal','real')
+    setlimit('aHredorspinal',4095,0,1)
+endif
+
+exists('pwHredorspinal','parameter'):$e
+if $e < 0.5 then
+    create('pwHredorspinal','pulse')
+    setlimit('pwHredorspinal',8192,0,0.0125)
+endif
+
+exists('phHredorspinal','parameter'):$e
+if $e < 0.5 then
+    create('phHredorspinal','real')
+    setlimit('phHredorspinal',180,-180,0.0438)
+endif
+
+exists('alpHredorspinal','parameter'):$e
+if $e < 0.5 then
+    create('alpHredorspinal','real')
+    setlimit('alpHredorspinal',180,-180,0.0438)
+endif
+
+exists('chHredorspinal','parameter'):$e
+if $e < 0.5 then
+   create('chHredorspinal','flag')
+endif 
+setvalue('chHredorspinal','dec')
+
+//================================================
+// PBOX X Inversion Pulse
+//================================================
+
+exists('chXshp1','parameter'):$e
+if $e < 0.5 then
+   create('chXshp1','flag')
+endif 
+setvalue('chXshp1','obs')
+
+exists('wvXshp1','parameter'):$e
+if $e < 0.5 then
+   create('wvXshp1','flag')
+   setvalue('wvXshp1','rsnob')
+endif 
+
+exists('ofXshp1','parameter'):$e
+if $e < 0.5 then
+   create('ofXshp1','frequency')
+endif 
+
+exists('aXshp1','parameter'):$e
+if $e < 0.5 then
+   create('aXshp1','real')
+   setlimit('aXshp1',4095,0,1)
+endif 
+
+exists('dbXshp1','parameter'):$e
+if $e < 0.5 then
+   create('dbXshp1','real')
+   setlimit('dbXshp1',63,-16,1)
+endif 
+
+exists('stXshp1','parameter'):$e
+if $e < 0.5 then
+   create('stXshp1','real')
+endif 
+
+exists('pwXshp1','parameter'):$e
+if $e < 0.5 then
+   create('pwXshp1','pulse')
+   setlimit('pwXshp1',8192,0,0.0125)
+endif 
+
+exists('phXshp1','parameter'):$e
+if $e < 0.5 then
+    create('phXshp1','real')
+    setlimit('phXshp1',180,-180,0.0)
+endif
+
+
+//------------------------------------------------
+//  Set Bit 14 for new parameters of the .par file 
+//------------------------------------------------
+
+$params = 'aXredor pwXredor aYredor pwYredor '
+$params = $params + 'aHredortppm pwHredortppm phHredortppm chHredortppm Hseq wrtp '
+$params = $params + 'aHredorspinal pwHredorspinal phHredorspinal chHredorspinal Hredorseq'
+setprotect('','clear',16384)
+setprotect($params,'on',16384)
+
+//------------------------------------------------
+//  Set the parameter templates
+//------------------------------------------------
+
+setprotect('dg','clear',4)
+$dg = '1:ACQUISITION:sw:1,at:6,np:0,d1:6,nt:0,ct:0,bs:0,'
+$dg = $dg + 'ss:0,rd:1,ad:1,ddrtc:1,rof3(rof3):1,gain:0,temp:0,srate:1;'
+$dg = $dg + '2:cpHX:shHX,chHX,aHhx:0,aXhx:0,bHX:6,dHX:6,tHX:1,ofHX:3;'
+$dg = $dg + '2:PWs:aH90,pwH90:1,aX90,pwX90:1,aY90,pwY90:1;'
+$dg = $dg + '3:TEDOR FLAG:tedor_flag;'
+$dg = $dg + '3:REDOR:nredor,nredor_max,aXredor,pwXredor:1,aYredor,pwYredor:1;'
+$dg = $dg + '3(tedor_flag=\'BASE\'):BASE:wvXshp1,dbXshp1,aXshp1,pwXshp1:1,ofXshp1;'
+$dg = $dg + '3:ZF:aHzf;'
+$dg = $dg + '4:DEC TYPE:Hseq,Hredorseq;'
+$dg = $dg + '4(Hseq=\'tppm\'):TPPM for evol:aHtppm:0,pwHtppm:1,phHtppm:2;'
+$dg = $dg + '4(Hseq=\'spinal\'):SPINAL for evol:aHspinal:0,pwHspinal:1,phHspinal,alpHspinal;'
+$dg = $dg + '4(Hredorseq=\'tppm\'):TPPM for REDOR:aHredortppm:0,pwHredortppm:1,phHredortppm;'
+$dg = $dg + '4(Hredorseq=\'spinal\'):SPINAL for REDOR:aHredorspinal:0,pwHredorspinal:1,phHredorspinal,alpHspinal;'
+dg = $dg
+setprotect('dg','on',4)
+
+setprotect('dg2','clear',4)
+$dg2 = '1:OBSERVE:rfchval1,tn,sfrq:6,tof:1,tpwr:0,amplimval1:0,kWampval1:0,ampmodval1:0,aX90:0,pwX90:1;'
+$dg2=$dg2+'2:DECOUPLE:rfchval2,dn,dfrq:6,dof:1,dpwr:0,amplimval2:0,kWampval2:0,ampmodval2:0,aH90:0,pwH90:1;'
+$dg2=$dg2+'3:DECOUPLE2:rfchval3,dn2,dfrq2:6,dof2:1,dpwr2:0,amplimval3:0,kWampval3:0,ampmodval3:0,aY90:0,pwY90:1;'
+$dg2=$dg2+'4:DECOUPLE3:rfchval4,dn3,dfrq3:6,dof3:1,dpwr3:0,amplimval4:0,kWampval4:0,ampmodval4:0,aZ90:0,pwZ90:1;'
+dg2 = $dg2
+setprotect('dg2','on',4)
+
+setprotect('ap','clear',4)
+$ap = '1:SAMPLE:date,temp:1,srate:1,file;'
+$ap = $ap + '1:ACQUISITION:tn,sfrq:6,tof:1,tpwr:0,sw:1,at:6,np:0,d1:6,nt:0,ct:0,ss:0,rd:1,ad:1,aX90:0,pwX90:1;'
+$ap = $ap + '1(ni):2D ACQUISITION:d2:6,sw1:1,ni:0,phase:0;'
+$ap = $ap + '1:DECOUPLE:dn,dfrq:6,dof:1,dpwr:0,aH90:0,pwH90:1;'
+$ap = $ap + '1(dfrq2>0):DECOUPLE2:dn2,dfrq2:6,dof2:1,dpwr2:0,aY90:0,pwY90:1;'
+$ap = $ap + '1(dfrq3>0):DECOUPLE3:dn3,dfrq3:6,dof3:1,dpwr3:0,aZ90:0,pwZ90:1;'
+$ap = $ap + '1:cpHX:shHX,chHX,aHhx:0,aXhx:0,bHX:6,dHX:6,tHX:1,ofHX:3;'
+$ap = $ap + '1:180X:aX180:0,pwX180:1;'
+$ap = $ap + '1:xy8Y:aYxy8:0,pwYxy8:1,nYxy8:0,onYxy8;'
+$ap = $ap + '1(Hseq=\'tppm\'):TPPM:aHtppm:0,pwHtppm:1,phHtppm:2;'
+$ap = $ap + '1(Hseq=\'spinal\'):SPINAL:aHspinal:0,pwHspinal:1,phHspinal:2;'
+$ap = $ap + '2(Hredorseq=\'tppm\'):TPPM:aHredortppm:0,pwHredortppm:1,phHredortppm:2;'
+$ap = $ap + '2(Hredorseq=\'spinal\'):SPINAL:aHredorspinal:0,pwHredorspinal:1,phHredorspinal:2;'
+$ap = $ap + '1:PROCESSING:fn:0,phfid:2,rp:2,lp:2,lsfrq(lsfrq):1,lb(lb):1,sb(sb):3,sbs(sb):3,'
+$ap = $ap + 'gf(gf):3,gfs(gf):3,lsfid(lsfid):0,wtfile(wtfile);'
+$ap = $ap + '1(ni):2D PROCESSING:fn1:0,phfid1:2,rp1:2,lp1:2,lsfrq1(lsfrq1):1,lb1(lb1):1,sb1(sb1):3,sbs1(sb1):3,'
+$ap = $ap + 'gf1(gf1):3,gfs1(gf1):3,lsfid1(lsfid1):0,wtfile1(wtfile1);'
+ap = $ap
+setvalue('ap',$ap,'processed')
+setprotect('ap','on',4)

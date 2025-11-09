@@ -1,0 +1,77 @@
+// AJN 08/2010 set up a resonable hNCA cp from the probe file
+// Macro assumes: that you have run and optimized a hNcp 
+// You've set your srate to the right value
+
+banner('You must have an HN condition in hX before starting')
+
+// Set the pw's from the probe file
+hYXX
+tn='C13'
+dn='H1'
+dn2='N15'
+getsolidsprobedata('tn')
+getsolidsprobedata('dn')
+getsolidsprobedata('dn2')
+
+exists('tempHYXX','parameter'):$e
+if $e < 0.5 then
+    create('tempHYXX','real')
+endif  
+
+// move the HN cp to dn2
+aHhy=aHhx
+aYhy=aXhx
+dHY=dHX
+bHY=bHX
+tHY=tHX
+
+//Set the 13C carrier to 55ppm
+tempHYXX=sfrq*(-36)  //Properly referenced to adam tof=0 is about 91 ppm on C
+tof=tempHYXX
+
+//Set the 15N carrier to 117ppm
+tempHYXX=dfrq2*(26)  //Properly referenced to adam tof=0 is about 91 ppm on N
+dof2=tempHYXX
+
+//Set the 15N/13C CP
+
+//15N at 5/2 wr
+tempHYXX= (5*srate/2000)
+tempHYXX=(tempHYXX/(1000/(pwY90*4)))
+aYyx=(aY90/4095)*tempHYXX*4095
+
+//13C at 3/2 wr
+tempHYXX=3*srate/2000
+tempHYXX=(tempHYXX/(1000/(pwX90*4)))
+aXyx=4095*tempHYXX*(aX90/4095)
+
+//GB1 like paramters for these
+tYX=5000
+dYX=aXyx*.1
+bYX=dYX/3
+
+//100 kHz aHyx
+tempHYXX=(1000/(pwH90*4))
+tempHYXX=(100/tempHYXX)
+aHyx=tempHYXX*4095*(aH90/4095)
+
+// Set the window and d1
+d1=2
+sw=100000
+np=4096
+rd=5
+ad=5
+ddrtc=10
+lp=0
+
+// 3D pars assume we're trying for a 1D for now
+par3d
+sw1=srate*2
+sw2=srate*4
+ni=0
+ni2=0
+
+destroy('tempHYXX')
+
+
+

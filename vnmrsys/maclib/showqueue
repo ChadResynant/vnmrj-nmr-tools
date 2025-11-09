@@ -1,0 +1,25 @@
+"showqueuue new version, accurate time cal. Donghua H. Zhou, Apr. 13 ,2008, UIUC"
+
+
+clear
+jexp:$cwexp
+write('alpha','New version, showing correct exp time')
+
+$fr=1 $to=39
+
+$total=0
+$i=$fr
+while ($i <= $to) do
+  jexp($i) expactive:$st
+  if ($st >= 1) then
+    exptime:$time  $total=$total+$time
+    write('alpha','EXP%-3d %6.2f %8s order=%-2d %s',$i,$time/3600.0,seqfil,$st,n1)
+  endif
+  $i=$i+1
+endwhile
+
+write('alpha','Total time is %6.2f',$total/3600.0)
+
+jexp($cwexp)
+"write('alpha','Please type dg to show correct current exp#')"
+return($total/3600.0)

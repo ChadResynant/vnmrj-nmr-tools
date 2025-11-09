@@ -1,0 +1,22 @@
+$i = 0
+while ($i<$#) do
+   $i = $i + 1
+   $istring=''
+   $paramname=''
+   $newparams=''
+   format($i,1,0):$istring
+   $paramname = '$' + $istring
+   $paramval = {$paramname}
+   $newparams = $newparams + $paramval + ' ' 
+endwhile   
+setprotect($newparams,'on',16384)
+
+exists('newparams','parameter'):$e
+if ($e < 0.5) then 
+   create('newparams','string')
+endif 
+newparams=''  
+setprotect('','list',16384):newparams 
+display('newparams')
+destroy('newparams')
+write('alpha','Designated Parameters Set')

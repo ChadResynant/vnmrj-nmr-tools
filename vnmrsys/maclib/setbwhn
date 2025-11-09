@@ -1,0 +1,6 @@
+"setbwhn:  set 6 to 11 ppm proton amide bw"
+
+ff
+sp=6p
+wp=5p
+

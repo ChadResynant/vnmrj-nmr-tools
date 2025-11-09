@@ -1,0 +1,646 @@
+/*
+ * nus_utils - NUS Utilities for Biosolids Sequences
+ * 
+ * Provides utilities for Non-Uniform Sampling (NUS) schedule generation,
+ * validation, and parameter setup for biosolids pulse sequences.
+ * 
+ * Functions:
+ * - nus_utils('setup')     - Interactive NUS parameter setup
+ * - nus_utils('validate')  - Validate current NUS parameters
+ * - nus_utils('schedule')  - Generate NUS schedule files
+ * - nus_utils('check')     - Check schedule file format
+ * - nus_utils('convert')   - Convert old ni/ni2/ni3 to nimax format
+ * 
+ * Usage: nus_utils('function_name')
+ * 
+ * Author: Consolidated biosolids NUS system
+ * Date: July 2025
+ */
+
+// Get function argument
+$function = $1
+if ($function = '') then
+    $function = 'help'
+endif
+
+//=============================================================================
+// HELP FUNCTION
+//=============================================================================
+
+if ($function = 'help') then
+    write('line3','')
+    write('line3','=== NUS Utilities for Biosolids Sequences ===')
+    write('line3','')
+    write('line3','Available functions:')
+    write('line3','  nus_utils(\'setup\')     - Interactive NUS parameter setup')
+    write('line3','  nus_utils(\'validate\')  - Validate current NUS parameters')
+    write('line3','  nus_utils(\'schedule\')  - Generate NUS schedule files')
+    write('line3','  nus_utils(\'check\')     - Check schedule file format')
+    write('line3','  nus_utils(\'convert\')   - Convert old ni/ni2/ni3 to nimax format')
+    write('line3','  nus_utils(\'help\')      - Show this help message')
+    write('line3','')
+    write('line3','Example: nus_utils(\'setup\')')
+    write('line3','')
+    return
+endif
+
+//=============================================================================
+// SETUP FUNCTION - Interactive NUS Parameter Configuration
+//=============================================================================
+
+if ($function = 'setup') then
+    write('line3','')
+    write('line3','=== Interactive NUS Setup ===')
+    write('line3','')
+    
+    // Check if sequence supports NUS
+    $seqname = seqfil
+    $is_nus_seq = 0
+    if ($seqname = 'hYXH_S' OR $seqname = 'hYYXH_S' OR strstr($seqname,'_S')) then
+        $is_nus_seq = 1
+    endif
+    
+    if ($is_nus_seq = 0) then
+        write('error','Current sequence (%s) does not support NUS',$seqname)
+        write('line3','Load a sequence ending in \'_S\' for NUS support')
+        return
+    endif
+    
+    // Determine dimensionality
+    $ndim = 2  // Default
+    if (ni2 > 1 OR getval('ni2max') > 1) then
+        $ndim = 3
+    endif
+    if (ni3 > 1 OR getval('ni3max') > 1) then
+        $ndim = 4
+    endif
+    
+    write('line3','Detected %dD experiment',$ndim)
+    write('line3','')
+    
+    // Get current sampling parameters
+    $full_sampling = 1
+    $current_nimax = getval('nimax')
+    $current_ni2max = getval('ni2max')
+    $current_ni3max = getval('ni3max')
+    
+    if ($current_nimax > 1) then
+        $full_sampling = $full_sampling * $current_nimax
+    endif
+    if ($ndim >= 3 AND $current_ni2max > 1) then
+        $full_sampling = $full_sampling * $current_ni2max
+    endif
+    if ($ndim >= 4 AND $current_ni3max > 1) then
+        $full_sampling = $full_sampling * $current_ni3max
+    endif
+    
+    write('line3','Current parameters:')
+    write('line3','  nimax = %d',$current_nimax)
+    if ($ndim >= 3) then
+        write('line3','  ni2max = %d',$current_ni2max)
+    endif
+    if ($ndim >= 4) then
+        write('line3','  ni3max = %d',$current_ni3max)
+    endif
+    write('line3','  Full sampling would be: %d points',$full_sampling)
+    write('line3','')
+    
+    // Interactive parameter setting
+    write('line3','=== Setting NUS Parameters ===')
+    
+    // Get nimax (first indirect dimension)
+    $prompt = 'Enter nimax (max increments for first indirect): '
+    $default = format($current_nimax,0,0)
+    input($prompt + '[' + $default + '] '):$input_nimax
+    if ($input_nimax = '') then
+        $input_nimax = $current_nimax
+    else
+        $input_nimax = $input_nimax + 0  // Convert to number
+    endif
+    
+    // Get ni2max for 3D+ experiments
+    if ($ndim >= 3) then
+        $prompt = 'Enter ni2max (max increments for second indirect): '
+        $default = format($current_ni2max,0,0)
+        input($prompt + '[' + $default + '] '):$input_ni2max
+        if ($input_ni2max = '') then
+            $input_ni2max = $current_ni2max
+        else
+            $input_ni2max = $input_ni2max + 0
+        endif
+    endif
+    
+    // Get ni3max for 4D experiments
+    if ($ndim >= 4) then
+        $prompt = 'Enter ni3max (max increments for third indirect): '
+        $default = format($current_ni3max,0,0)
+        input($prompt + '[' + $default + '] '):$input_ni3max
+        if ($input_ni3max = '') then
+            $input_ni3max = $current_ni3max
+        else
+            $input_ni3max = $input_ni3max + 0
+        endif
+    endif
+    
+    // Calculate new full sampling
+    $new_full = $input_nimax
+    if ($ndim >= 3) then
+        $new_full = $new_full * $input_ni2max
+    endif
+    if ($ndim >= 4) then
+        $new_full = $new_full * $input_ni3max
+    endif
+    
+    // Get number of NUS points
+    $current_nrows = getval('nrows')
+    $suggested_nrows = trunc($new_full * 0.25)  // 25% sampling
+    if ($suggested_nrows < 50) then
+        $suggested_nrows = 50
+    endif
+    
+    $prompt = 'Enter nrows (number of NUS points): '
+    $default = format($suggested_nrows,0,0)
+    input($prompt + '[' + $default + '] '):$input_nrows
+    if ($input_nrows = '') then
+        $input_nrows = $suggested_nrows
+    else
+        $input_nrows = $input_nrows + 0
+    endif
+    
+    // Get schedule file path
+    $current_file = getval('sparse_file')
+    $suggested_file = userdir + '/nus_schedules/' + $seqname + '_' + format($input_nrows,0,0) + '.sched'
+    
+    write('line3','')
+    write('line3','Current schedule file: %s',$current_file)
+    $prompt = 'Enter new schedule file path: '
+    input($prompt + '['+ $suggested_file + '] '):$input_file
+    if ($input_file = '') then
+        $input_file = $suggested_file
+    endif
+    
+    // Set parameters
+    setvalue('nimax',$input_nimax)
+    if ($ndim >= 3) then
+        setvalue('ni2max',$input_ni2max)
+    endif
+    if ($ndim >= 4) then
+        setvalue('ni3max',$input_ni3max)
+    endif
+    setvalue('nrows',$input_nrows)
+    setvalue('sparse_file',$input_file)
+    
+    // Summary
+    write('line3','')
+    write('line3','=== NUS Parameters Set ===')
+    write('line3','  nimax = %d',$input_nimax)
+    if ($ndim >= 3) then
+        write('line3','  ni2max = %d',$input_ni2max)
+    endif
+    if ($ndim >= 4) then
+        write('line3','  ni3max = %d',$input_ni3max)
+    endif
+    write('line3','  nrows = %d',$input_nrows)
+    write('line3','  Full sampling = %d points',$new_full)
+    write('line3','  NUS sampling = %.1f%%',100.0*$input_nrows/$new_full)
+    write('line3','  Schedule file: %s',$input_file)
+    write('line3','')
+    write('line3','Next steps:')
+    write('line3','1. Generate schedule: nus_utils(\'schedule\')')
+    write('line3','2. Enable NUS: SPARSE=\'y\'')
+    write('line3','3. Validate setup: nus_utils(\'validate\')')
+    
+    return
+endif
+
+//=============================================================================
+// VALIDATE FUNCTION - Check NUS Parameter Consistency
+//=============================================================================
+
+if ($function = 'validate') then
+    write('line3','')
+    write('line3','=== NUS Parameter Validation ===')
+    write('line3','')
+    
+    // Check if NUS is enabled
+    $sparse_enabled = ''
+    getstr('SPARSE',$sparse_enabled)
+    
+    if ($sparse_enabled <> 'y') then
+        write('line3','SPARSE = \'%s\' (NUS disabled)',$sparse_enabled)
+        write('line3','Set SPARSE=\'y\' to enable NUS')
+        return
+    endif
+    
+    // Get parameters
+    $nimax = getval('nimax')
+    $ni2max = getval('ni2max') 
+    $ni3max = getval('ni3max')
+    $nrows = getval('nrows')
+    $schedule_file = ''
+    getstr('sparse_file',$schedule_file)
+    
+    // Determine dimensionality
+    $ndim = 2
+    if ($ni2max > 1) then
+        $ndim = 3
+    endif
+    if ($ni3max > 1) then
+        $ndim = 4
+    endif
+    
+    // Calculate full sampling
+    $full_sampling = $nimax
+    if ($ndim >= 3) then
+        $full_sampling = $full_sampling * $ni2max
+    endif
+    if ($ndim >= 4) then
+        $full_sampling = $full_sampling * $ni3max
+    endif
+    
+    // Check parameters
+    $errors = 0
+    
+    if ($nimax <= 0) then
+        write('error','nimax must be > 0 (currently %d)',$nimax)
+        $errors = $errors + 1
+    endif
+    
+    if ($ndim >= 3 AND $ni2max <= 0) then
+        write('error','ni2max must be > 0 for 3D+ experiments (currently %d)',$ni2max)
+        $errors = $errors + 1
+    endif
+    
+    if ($ndim >= 4 AND $ni3max <= 0) then
+        write('error','ni3max must be > 0 for 4D experiments (currently %d)',$ni3max)
+        $errors = $errors + 1
+    endif
+    
+    if ($nrows <= 0) then
+        write('error','nrows must be > 0 (currently %d)',$nrows)
+        $errors = $errors + 1
+    endif
+    
+    if ($nrows > $full_sampling) then
+        write('error','nrows (%d) > full sampling (%d)',$nrows,$full_sampling)
+        $errors = $errors + 1
+    endif
+    
+    // Check schedule file
+    exists($schedule_file,'file'):$file_exists
+    if ($file_exists < 0.5) then
+        write('error','Schedule file not found: %s',$schedule_file)
+        $errors = $errors + 1
+    endif
+    
+    // Report results
+    if ($errors = 0) then
+        write('line3','✓ All NUS parameters are valid')
+        write('line3','')
+        write('line3','Configuration:')
+        write('line3','  Experiment: %dD',$ndim)
+        write('line3','  nimax = %d',$nimax)
+        if ($ndim >= 3) then
+            write('line3','  ni2max = %d',$ni2max)
+        endif
+        if ($ndim >= 4) then
+            write('line3','  ni3max = %d',$ni3max)
+        endif
+        write('line3','  nrows = %d',$nrows)
+        write('line3','  Full sampling = %d points',$full_sampling)
+        write('line3','  NUS sampling = %.1f%%',100.0*$nrows/$full_sampling)
+        write('line3','  Schedule file: %s',$schedule_file)
+        
+        // Additional safety checks
+        $tRF = getval('tRF')
+        if ($tRF < 10e-3) then
+            write('line3','')
+            write('line3','⚠ WARNING: tRF (%.1f ms) may be too short for NUS',$tRF*1000)
+            write('line3','  Consider tRF > 50 ms for safety')
+        endif
+        
+    else
+        write('line3','❌ Found %d validation errors',$errors)
+        write('line3','Fix these issues before running NUS experiment')
+    endif
+    
+    return
+endif
+
+//=============================================================================
+// SCHEDULE FUNCTION - Generate NUS Schedule Files
+//=============================================================================
+
+if ($function = 'schedule') then
+    write('line3','')
+    write('line3','=== NUS Schedule Generation ===')
+    write('line3','')
+    
+    // Get parameters
+    $nimax = getval('nimax')
+    $ni2max = getval('ni2max')
+    $ni3max = getval('ni3max') 
+    $nrows = getval('nrows')
+    $schedule_file = ''
+    getstr('sparse_file',$schedule_file)
+    
+    // Determine dimensionality
+    $ndim = 2
+    if ($ni2max > 1) then
+        $ndim = 3
+    endif
+    if ($ni3max > 1) then
+        $ndim = 4
+    endif
+    
+    write('line3','Generating %dD NUS schedule...',$ndim)
+    write('line3','Parameters:')
+    write('line3','  nimax = %d',$nimax)
+    if ($ndim >= 3) then
+        write('line3','  ni2max = %d',$ni2max)
+    endif
+    if ($ndim >= 4) then
+        write('line3','  ni3max = %d',$ni3max)
+    endif
+    write('line3','  nrows = %d',$nrows)
+    
+    // Create directory if needed
+    $schedule_dir = ''
+    substr($schedule_file,1,'dirname'):$schedule_dir
+    exists($schedule_dir,'file'):$dir_exists
+    if ($dir_exists < 0.5) then
+        shell('mkdir -p "' + $schedule_dir + '"')
+        write('line3','Created directory: %s',$schedule_dir)
+    endif
+    
+    // Generate schedule based on dimensionality
+    if ($ndim = 2) then
+        // 2D NUS schedule generation
+        write('file',$schedule_file,'# 2D NUS schedule for %s',seqfil)
+        write('file',$schedule_file,'# nimax=%d, nrows=%d',$nimax,$nrows)
+        write('file',$schedule_file,'# Format: d2_increment')
+        
+        $i = 1
+        repeat
+            $increment = trunc(random*$nimax)
+            write('file',$schedule_file,'%d',$increment)
+            $i = $i + 1
+        until ($i > $nrows)
+        
+    elseif ($ndim = 3) then
+        // 3D NUS schedule generation
+        write('file',$schedule_file,'# 3D NUS schedule for %s',seqfil)
+        write('file',$schedule_file,'# nimax=%d, ni2max=%d, nrows=%d',$nimax,$ni2max,$nrows)
+        write('file',$schedule_file,'# Format: d2_increment d3_increment')
+        
+        $i = 1
+        repeat
+            $inc1 = trunc(random*$nimax)
+            $inc2 = trunc(random*$ni2max)
+            write('file',$schedule_file,'%d %d',$inc1,$inc2)
+            $i = $i + 1
+        until ($i > $nrows)
+        
+    elseif ($ndim = 4) then
+        // 4D NUS schedule generation
+        write('file',$schedule_file,'# 4D NUS schedule for %s',seqfil)
+        write('file',$schedule_file,'# nimax=%d, ni2max=%d, ni3max=%d, nrows=%d',$nimax,$ni2max,$ni3max,$nrows)
+        write('file',$schedule_file,'# Format: d2_increment d3_increment d4_increment')
+        
+        $i = 1
+        repeat
+            $inc1 = trunc(random*$nimax)
+            $inc2 = trunc(random*$ni2max)
+            $inc3 = trunc(random*$ni3max)
+            write('file',$schedule_file,'%d %d %d',$inc1,$inc2,$inc3)
+            $i = $i + 1
+        until ($i > $nrows)
+    endif
+    
+    write('line3','')
+    write('line3','✓ Schedule generated: %s',$schedule_file)
+    write('line3','')
+    write('line3','NOTE: This is a simple random sampling schedule.')
+    write('line3','For better results, consider using:')
+    write('line3','- Poisson gap sampling')
+    write('line3','- Compressed sensing optimized schedules')
+    write('line3','- External NUS schedule generators')
+    
+    return
+endif
+
+//=============================================================================
+// CHECK FUNCTION - Validate Schedule File Format
+//=============================================================================
+
+if ($function = 'check') then
+    write('line3','')
+    write('line3','=== Schedule File Check ===')
+    write('line3','')
+    
+    $schedule_file = ''
+    getstr('sparse_file',$schedule_file)
+    
+    exists($schedule_file,'file'):$file_exists
+    if ($file_exists < 0.5) then
+        write('error','Schedule file not found: %s',$schedule_file)
+        return
+    endif
+    
+    write('line3','Checking file: %s',$schedule_file)
+    
+    // Get expected parameters
+    $nimax = getval('nimax')
+    $ni2max = getval('ni2max')
+    $ni3max = getval('ni3max')
+    $nrows = getval('nrows')
+    
+    // Determine expected format
+    $ndim = 2
+    if ($ni2max > 1) then
+        $ndim = 3
+    endif
+    if ($ni3max > 1) then
+        $ndim = 4
+    endif
+    
+    // Read and check file
+    lookup('file',$schedule_file)
+    $line_count = 0
+    $error_count = 0
+    $skip_count = 0
+    
+    repeat
+        lookup('read'):$line
+        if ($line <> '') then
+            $line_count = $line_count + 1
+            
+            // Skip comment lines
+            substr($line,1,1):$first_char
+            if ($first_char = '#') then
+                $skip_count = $skip_count + 1
+            else
+                // Parse line based on dimensionality
+                if ($ndim = 2) then
+                    format($line,'%d'):$inc1
+                    if ($inc1 < 0 OR $inc1 >= $nimax) then
+                        write('line3','Line %d: increment %d out of range [0,%d]',$line_count,$inc1,$nimax-1)
+                        $error_count = $error_count + 1
+                    endif
+                    
+                elseif ($ndim = 3) then
+                    format($line,'%d %d'):$inc1,$inc2
+                    if ($inc1 < 0 OR $inc1 >= $nimax) then
+                        write('line3','Line %d: d2_inc %d out of range [0,%d]',$line_count,$inc1,$nimax-1)
+                        $error_count = $error_count + 1
+                    endif
+                    if ($inc2 < 0 OR $inc2 >= $ni2max) then
+                        write('line3','Line %d: d3_inc %d out of range [0,%d]',$line_count,$inc2,$ni2max-1)
+                        $error_count = $error_count + 1
+                    endif
+                    
+                elseif ($ndim = 4) then
+                    format($line,'%d %d %d'):$inc1,$inc2,$inc3
+                    if ($inc1 < 0 OR $inc1 >= $nimax) then
+                        write('line3','Line %d: d2_inc %d out of range [0,%d]',$line_count,$inc1,$nimax-1)
+                        $error_count = $error_count + 1
+                    endif
+                    if ($inc2 < 0 OR $inc2 >= $ni2max) then
+                        write('line3','Line %d: d3_inc %d out of range [0,%d]',$line_count,$inc2,$ni2max-1)
+                        $error_count = $error_count + 1
+                    endif
+                    if ($inc3 < 0 OR $inc3 >= $ni3max) then
+                        write('line3','Line %d: d4_inc %d out of range [0,%d]',$line_count,$inc3,$ni3max-1)
+                        $error_count = $error_count + 1
+                    endif
+                endif
+            endif
+        endif
+    until ($line = '')
+    lookup('file')
+    
+    $data_lines = $line_count - $skip_count
+    
+    write('line3','')
+    write('line3','File statistics:')
+    write('line3','  Total lines: %d',$line_count)
+    write('line3','  Comment lines: %d',$skip_count)
+    write('line3','  Data lines: %d',$data_lines)
+    write('line3','  Expected data lines (nrows): %d',$nrows)
+    write('line3','  Format errors: %d',$error_count)
+    
+    if ($data_lines <> $nrows) then
+        write('line3','')
+        write('line3','⚠ WARNING: Data lines (%d) ≠ nrows (%d)',$data_lines,$nrows)
+        write('line3','  Consider updating nrows or schedule file')
+    endif
+    
+    if ($error_count = 0) then
+        write('line3','')
+        write('line3','✓ Schedule file format is valid')
+    else
+        write('line3','')
+        write('line3','❌ Found %d format errors',$error_count)
+    endif
+    
+    return
+endif
+
+//=============================================================================
+// CONVERT FUNCTION - Convert Old ni/ni2/ni3 Parameters to nimax Format
+//=============================================================================
+
+if ($function = 'convert') then
+    write('line3','')
+    write('line3','=== Converting ni/ni2/ni3 to nimax Format ===')
+    write('line3','')
+    
+    // Check for old parameters
+    $old_ni = ni
+    $old_ni2 = ni2  
+    $old_ni3 = ni3
+    
+    write('line3','Current ni parameters:')
+    write('line3','  ni = %d',$old_ni)
+    write('line3','  ni2 = %d',$old_ni2)
+    write('line3','  ni3 = %d',$old_ni3)
+    write('line3','')
+    
+    // Suggest nimax values
+    $suggest_nimax = $old_ni
+    if ($suggest_nimax < 16) then
+        $suggest_nimax = 32  // Reasonable minimum
+    endif
+    
+    $suggest_ni2max = $old_ni2
+    if ($suggest_ni2max < 16 AND $suggest_ni2max > 1) then
+        $suggest_ni2max = 32
+    endif
+    
+    $suggest_ni3max = $old_ni3
+    if ($suggest_ni3max < 16 AND $suggest_ni3max > 1) then
+        $suggest_ni3max = 16
+    endif
+    
+    write('line3','Suggested nimax parameters:')
+    write('line3','  nimax = %d (max increments for first indirect)',$suggest_nimax)
+    if ($suggest_ni2max > 1) then
+        write('line3','  ni2max = %d (max increments for second indirect)',$suggest_ni2max)
+    endif
+    if ($suggest_ni3max > 1) then
+        write('line3','  ni3max = %d (max increments for third indirect)',$suggest_ni3max)
+    endif
+    write('line3','')
+    
+    $prompt = 'Apply these conversions? [y/n]: '
+    input($prompt):$answer
+    
+    if ($answer = 'y' OR $answer = 'Y') then
+        setvalue('nimax',$suggest_nimax)
+        if ($suggest_ni2max > 1) then
+            setvalue('ni2max',$suggest_ni2max)
+        endif
+        if ($suggest_ni3max > 1) then
+            setvalue('ni3max',$suggest_ni3max)
+        endif
+        
+        // Calculate suggested nrows
+        $full_sampling = $suggest_nimax
+        if ($suggest_ni2max > 1) then
+            $full_sampling = $full_sampling * $suggest_ni2max
+        endif
+        if ($suggest_ni3max > 1) then
+            $full_sampling = $full_sampling * $suggest_ni3max
+        endif
+        
+        $suggest_nrows = trunc($full_sampling * 0.25)  // 25% sampling
+        setvalue('nrows',$suggest_nrows)
+        
+        write('line3','✓ Conversion complete!')
+        write('line3','  Set nimax = %d',$suggest_nimax)
+        if ($suggest_ni2max > 1) then
+            write('line3','  Set ni2max = %d',$suggest_ni2max)
+        endif
+        if ($suggest_ni3max > 1) then
+            write('line3','  Set ni3max = %d',$suggest_ni3max)
+        endif
+        write('line3','  Set nrows = %d (25%% sampling)',$suggest_nrows)
+        write('line3','')
+        write('line3','Next steps:')
+        write('line3','1. Adjust nimax values if needed')
+        write('line3','2. Generate schedule: nus_utils(\'schedule\')')
+        write('line3','3. Enable NUS: SPARSE=\'y\'')
+        
+    else
+        write('line3','Conversion cancelled.')
+    endif
+    
+    return
+endif
+
+//=============================================================================
+// UNKNOWN FUNCTION
+//=============================================================================
+
+write('error','Unknown function: %s',$function)
+write('line3','Use nus_utils(\'help\') for available functions')

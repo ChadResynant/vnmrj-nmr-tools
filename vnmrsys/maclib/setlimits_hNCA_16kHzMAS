@@ -1,0 +1,25 @@
+"CMR 7/27/23 good defaults for HCN 1.6 mm 16.667 kHz MAS"
+" HY values appropriate for HN CP on PDA09 TR328 standard sample"
+" This macro will reset to initial hNCA default conditions"
+setlimit('aHhy',2500,1500,20) aHhy=2000
+setlimit('aYhy',3800,2800,10) chHY='fr' aYhy=3200
+setlimit('dHY',500,-500,20) dHY=250
+setlimit('bHY',500,10,10) bHY=100
+setlimit('tHY',2000,400,100) tHY=1000
+" NCA condition assuming wN=5/2 wR, wCA=3/2 wR, and pwC90=2.25 pwN90=3.2"
+" wN at full power ~78 kHz, wCA at full power ~110 kHz"
+" aYyx needs to be 5/2 wR = 5/2 * 16.667 = 41.7 kHz"
+" 41.7 kHz * 4000 / 78 kHz = ~2200"
+setlimit('aYyx',2600,1800,20) aYyx=2200
+dof2=(115-82.5)*76
+" aXyx needs to be 3/2 wR = 25 kHz for CA"
+" 25 kHz * 4000 / 110 kHz = ~900"
+setlimit('aXyx',1200,600,10) aXyx=900 chYX='to'
+tof=-42.5*188.56
+" typically aHyx is high power, but safe"
+setlimit('aHyx',3500,1500,100) aHyx=3000
+setlimit('dYX',200,-200,10) dYX=100
+setlimit('bYX',200,10,10) bYX=50
+setlimit('tYX',10000,2000,1000) tYX=6000
+tXmix=120 d2=0 d3=0 dof=0
+

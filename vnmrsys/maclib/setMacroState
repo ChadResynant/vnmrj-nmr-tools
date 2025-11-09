@@ -1,0 +1,14 @@
+#  SolidsPack Version 8/14/07
+#  SIMPLEXER: setMacroState (version 4)
+
+set stateFile [lindex $argv 0]
+set nDim [lindex $argv 1]
+set state [lindex $argv 2]
+set row [lindex $argv 3]
+
+set  fd [open $stateFile w]
+puts $fd $nDim
+puts $fd $state
+puts $fd $row
+close $fd
+exit

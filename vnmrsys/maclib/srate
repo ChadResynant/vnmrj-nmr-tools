@@ -1,0 +1,2 @@
+srate=$1
+sethw('spin',srate,'nowait')

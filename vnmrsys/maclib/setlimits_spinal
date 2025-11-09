@@ -1,0 +1,6 @@
+setlimit('aHspinal',3000,2000,1)
+setlimit('pwHspinal',8,4,0.1)
+setlimit('phHspinal',15,0,1)
+setlimit('alpHspinal',15,0,1)
+
+

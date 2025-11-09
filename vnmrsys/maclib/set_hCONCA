@@ -1,0 +1,95 @@
+// AJN 08/2010 set up a resonable hCONCA cp from the probe file
+// Macro assumes: that you have run and optimized a hCcp 
+// You've set your srate to the right value
+
+banner('You must have an HC condition in hX before starting')
+
+// Set the pw's from the probe file
+hXYX
+tn='C13'
+dn='H1'
+dn2='N15'
+getsolidsprobedata('tn')
+getsolidsprobedata('dn')
+getsolidsprobedata('dn2')
+
+exists('tempHXYX','parameter'):$e
+if $e < 0.5 then
+    create('tempHXYX','real')
+endif  
+
+//Set the 13C carrier to 175ppm
+tempHXYX=sfrq*(84)  //Properly referenced to adam tof=0 is about 91 ppm on C
+tof=tempHXYX
+
+//Set the 15N carrier to 117ppm
+tempHXYX=dfrq2*(26)  //Properly referenced to adam tof=0 is about 91 ppm on N
+dof2=tempHXYX
+
+//Set the CO to N
+
+//15N at 3/2 wr
+tempHXYX= (3*srate/2000)
+tempHXYX=(tempHXYX/(1000/(pwY90*4)))
+aYxy=(aY90/4095)*tempHXYX*4095
+
+//13C at 5/2 wr
+tempHXYX=5*srate/2000
+tempHXYX=(tempHXYX/(1000/(pwX90*4)))
+echo(tempHXYX)
+aXxy=4095*tempHXYX*(aX90/4095)
+
+//GB1 like paramters for these
+tXY=5000
+dXY=aYxy*.1
+bXY=dXY/3
+
+//100 kHz aHxy
+tempHXYX=(1000/(pwH90*4))
+tempHXYX=(100/tempHXYX)
+aHxy=tempHXYX*4095*(aH90/4095)
+
+//Set the N to CA
+tempHXYX=sfrq*(-120)  //120 ppm from 175 to 55
+ofYX=tempHXYX
+
+//15N at 5/2 wr
+tempHXYX= (5*srate/2000)
+tempHXYX=(tempHXYX/(1000/(pwY90*4)))
+aYyx=(aY90/4095)*tempHXYX*4095
+
+//13C at 3/2 wr
+tempHXYX=3*srate/2000
+tempHXYX=(tempHXYX/(1000/(pwX90*4)))
+aXyx=4095*tempHXYX*(aX90/4095)
+
+//GB1 like paramters for these
+tYX=5000
+dYX=aXyx*.1
+bYX=dYX/3
+
+//100 kHz aHyx
+tempHXYX=(1000/(pwH90*4))
+tempHXYX=(100/tempHXYX)
+aHyx=tempHXYX*4095*(aH90/4095)
+
+// Set the window and d1
+d1=2
+sw=100000
+np=4096
+rd=5
+ad=5
+ddrtc=10
+lp=0
+
+// 3D pars assume we're trying for a 1D for now
+par3d
+sw1=srate*2
+sw2=srate*4
+ni=0
+ni2=0
+
+destroy('tempHXYX')
+
+
+

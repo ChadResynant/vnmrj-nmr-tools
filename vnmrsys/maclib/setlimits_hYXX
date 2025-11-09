@@ -1,0 +1,17 @@
+setlimit('pwH90',3,1,0.1)
+setlimit('pwX90',3,1,0.1)
+setlimit('pwY90',4,2,0.1)
+setlimit('aHhy',3000,2000,1)
+setlimit('aYhy',3500,2500,1)
+setlimit('dHY',500,-500,1)
+setlimit('bHY',500,1,1)
+setlimit('tHY',2000,400,1)
+setlimit('aYyx',1700,1400,1)
+setlimit('aXyx',700,400,1)
+setlimit('aHyx',3500,1500,1)
+setlimit('dYX',100,-100,1)
+setlimit('bYX',100,1,1)
+setlimit('tYX',6000,400,1)
+"optionally set defaults"
+"aHhy=2500 aYhy=2500 dHY=250 bHY=125 tHY=1000"
+"aYyx=1500 aXyx=500 aHyx=2500 dYX=100 bYX=50 tYX=3000"

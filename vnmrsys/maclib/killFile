@@ -1,0 +1,8 @@
+#  SolidsPack Version 8/14/07
+#  SIMPLEXER: killFile (version 4)
+
+set fileName [lindex $argv 0]
+if { [file exists $fileName] } {
+    file delete -force $fileName
+}
+exit

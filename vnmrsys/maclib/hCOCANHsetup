@@ -1,0 +1,193 @@
+/*
+ * hCOCANH - Setup macro for 4D CO-CA-N-H correlation experiments
+ * 
+ * This macro sets up optimized parameters for 4D hCAcoNH experiments:
+ * H → CO → CO/CA mixing → CA → NH → H detection
+ * 
+ * Experiment design:
+ * - F4 (direct): 1H detection
+ * - F3 (first indirect, ni,sw1,d2): 15N evolution (NH)
+ * - F2 (second indirect, ni2,sw2,d3): 13CA evolution  
+ * - F1 (third indirect, ni3,sw3,d4): 13CO evolution
+ * 
+ * Key optimizations:
+ * - 4D matrix sizes optimized for sequential assignment
+ * - CA-CO mixing for inter-residue connectivity
+ * - Spectral widths for CA, CO, and NH regions
+ * - Aggressive NUS sampling for practical experiment times
+ * 
+ * Usage: hCAcoNH
+ * 
+ * Author: CMR
+ * Project: Biosolids application-specific macros  
+ * Date: July 2025
+ */
+
+hYYXH
+layout = seqfil
+pwH90=1.75      // 1H 90° pulse
+pwX90=2.65      // 15N 90° pulse
+pwY90=1.85      // 13C 90° pulse
+
+// Power levels (correct channels)
+tpwr=63        // 1H transmitter power
+dpwr=63        // 15N decoupler power (2nd channel)
+dpwr2=63       // 13C decoupler power (3rd channel)
+
+// Decoupling sequences
+Hseq='waltz'   // 1H decoupling sequence
+Xseq='waltz'   // 15N decoupling sequence
+Yseq='waltz'   // 13C decoupling sequence
+
+// Spectral widths and evolution delays
+sw=25000 ad=12.5 rd=12.5 ddrtc=25     // Direct 1H detection (F4)
+sw1=srate/8 d2=0 ni=0  // F3: 15N
+sw2=srate/4 d3=0 ni2=0 // F2: 13CA
+sw3=srate/8 d4=0 ni3=0 // F1: 13CO
+
+// Load base parameters
+write('line3','==========================================')
+write('line3','hCOCANH Setup (4D CO[i]-CA[i]-N[i]-HN[i])')
+write('line3',' Experiment: h CO(t1) CA(t2) N(t3) H(t4)')
+write('line3',' F1 (ni3,sw3,d4): CO evolution with softpul')
+write('line3','  CA-CO mixing with SPC5(3) qYspcn ofYspcn')
+write('line3',' F2 (ni2,sw2,d3): CA evolution with softpul2')
+write('line3',' F3 (ni,sw1,d2): N evolution')
+write('line3',' F4 (direct): H detection')
+
+//=============================================================================
+// 4D CA-CO-NH SPECIFIC SPECTRAL WIDTHS
+//=============================================================================
+
+setlimit('sw1',10000,2000,1)
+setlimit('sw2',10000,2000,1)
+setlimit('sw3',10000,2000,1)
+
+//=============================================================================
+// 4D OPTIMIZED ACQUISITION PARAMETERS
+//=============================================================================
+
+// Conservative 4D matrix sizes
+setlimit('ni',128,0,1)
+setlimit('ni2',128,0,1) 
+setlimit('ni3',128,0,1)
+
+// Evolution time limits (shorter for 4D to manage experiment time)
+d2max = 15e-3    // 12 ms for 15N
+d3max = 10e-3    // 10 ms for 13CO
+d4max = 10e-3    // 10 ms for 13CA
+
+//=============================================================================
+// 4D CA-CO-NH CROSS-POLARIZATION OPTIMIZATION
+//=============================================================================
+
+// H→CA Cross Polarization (first transfer)
+shHY='t'
+chHY='to'
+aHhy = 1274     // ~45 kHz (Asyn fibril 35.714 kHz Taurus 600 Aug 2025)  
+aYhy = 196      // ~8 kHz 
+bHY = 254      // 
+dHY = -101      //
+tHY = 4000     // 4000 us HCA contact time
+ofHY = 0 // Assume carrier on the CA initially
+dof2 = 11773.1 // CO 175 ppm Aug 2025
+
+// CA soft pulse
+chYshp1='dec2'
+wvYshp1='rsnob'
+ofYshp1=0
+dbYshp1=40
+aYshp1=575
+pwYshp1=1246
+phYshp1=5
+aHshp1=0
+
+// First mixing period (CA evolution and mixing)
+mMix = 'spcn'   // Use SPCN for CA-CO transfer
+qYspcn = 90      // 5 rotor periods
+NYspcn = 5      // N=5 for SPCN, 
+pwYspcn = 8.4 // assuming SPC5(3) at 35.714 kHz; 28 us * 3 = 84 us / 10 = 8.4 us 2pi pulse
+aHmixspcn = 0 // Low power during mixing
+ofYspcn = -9800 // -9800 if carrier is on CA; +8200 if carrier is on CO
+
+// CO soft pulse
+chYshp2='dec2'
+wvYshp2='rsnob'
+ofYshp2=-18000
+dbYshp2=40
+aYshp2=625
+pwYshp2=1200
+phYshp2=5
+aHshp2=0
+
+// CO→NH Cross Polarization (after SPCN mixing)
+shYX='t' chYX='fr'
+aYyx = 214      // ~7 kHz on CO 
+aXyx = 1118      // Optimized for 15N
+tYX = 8000   // 8 ms CO-N contact time
+bYX = 24      
+dYX = 110
+ofYX = -18000
+
+// NH→H Cross Polarization (final transfer)
+shXH='t' chXH='to'
+tXH = 800     // 800 us NH contact time
+aHxh = 663   
+aXxh = 505   
+bXH = 68      
+dXH = 228
+
+//=============================================================================
+// 4D SPECIFIC TIMING PARAMETERS
+//=============================================================================
+
+// Relaxation delay (critical for 4D experiment time)
+d1 = 0.5         // assume Cu(II)EDTA doped for T1H ~ 100 ms
+
+// Homospoil and constant delays
+hst = 0     // no homospoil
+hstconst = 0 // no hs constant delay
+
+// Acquisition parameters
+at = 20e-3       // 20 ms acquisition (shorter for 4D)
+np = 1536        // 1.5K points direct dimension
+
+//=============================================================================
+// 4D PULSE SEQUENCE PARAMETERS
+//=============================================================================
+
+// No H-H mixing for backbone experiments
+qHrfdr = 0
+
+// Minimal presaturation
+qHpxy = 1
+aHpxy = 900
+pwHpxy = 20e3
+
+//=============================================================================
+// 4D SAFETY AND VALIDATION
+//=============================================================================
+
+// Calculate duty cycle (higher for 4D)
+$duty_pulse_time = (tHY + tYX + tXH + 4*pwH90 + pwHpxy*qHpxy + tRF + (d2max + d3max + d4max + at)*1e6)
+$duty_cycle_time = $duty_pulse_time + d1*1e6
+$duty_cycle = $duty_pulse_time / $duty_cycle_time
+
+write('line3','RF on / (RF+d1) = %.0f ms / %.0f ms = %.1f%%',$duty_pulse_time/1000,$duty_cycle_time/1000,$duty_cycle*100)
+//write('line3','RF + d1: %.0f ms',$duty_cycle_time/1000)
+//write('line3','Duty cycle: %.1f%%',$duty_cycle*100)
+
+if ($duty_cycle > 0.20) then
+    write('line3',' ERROR: Duty cycle %.1f%% > 20%% for 4D experiment',$duty_cycle*100)
+    write('line3','  Make d1 longer or reduce elsewhere')
+    abort
+endif
+
+// Check spinning rate requirement (critical for 4D)
+if (srate < 25000) then
+    write('line3',' WARNING: Spinning rate %.0f Hz may be too low for 4D',srate)
+    write('line3','  Recommend srate ≥ 25 kHz for 4D H detection')
+endif
+
+write('line3',' 4D hCACONH setup complete!')
+write('line3','  Evolution limits: %.0f ms (CA,F1), %.0f ms (CO,F2), %.0f ms (N,F3)',d2max*1000,d3max*1000,d4max*1000)

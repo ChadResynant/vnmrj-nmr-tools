@@ -1,0 +1,17 @@
+"assume 36 kHz MAS, 125 kHz max on H and C, 83 kHz max on N"
+"low power conditions all spin locks < wR"
+setlimit('aHhx',1200,300,10) aHhx=600
+setlimit('aXhx',1600,300,10) aXhx=900
+setlimit('dHX',-1,-400,1)    dHX=-150
+setlimit('bHX',300,10,1)      bHX=75
+setlimit('tHX',2000,400,10)   tHX=800
+
+"wH=5/2 wR at about 2800"
+"wN=3/2 wR at about 2500"
+setlimit('aHxh',1200,300,1) aHxh=600
+setlimit('aXxh',1600,300,1) aXxh=900
+setlimit('dXH',-1,-400,1)    dXH=-150
+setlimit('bXH',300,10,1)       bXH=75
+setlimit('tXH',2000,0,10)     tXH=800 
+
+

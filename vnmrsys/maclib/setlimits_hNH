@@ -1,0 +1,19 @@
+"assume 36 kHz MAS, 125 kHz max on H and C, 83 kHz max on N"
+"use wH=5/2 wR wC=3/2 wR wN=3/2 wR for H transfers to/from XY"
+"wH=5/2 wR at about 2800"
+"wN=3/2 wR at about 1700"
+setlimit('aHhx',3600,2600,25) 
+setlimit('aXhx',3200,2600,25) 
+setlimit('dHX',-100,-800,25)   
+setlimit('bHX',300,10,25)    
+setlimit('tHX',5000,400,250)  
+
+"wH=5/2 wR at about 2800"
+"wN=3/2 wR at about 2500"
+setlimit('aHxh',3500,2600,25) 
+setlimit('aXxh',3600,2600,25) 
+setlimit('dXH',800,100,25)    
+setlimit('bXH',400,1,25)       
+setlimit('tXH',1000,0,250)      
+
+

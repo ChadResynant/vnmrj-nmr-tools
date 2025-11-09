@@ -1,0 +1,222 @@
+# hXX.c Refactoring Test Protocol
+
+## Files You'll Need
+
+Before testing, you'll need these header files in your sequence directory:
+
+### 1. biosolidevolution.h
+- Copy from the first artifact I created
+- Handles evolution periods with automatic CT/regular switching
+- Provides composite pulse decoupling
+
+### 2. biosolidcp.h  
+- Copy from the second artifact
+- Simplifies cross-polarization setup
+- Automatic channel assignments
+
+### 3. biosolidvalidation.h
+- Copy from the third artifact  
+- Comprehensive parameter validation
+- Unified duty cycle calculations
+
+### 4. hXX_refactored.c
+- Copy from the fourth artifact
+- The refactored sequence itself
+
+## Testing Protocol
+
+### Phase 1: Basic Compilation and Setup
+
+1. **Backup Original**: 
+   ```bash
+   cp hXX.c hXX_original.c
+   ```
+
+2. **Install Headers**:
+   - Place all `.h` files in your sequence directory
+   - Or in a common biosolid header directory
+
+3. **Test Compilation**:
+   ```bash
+   # Test that it compiles without errors
+   seqgen hXX_refactored
+   ```
+
+### Phase 2: Parameter Validation Testing
+
+Test the new validation system with known bad parameters:
+
+4. **Test Duty Cycle Limits**:
+   ```
+   # Set very short d1 to trigger duty cycle error
+   d1 = 0.001
+   # Should abort with clear duty cycle message
+   ```
+
+5. **Test Evolution Limits**:
+   ```
+   # Set very long evolution time
+   ni = 1000, sw1 = 1000  # Creates 1 second evolution
+   # Should abort with evolution time error
+   ```
+
+6. **Test Spinning Rate**:
+   ```
+   srate = 100  # Below 500 Hz minimum
+   # Should abort with spinning rate error
+   ```
+
+### Phase 3: Functional Testing
+
+7. **Simple 2D Test**:
+   ```
+   # Basic parameters that should work
+   cp = 'n'        # No cross-polarization
+   echo = 'n'      # No echo
+   mMix = 'n'      # No mixing
+   ni = 16         # Small 2D
+   d1 = 2.0        # Safe relaxation delay
+   ```
+
+8. **CP Test**:
+   ```
+   # Enable cross-polarization
+   cp = 'y'
+   cpboth = 'n'
+   # Verify CP works correctly
+   ```
+
+9. **Evolution Period Test**:
+   ```
+   # Test different evolution times
+   ni = 32, sw1 = 50000  # Short evolution
+   ni = 128, sw1 = 50000 # Longer evolution
+   # Compare spectra with original sequence
+   ```
+
+### Phase 4: Advanced Feature Testing
+
+10. **Mixing Test**:
+    ```
+    mMix = 'rad'    # DARR mixing
+    tXmix = 0.010   # 10 ms mixing
+    ```
+
+11. **Echo Test**:
+    ```
+    echo = 'soft'
+    tECHO = 0.001   # 1 ms echo
+    ```
+
+12. **Full Feature Test**:
+    ```
+    # All features enabled
+    cp = 'y'
+    echo = 'soft' 
+    mMix = 'spc5'
+    ```
+
+## Validation Checklist
+
+### ✅ Expected Improvements
+- [ ] **Better Error Messages**: Clear, specific error descriptions
+- [ ] **Automatic Validation**: Catches parameter problems early
+- [ ] **Consistent Timing**: Evolution periods behave predictably
+- [ ] **Duty Cycle Protection**: Prevents hardware damage
+
+### ✅ Should Be Identical
+- [ ] **Spectrum Quality**: No change in signal/noise or resolution
+- [ ] **Phase Cycling**: Identical artifact suppression
+- [ ] **Timing Accuracy**: Same evolution times as original
+
+### ✅ Parameter Compatibility  
+- [ ] **All Parameters Work**: Existing parameter files load correctly
+- [ ] **Default Behavior**: Same results with typical parameters
+- [ ] **Edge Cases**: Handles unusual parameter combinations
+
+## Troubleshooting Guide
+
+### Common Issues and Solutions
+
+**Compilation Errors:**
+```
+Error: biosolidevolution.h not found
+Solution: Ensure header files are in correct directory
+```
+
+**New Validation Errors:**
+```
+Error: Duty cycle 15% exceeds limit 10%
+Solution: These may be real issues the original sequence ignored
+Check: d1 too short, tXmix too long, or other timing issues
+```
+
+**Different Behavior:**
+```
+Issue: Slightly different timing or behavior
+Cause: Better parameter validation may change borderline cases
+Action: Compare parameters carefully, new version may be more accurate
+```
+
+## Performance Comparison
+
+### Timing Test Script
+```bash
+# Compare execution time (should be similar or faster)
+time seqgen hXX_original
+time seqgen hXX_refactored
+```
+
+### Memory Usage
+```bash
+# Check sequence size (should be similar)
+ls -la *.seq
+```
+
+## Migration Checklist
+
+### Before Going Live:
+- [ ] All tests pass
+- [ ] Spectra match original sequence  
+- [ ] Parameter validation working correctly
+- [ ] Error messages are helpful
+- [ ] Performance is acceptable
+
+### After Successful Testing:
+- [ ] Replace original sequence
+- [ ] Update documentation
+- [ ] Train users on new error messages
+- [ ] Apply same refactoring to other sequences
+
+## Benefits You Should See
+
+1. **Immediate**:
+   - Better error messages
+   - Automatic parameter validation
+   - Cleaner sequence code
+
+2. **Long-term**:
+   - Easier maintenance
+   - Consistent behavior across sequences
+   - Faster development of new sequences
+   - Reduced debugging time
+
+## Next Steps After hXX Success
+
+Once hXX.c is working well:
+
+1. **Apply to Simple 3D**: Start with TEDOR or hYXX
+2. **Extend Systems**: Add more evolution types, mixing modes
+3. **Create Templates**: Use as template for new sequences
+4. **Full Migration**: Gradually update all sequences
+
+## Support
+
+If you run into issues:
+
+1. **Compare Parameters**: Use `diff` to compare parameter files
+2. **Check Timing**: Use oscilloscope to verify RF timing
+3. **Validate Results**: Compare spectra quantitatively
+4. **Document Issues**: Note any differences for future sequences
+
+This systematic approach should give you confidence that the refactored version works correctly and provides the expected benefits.

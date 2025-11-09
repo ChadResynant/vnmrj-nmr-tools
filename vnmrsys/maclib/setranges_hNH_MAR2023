@@ -1,0 +1,17 @@
+"assume 36 kHz MAS, 125 kHz max on H and C, 83 kHz max on N"
+"use wH=5/2 wR wC=3/2 wR wN=3/2 wR for H transfers to/from XY"
+"20230304-08am best with ramp on N chHX='to', ramping down"
+setlimit('aHhx',3600,1800,1) aHhx=2320
+setlimit('aXhx',3600,1800,1) aXhx=2400 chHX='to'
+setlimit('dHX',-100,-300,1)  dHX=-216
+setlimit('bHX',250,50,1)     bHX=121
+setlimit('tHX',2500,250,1)   tHX=1390
+
+"20230304-08am best with ramp on N chXH='fr', ramping up"
+setlimit('aHxh',3600,2500,1) aHxh=2760
+setlimit('aXxh',3400,2400,1) aXxh=3180 chXH='fr'
+setlimit('dXH',600,200,1)    dXH=366
+setlimit('bXH',200,50,1)     bXH=140
+setlimit('tXH',2000,0,1)     tXH=1580 
+
+

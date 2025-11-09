@@ -1,0 +1,156 @@
+# Phase Table Organization System for NMR Sequences
+
+## Current Problems with Phase Tables
+
+### Issues We See:
+1. **Random Order**: Phase tables defined in historical order, not logical sequence order
+2. **Inconsistent Naming**: Mix of abbreviations and full names
+3. **Scattered Definitions**: `#define` statements far from table definitions
+4. **Hard to Debug**: Difficult to trace phase cycling through the sequence
+5. **No Clear Grouping**: CP phases mixed with evolution phases mixed with receiver phases
+
+## Proposed Organization System
+
+### 1. **Logical Sequence Order**
+Organize phase tables in the order they appear in the pulse sequence:
+
+```c
+// ================================================================
+// PHASE TABLES - Organized by sequence order
+// ================================================================
+
+// 1. EXCITATION PHASES
+static int phH90_table[4]    = {0,0,2,2};           // Initial excitation
+static int phX90_table[4]    = {1,1,3,3};           // Initial X pulse (if used)
+
+// 2. CROSS-POLARIZATION PHASES  
+static int phHhx_table[8]    = {1,1,1,1,1,1,1,1};   // H→X CP (H channel)
+static int phXhx_table[8]    = {0,2,0,2,2,0,2,0};   // H→X CP (X channel)
+static int phHhy_table[8]    = {3,3,3,3,3,3,3,3};   // H→Y CP (H channel)
+static int phYhy_table[8]    = {0,0,0,0,0,0,0,0};   // H→Y CP (Y channel)
+
+// 3. EVOLUTION PHASES
+static int phCompX1_table[4] = {0,0,0,0};           // X composite pulse 1
+static int phCompX2_table[4] = {1,1,1,1};           // X composite pulse 2
+static int phCompY1_table[4] = {0,0,0,0};           // Y composite pulse 1  
+static int phCompY2_table[4] = {1,1,1,1};           // Y composite pulse 2
+
+// 4. MIXING PHASES
+static int phXmix1_table[16] = {3,3,1,1,1,1,3,3,3,3,1,1,1,1,3,3};  // Mixing storage
+static int phXmix2_table[32] = {1,1,3,3,1,1,3,3,1,1,3,3,1,1,3,3,   // Mixing readout
+                                2,2,0,0,2,2,0,0,2,2,0,0,2,2,0,0};
+
+// 5. DETECTION PHASES
+static int phRec_table[32]   = {0,2,0,2,2,0,2,0,2,0,2,0,0,2,0,2,   // Receiver
+                                1,3,1,3,3,1,3,1,3,1,3,1,1,3,1,3};
+
+// ================================================================
+// PHASE ASSIGNMENTS - Clear mapping to sequence events
+// ================================================================
+
+#define phH90     t1    // Initial H excitation
+#define phX90     t2    // Initial X pulse (if used)
+#define phHhx     t3    // H→X CP: H channel  
+#define phXhx     t4    // H→X CP: X channel
+#define phHhy     t5    // H→Y CP: H channel
+#define phYhy     t6    // H→Y CP: Y channel
+#define phCompX1  t7    // X evolution: composite pulse 1
+#define phCompX2  t8    // X evolution: composite pulse 2
+#define phCompY1  t9    // Y evolution: composite pulse 1
+#define phCompY2  t10   // Y evolution: composite pulse 2
+#define phXmix1   t11   // X mixing: storage pulse
+#define phXmix2   t12   // X mixing: readout pulse
+#define phRec     t13   // Receiver phase
+```
+
+### 2. **Standardized Naming Convention**
+
+#### Format: `ph[Nucleus][Event][Details]_table`
+
+**Examples:**
+- `phH90_table` - H 90-degree pulse
+- `phHhx_table` - H→X CP, H channel
+- `phXhx_table` - H→X CP, X channel  
+- `phCompX1_table` - X composite pulse, first pulse
+- `phXmix1_table` - X mixing, storage pulse
+
+#### Event Types:
+- **90, 180** - Hard pulse angles
+- **hx, hy, yx, xh** - Cross-polarization transfers
+- **Comp1, Comp2** - Composite pulse elements
+- **mix1, mix2** - Mixing storage/readout
+- **Rec** - Receiver
+
+### 3. **Functional Grouping with Comments**
+
+```c
+// ================================================================
+// EXCITATION AND PREPARATION
+// ================================================================
+static int phH90_table[4] = {0,0,2,2};
+
+// ================================================================  
+// CROSS-POLARIZATION TRANSFERS
+// ================================================================
+static int phHhx_table[8] = {1,1,1,1,1,1,1,1};     // H channel
+static int phXhx_table[8] = {0,2,0,2,2,0,2,0};     // X channel
+
+// ================================================================
+// EVOLUTION PERIODS  
+// ================================================================
+static int phCompX1_table[4] = {0,0,0,0};          // F2 composite pulses
+static int phCompX2_table[4] = {1,1,1,1};
+static int phCompY1_table[4] = {0,0,0,0};          // F1 composite pulses  
+static int phCompY2_table[4] = {1,1,1,1};
+
+// ================================================================
+// MIXING SEQUENCES
+// ================================================================
+static int phXmix1_table[16] = {...};              // Storage pulse
+static int phXmix2_table[32] = {...};              // Readout pulse
+
+// ================================================================
+// DETECTION AND RECEIVER
+// ================================================================
+static int phRec_table[32] = {...};                // Receiver cycling
+```
+
+### 4. **Clear Phase Cycling Documentation**
+
+Add comments explaining the phase cycling strategy:
+
+```c
+// ================================================================
+// PHASE CYCLING STRATEGY
+// ================================================================
+/*
+ * 8-step base cycle for artifact suppression:
+ * - Steps 1-2: Select coherence pathway
+ * - Steps 3-4: Remove quadrature artifacts  
+ * - Steps 5-8: Spin temperature alternation
+ * 
+ * Extended to 16/32 steps for:
+ * - Long mixing sequences (additional artifact suppression)
+ * - Multiple evolution periods (independent cycling)
+ * - DQF options (double quantum filtering)
+ */
+```
+
+### 5. **Automatic Phase Table Setup Function**
+
+```c
+// ================================================================
+// PHASE TABLE SETUP FUNCTION
+// ================================================================
+void setup_phase_tables_hxx(void) {
+    // Setup in logical sequence order
+    settable(phH90,     4,  phH90_table);      // 1. Initial excitation
+    settable(phHhx,     8,  phHhx_table);      // 2. H→X CP (H channel)
+    settable(phXhx,     8,  phXhx_table);      // 3. H→X CP (X channel)
+    settable(phCompX1,  4,  phCompX1_table);   // 4. X evolution (comp 1)
+    settable(phCompX2,  4,  phCompX2_table);   // 5. X evolution (comp 2)
+    settable(phXmix1,   16, phXmix1_table);    // 6. X mixing (storage)
+    settable(phXmix2,   32, phXmix2_table);    // 7. X mixing (readout)
+    settable(phRec,     32, phRec_table);      // 8. Receiver
+}
+```

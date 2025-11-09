@@ -1,0 +1,9 @@
+"testSettancpx"
+"  load tancpX with some reasonable testing parameters"
+Settancpx
+tn='C13' dn='H1'
+aH90=4000 pwH90=100
+tHX=1000 aHhx=1500 aXhx=2500 shHX='t' bHX=100 dHX=200 
+aHspinal=2500 phHspinal=5 pwHspinal=7.5
+sw=100k at=.002 ddrtc=10
+d1=.25 nt=1e4

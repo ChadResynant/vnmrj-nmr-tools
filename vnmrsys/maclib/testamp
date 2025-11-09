@@ -1,0 +1,50 @@
+seqfil = 'testamp'
+
+
+exists('blank1','parameter'):$e
+if $e < 0.5 then
+   create('blank1','flag')
+   blank1='n'
+endif 
+
+exists('blank2','parameter'):$e
+if $e < 0.5 then
+   create('blank2','flag')
+   blank2='n'
+endif 
+
+//------------------------------
+// Receiver Delays
+//------------------------------
+
+exists('rd','parameter'):$e
+if $e < 0.5 then
+   create('rd','pulse')
+   setlimit('rd',8192,0,0.0125)  
+endif 
+
+exists('ad','parameter'):$e
+if $e < 0.5 then
+   create('ad','pulse')
+   setlimit('ad',8192,0,0.0125)  
+endif
+
+exists('ddrtc','parameter'):$e
+if $e < 0.5 then
+   create('ddrtc','pulse')
+   setlimit('ddrtc',8192,0,0.0125)  
+endif
+
+
+//------------------------------------------------
+//  Set the parameter templates
+//------------------------------------------------
+
+setprotect('dg','clear',4)
+$dg = '1:ACQUISITION:sw:1,at:6,np:0,d1:6,d2:6,nt:0,ct:0,bs:0,'
+$dg = $dg + 'ss:0,rd:1,ad:1,ddrtc:1,rof3(rof3):1,gain:0;'
+$dg = $dg + '2:PULSE:aX90:0,pwX90:1;'
+$dg = $dg + '3:FLAGS:blank1,blank2;'
+dg = $dg
+setprotect('dg','on',4)
+

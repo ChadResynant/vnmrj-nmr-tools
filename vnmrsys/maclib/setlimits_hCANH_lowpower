@@ -1,0 +1,31 @@
+"assume 36 kHz MAS, 125 kHz max on H and C, 83 kHz max on N"
+"use wH=5/2 wR wC=3/2 wR wN=3/2 wR for H transfers to/from XY"
+"wH=5/2 wR at about 2800"
+"wC=3/2 wR at about 1700"
+setlimit('aHhy',3500,2000,10) aHhy=2750
+setlimit('aYhy',2500,1000,10) aYhy=1750
+setlimit('dHY',500,5,1) dHY=250
+setlimit('bHY',500,5,1) bHY=125
+setlimit('tHY',4000,400,10) tHY=2000
+
+"wH=5/2 wR at about 2800"
+"wN=3/2 wR at about 2500"
+setlimit('aHxh',3500,2000,10) aHxh=2750
+setlimit('aXxh',3200,1800,10) aXxh=2500
+setlimit('dXH',500,5,1) dXH=250
+setlimit('bXH',500,5,1) bXH=125
+"limit XH contact time to avoid interresidue"
+setlimit('tXH',2000,200,10) tXH=800 
+
+"use low power n=1 DQ CP condition for CAN; wC<wR and wN<wR"
+"set ranges to approx. 0.2 wR to 0.8 wR"
+"wN=wR at about aX=1750; wC=wR at about aY=1200"
+setlimit('aYyx',1200,200,1) aYyx=700
+setlimit('aXyx',1800,200,1) aXyx=1000
+setlimit('aHyx',3500,2000,1) aHyx=3000
+setlimit('dYX',150,-150,1) dYX=75
+setlimit('bYX',100,10,1) bYX=25
+setlimit('tYX',8000,1000,1) tYX=4000
+"optionally set defaults"
+"aHhy=2500 aYhy=2800 dHY=250 bHY=125 tHY=1000"
+"aYyx=500 aXyx=500 aHyx=2500 dYX=100 bYX=50 tYX=4000"

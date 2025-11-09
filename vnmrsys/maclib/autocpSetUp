@@ -1,0 +1,1075 @@
+#==================================================================================
+#   SolidsPack Version 8/13/07
+#==================================================================================
+#   SIMPLEXER(shimDriver): asSetup
+#
+###################################################################################
+#  asSetUp
+#==================================================================================
+#
+#  This program generates menus for selection of a series of autoShim 
+#  experiments.  The series may be repeated nCycles times.
+#  It is called from within a MAGICAL macro.
+#
+#  arg 0 is the location of the current experiment
+#  args 1-n are the names of the shims
+#
+#  Operation is mostly self-evident. The user can delete a method by selecting
+#  the method in the method list with the left mouse button and then right-clicking.
+#
+#===================================================================================
+#===================================================================================
+#
+# program outputs the file tempMethods into the curexp directory
+#
+#===================================================================================
+#===================================================================================
+# curpar/conpar format:
+#
+#   line 1: attributes
+#       0: name
+#       1: subtype. 0(none)1(real)2(string)3(delay)4(flag)5(freq)6(pulse)7(int)
+#       2: basic type. 0(none)1(real)2(string)
+#       3: maxval. either the value or an index into parmax
+#       4: minval. "                               " parmin
+#       5: stepsize."                              " parstep
+#       6: Ggroup. 
+#       7: Dgroup
+#       8: protext word. 32 bits
+#       9: active/not active
+#      10: unused
+#
+#   line 2: First field gives the number of values of the parameter
+#           If basic type == 1, then all parameter values are listed in line 2
+#           If basic type == 2, then the first value is given in line 2 and
+#           subsequent values are given in subsequent lines
+#
+#====================================================================================
+
+set Method 0
+set Range 100
+
+
+set lClass [list "Axial" "LowNon-Spinning" \
+                 "HighNon-Spinning" "Tilted" ]
+
+set ssColor #24c3c3
+set ssColor gray75
+set hdColor red
+set textColor blue
+tk_setPalette $ssColor
+
+
+proc popup msg {
+    tk_messageBox -type ok -message $msg
+}
+
+set name    0
+set value   1
+set units   2
+set min     3
+set max     4
+set step    5
+set dgroup  6
+set type    7
+set class   8
+
+set axialShims  [list z1 z2 z1c z2c z3 z4 z5 z6 z7 z8]
+set lowNonSpin  [list x1 y1 xz yz xy zxy xz2 yz2 x3 y3 z3c z2xy x2y2 z3x z3y zx3 zy3] 
+set highNonSpin [list x4 y4 zx2y2 z2x2y2 z4x z4y z3x2y2 z3xy z2x3 z2y3 \
+                      z3x3 z3y3 z4x2y2 z4c z4xy z5x z5y ] 
+
+#=================================================
+#  Read shim values and order them
+#=================================================                      
+                      
+proc parseShims file {
+    
+    global shimList
+    
+    global name; global value; global units; global min
+    global max; global step; global dgroup; global type; global class
+    
+    global shimArr; global nElements
+    
+    global parmin; global parmax; global parstep 
+    
+    global axialShims; global lowNonSpin; global highNonSpin
+    
+    set idx 0
+    set fd [open $file  r]
+    
+     while { [gets $fd line] >= 0 } {
+       
+         if {  [llength $line]  < 1} {
+                continue
+         }
+           
+        set nElements $idx
+ 
+        set e0 [lindex $line 0]
+        set e1 [lindex $line 1]
+        set e2 [lindex $line 2]
+        set e3 [lindex $line 3]
+        set e4 [lindex $line 4]
+        set e5 [lindex $line 5]
+        set e6 [lindex $line 6]
+        set e7 [lindex $line 7]
+        set e8 [lindex $line 8]
+        set e9 [lindex $line 9]
+        set e10 [lindex $line 10]
+        set shimArr($idx,$name) $e0
+        
+        
+        if { [lsearch -exact $shimList $e0] == -1 } {
+                gets $fd line
+                if { [lindex $line 0] !=  1} {
+                    if { $e2 == 2 } { 
+                        for {set j 1 } {$j < [lindex $line 0] } {incr j 1} {
+                            gets $fd line
+                        }
+                    } 
+                } 
+                gets $fd line
+                continue   
+        }
+        
+        if { [lsearch -exact $axialShims $e0] != -1 } {
+           set shimArr($idx,$class) "Axial"
+        } else {
+            if { [lsearch -exact $lowNonSpin $e0] != -1 } {
+               set shimArr($idx,$class) "LowNon-Spinning"
+            } else {
+                if { [lsearch -exact $highNonSpin $e0] != -1 } {
+                    set shimArr($idx,$class) "HighNon-Spinning" 
+                } else {
+                    set strError "Error Loading Shim File! Shim "
+                    append strError $e0
+                    append strError "cannot be classified"
+                    popup $strError
+                    return
+                }
+            }
+        }
+
+       
+        set shimArr($idx,$type)  $e1
+        set shimArr($idx,$dgroup) $e7
+        
+        switch -exact -- $shimArr($idx,$type) {
+           0 -
+           1 -
+           4 -
+           7 -
+           2 {set shimArr($idx,$units) " "}
+           3 {set shimArr($idx,$units) "s"}
+           5 {set shimArr($idx,$units) "Hz"}
+           6 {set shimArr($idx,$units) "us"}
+           default {set shimArr($idx,$units) " "}
+       }
+           
+        set val 8192 
+        for { set i 12 } {$i >= 0 } {incr i -1} {
+            if {$e8 >= $val} {
+                set arrT($i) 1
+                incr e8 [expr -1*$val] 
+            } else {
+                set arrT($i) 0 
+            }
+            set val [expr $val/2]
+        }
+        set cludge 0
+        set lProt $arrT($cludge)
+        for {set i 1} {$i <  13} {incr i 1} {
+            lappend lProt $arrT($i)
+        }
+        unset cludge
+        unset arrT
+        unset val
+        
+        if { [lindex $lProt  [ expr [llength $lProt] - 1] ] == 1} {
+            set shimArr($idx,$min)  [ lindex $parmin [ expr $e3 - 1] ]
+            set shimArr($idx,$max)   [ lindex $parmax [ expr $e4 - 1] ]
+            set shimArr($idx,$step)  [ lindex $parstep [ expr $e5 - 1] ]
+        } else {
+            set shimArr($idx,$min) $e3
+            set shimArr($idx,$max) $e4
+            set shimArr($idx,$step) $e5
+        }
+        gets $fd line
+        if { [lindex $line 0] !=  1} {
+          set  strMsg $e0
+          append strMsg "  Is an array! Loading first value only"
+          popup $strMsg
+          set shimArr($idx,$value)  [lindex $line 1]
+          if { $e2 == 2 } { 
+            for {set j 1 } {$j < [lindex $line 0] } {incr j 1} {
+                gets $fd line
+            }
+          } 
+        } else {
+           set shimArr($idx,$value)  [lindex $line 1]
+        }
+        gets $fd line
+        
+        
+        
+        incr idx 1
+  }
+  close $fd
+  sortShimArray
+}
+
+proc sortShimArray { } {
+  global shimArr; global nElements; global arrSel
+  global nElements
+  global name; global value; global units; global min
+  global max; global step; global dgroup; global type; global class
+  
+  set idx 0
+  set nList [list $shimArr($idx,$name) ]
+  for {set i 1} { $i < $nElements } {incr i 1} {
+    lappend nList $shimArr($i,$name)
+  }
+  set n2List [lsort -dictionary $nList]
+  
+  for {set i 0} {$i < $nElements } { incr i 1} {
+    set n [lsearch $nList [lindex $n2List $i] ]
+    set nArr($i,$name) $shimArr($n,$name)
+    set nArr($i,$value) $shimArr($n,$value)
+    set nArr($i,$units) $shimArr($n,$units)
+    set nArr($i,$min) $shimArr($n,$min)
+    set nArr($i,$max) $shimArr($n,$max)
+    set nArr($i,$step) $shimArr($n,$step)
+    set nArr($i,$dgroup) $shimArr($n,$dgroup)
+    set nArr($i,$type) $shimArr($n,$type)
+    set nArr($i,$class) $shimArr($n,$class) 
+  }
+  for {set i 0} {$i < $nElements } { incr i 1} {
+    set n [lsearch $nList [lindex $n2List $i] ]
+    set shimArr($i,$name) $nArr($i,$name)
+    set shimArr($i,$value) $nArr($i,$value)
+    set shimArr($i,$units) $nArr($i,$units)
+    set shimArr($i,$min) $nArr($i,$min)
+    set shimArr($i,$max) $nArr($i,$max)
+    set shimArr($i,$step) $nArr($i,$step)
+    set shimArr($i,$dgroup) $nArr($i,$dgroup)
+    set shimArr($i,$type) $nArr($i,$type)
+    set shimArr($i,$class) $nArr($i,$class) 
+  }
+}
+
+#=================================
+#   Get min,max, step from conpar
+#=================================
+
+proc parseConpar conparFile {
+
+     global parmin
+     global parmax
+     global parstep
+
+    
+    set fd [open $conparFile r]
+
+    while { [gets $fd line] >= 0 } {
+
+      if { [lindex $line 0] == "parstep" } {
+         gets $fd line
+       for {set i 1} {$i < [llength $line] } {incr i 1} {
+             lappend parstep  [lindex $line $i]
+        }
+         gets $fd line
+         continue
+      }
+
+        if { [lindex $line 0] == "parmax" } {
+            gets $fd line
+            for {set i 1} {$i < [llength $line] } {incr i 1} {
+                 lappend parmax  [lindex $line $i]
+            }
+            gets $fd line
+            continue
+          }
+
+       if { [lindex $line 0] == "parmin" } {
+          gets $fd line
+         for {set i 1} {$i < [llength $line] } {incr i 1} {
+               lappend parmin  [lindex $line $i]
+       }
+         gets $fd line
+        continue
+      }
+    }
+    close $fd
+}
+
+proc abort {fileName}  {
+   set fd [open $fileName w]
+   puts $fd -999
+   close $fd
+   exit
+}
+
+proc start {fileName}  {
+
+   global shimArr nShims nMethods
+   global shimArr arrRange
+   global arrSel
+   global name min max
+   global nIter fTol nCycles
+   
+   set nCurrentCycle 1
+   set nCurrentMethod 0
+   
+   if {$fTol < 0.0001 || $fTol > 0.25 } {
+    popup "fTol must be between 0.001 and 0.25"
+    return
+   }
+   
+   if {$nCycles <1 || $nCycles > 4} {
+    popup "nCycles must be between 1 and 4"
+    return
+   }
+   
+   if { $nIter <1 || $nIter > 10000} {
+    popup "nIter must be between 1 and 10,000"
+    return
+   }
+   
+   for {set i 0 } {$i < $nMethods } {incr i 1 } {
+        set iCount 0
+        for {set j 0 } {$j < $nShims } { incr j 1 } {
+            if { $arrSel($i,$j) == 1 } {
+                incr iCount 1 
+            }
+        }
+        if { $iCount < 2 } {
+            set strError "Error: Method "
+            append strError $i
+            append strError  "  must have at least 2 parameters"
+            popup $strError 
+            return
+        }
+    }
+   
+   set fd [open $fileName w]
+   puts $fd $nCycles
+   puts $fd $nCurrentCycle
+   puts $fd $nMethods
+   puts $fd $nCurrentMethod
+   puts $fd $nIter
+   puts $fd $fTol
+   
+   for {set nMethod 0} {$nMethod <= $nMethods} {incr nMethod 1 } {
+      set iCount 0
+      if { [array size eL] != 0 } {
+          unset eL
+      }
+      for { set i 0 } {$i < $nShims } {incr i 1 } {
+          if { $arrSel($nMethod,$i) == 1 } {
+            set eL($iCount) $i
+            incr iCount 1
+          }
+      }
+      set n [array size eL]
+      puts $fd $n
+      puts $fd $arrRange($nMethod)
+      for {set i 0} {$i < $n} {incr i 1} {
+            set idx $eL($i)
+            puts -nonewline $fd $shimArr($idx,$name)
+            puts -nonewline $fd \t
+            puts -nonewline $fd $shimArr($idx,$min)
+            puts -nonewline $fd \t
+            puts $fd $shimArr($idx,$max)
+      }
+   }
+   
+   close $fd
+   exit
+}
+
+#================================================================
+#           Method Selection
+#================================================================
+
+
+proc load {curExpFile } {
+   
+    global shimArr nShims nMethods
+    global shimArr arrRange eL
+    global arrSel 
+    global name min max
+    global nIter fTol nCycles
+    global nMethods nCurrentMethod arrRange arrSel nShims lMethods
+    global cuurent view
+      
+    
+    set shimDir [string range $curExpFile 0 [string last "/" $curExpFile] ]
+    append shimDir "shims"
+    set methodFile [tk_getOpenFile -initialdir $shimDir]
+    
+    set fd [open $methodFile r]
+    gets $fd line
+    if { [lindex $line 0] != "shimProcedure" } {
+       set strError "Error: "
+       append strError $methodFile
+       append strError " is not a valid Shim Procedure File! "
+       popup $strError
+       close $fd
+       return
+    }
+    
+    
+    
+    #
+    # deleteMethod resets value of nMethods
+    #
+    
+    set n $nMethods
+    
+    for {set i 1 } {$i <= $n} { incr i 1} {
+       deleteMethod $i
+    } 
+    
+    set currentview 0
+    
+    unset arrRange
+    unset arrSel
+    
+    gets $fd line
+    set nCycles [lindex $line 0]
+    gets $fd line
+    set nCurrentCycle 0
+    gets $fd line
+    set nMethods [lindex $line 0]
+    gets $fd line
+    set nCurrentMethod 0
+    gets $fd line
+    set nIter [lindex $line 0]
+    gets $fd line
+    set fTol [lindex $line 0]
+    for {set i 0 } {$i <= $nMethods } {incr i 1} {
+        for {set j 0 } {$j < $nShims } { incr j 1 } {
+            set arrSel($i,$j) 0
+        }
+    }
+    for {set i 0} {$i <= $nMethods } {incr i 1} {
+        gets $fd line
+        set n [lindex $line 0]
+        gets $fd line
+        set arrRange($i) [lindex $line 0]
+        for { set k 0 } {$k < $n } { incr k 1} {
+            gets $fd line
+            set tname [lindex $line 0]
+            set idx [indexFromName $tname]
+            set arrSel($i,$idx) 1
+        }
+    }
+    
+    set lMethods [list ]
+    for {set i 0} {$i <= $nMethods } {incr i 1} {
+        lappend lMethods $i
+    }
+    .flbox.lb selection set $nCurrentMethod        
+    display 0 "All"
+}
+
+proc indexFromName {Name} {
+    global shimArr nShims name
+    set iRet -1
+    for { set i 0 } {$i < $nShims } { incr i 1} {
+         if { $shimArr($i,$name) == $Name } {
+             set iRet $i
+             break
+         }
+    }
+    
+    if {$iRet == -1 } {
+        set strError "Error: Load Procedure. Cannot find shim  "
+        append strError $Name
+        popup $strError
+        return
+    }
+    
+    return $iRet
+}
+    
+proc store {curExpFile } {
+
+    global shimArr nShims nMethods
+    global shimArr arrRange
+    global arrSel
+    global name min max
+    global nIter fTol nCycles
+
+    set shimDir [string range $curExpFile 0 [string last "/" $curExpFile] ]
+    append shimDir "shims"
+    set methodFile [tk_getSaveFile -initialdir $shimDir]
+    
+   set fd [open $methodFile w]
+   puts $fd "shimProcedure"
+   puts $fd $nCycles
+   puts $fd 0
+   puts $fd $nMethods
+   puts $fd 0
+   puts $fd $nIter
+   puts $fd $fTol
+   
+   for {set nMethod 0} {$nMethod <= $nMethods} {incr nMethod 1 } {
+      set iCount 0
+      if { [array size eL] != 0 } {
+          unset eL
+      }
+      for { set i 0 } {$i < $nShims } {incr i 1 } {
+          if { $arrSel($nMethod,$i) == 1 } {
+            set eL($iCount) $i
+            incr iCount 1
+          }
+      }
+      set n [array size eL]
+      puts $fd $n
+      puts $fd $arrRange($nMethod)
+      for {set i 0} {$i < $n} {incr i 1} {
+            set idx $eL($i)
+            puts -nonewline $fd $shimArr($idx,$name)
+            puts -nonewline $fd \t
+            puts -nonewline $fd $shimArr($idx,$min)
+            puts -nonewline $fd \t
+            puts $fd $shimArr($idx,$max)
+      }
+   }
+   
+   close $fd
+   return
+}
+
+proc addMethod { } {
+    global lMethods nMethods nCurrentMethod nShims arrSel arrRange
+    global currentView
+    
+    .flbox.lb selection clear 0 $nMethods
+
+    incr nMethods 1
+    lappend lMethods $nMethods
+    set nCurrentMethod $nMethods
+    for {set i 0} {$i < $nShims } {incr i 1} {
+        set arrSel($nCurrentMethod,$i) 0
+    }
+    set arrRange($nCurrentMethod) 50
+    updateRange
+    .flbox.lb selection set $nCurrentMethod
+    display $nCurrentMethod $currentView         
+}
+
+proc queryDelete { } {
+
+    global nDlgVal ssColor
+    global nMethods
+    set nDlgVal -1
+    
+    set oldFocus [focus]
+    toplevel .dlg
+    wm title .dlg "Delete Method"
+    frame .dlg.f1
+    button .dlg.f1.b1 -text "OK" -command    {set nDlgVal $n}
+    button .dlg.f1.b2 -text "Abort" -command {set nDlgVal -1 }
+       
+    pack .dlg.f1.b1 .dlg.f1.b2 -side left
+    pack .dlg.f1 -side top
+    
+    frame .dlg.f2
+    label .dlg.f2.l -text "Enter Method to Delete" 
+    entry .dlg.f2.e -width 4 -textvariable n
+    pack .dlg.f2.l .dlg.f2.e -side left
+    pack .dlg.f2 -side top
+    
+    focus .dlg
+    grab .dlg
+    
+    tkwait variable nDlgVal
+    grab release .dlg
+    destroy .dlg
+    focus $oldFocus 
+    if {$nDlgVal < 0 || $nDlgVal > $nMethods } {
+        set strMsg "Method Number "
+        append strMsg $nDlgVal
+        append strMsg " is not Defined "
+        popup $strMsg
+        set nDlgVal -1
+        return 
+    }   
+    return 
+}
+
+proc deleteMethod {n} {
+    global nMethods nCurrentMethod arrRange arrSel nShims lMethods
+    global currentView
+    global nDlgVal
+    
+    
+    if {$n == -99 } {  
+        queryDelete
+        set n $nDlgVal
+        if {$n == -1 } {return }
+    }
+    
+    if {$n == 0 && $nMethods == 0 } {
+        popup "Error: Can't Delete only Method!"
+        return
+    }
+    
+    .flbox.lb selection clear 0 $nMethods
+    .flbox.lb delete 0 $nMethods
+    
+    set nNew [expr $nMethods - 1]  
+    set iCount 0
+    for {set i 0} {$i <= $nMethods } { incr i 1 } {
+        if {$i != $n} {
+            set arrRTem($iCount) $arrRange($i)
+            for {set j 0} {$j < $nShims } {incr j 1} {
+                set arrSTem($iCount,$j) $arrSel($i,$j)
+            }
+            incr iCount 1
+        }
+    }
+    
+    unset arrRange
+    unset arrSel
+    
+    set nMethods $nNew
+    
+    for {set i 0} {$i <= $nMethods} {incr i 1} {
+        .flbox.lb insert $i $i
+        set arrRange($i) $arrRTem($i)
+        for {set j 0} {$j < $nShims } {incr j 1} {
+            set arrSel($i,$j) $arrSTem($i,$j)
+        }
+    }
+    
+    unset arrRTem
+    unset arrSTem
+
+    if { $n == $nCurrentMethod } {
+        if {$n > 0} {
+            set nCurrentMethod [expr $n-1]
+            .flbox.lb selection set $nCurrentMethod
+            display $nCurrentMethod $currentView
+            return
+         } else {
+            set nCurrentMethod 0
+            .flbox.lb selection set $nCurrentMethod
+            display $nCurrentMethods $currentView
+        }
+    }
+}
+
+
+proc viewNext { } {
+    global nMethods nCurrentMethod currentView
+    if { $nCurrentMethod == $nMethods } {
+        popup "At end of Methods List"
+        return
+    }
+    
+    incr nCurrentMethod 1
+    updateRange
+    display $nCurrentMethod $currentView
+}
+
+proc viewPrevious { } {
+    global nMethods nCurrentMethod currentView
+    if { $nCurrentMethod == 0} {
+        popup "At Beginning of Methods List"
+        return
+    }
+    
+    incr nCurrentMethod -1
+    updateRange
+    display $nCurrentMethod $currentView
+}
+
+proc viewMethod n {
+    global nCurrentMethod currentView
+    
+    set nCurrentMethod $n
+    updateRange
+    display $nCurrentMethod $currentView
+}
+
+proc setRangeButtons r {
+
+    global nCurrentMethod arrRange
+    set arrRange($nCurrentMethod) $r 
+
+    .fRange.b1 configure -fg black -relief raised
+    .fRange.b2 configure -fg black -relief raised
+    .fRange.b3 configure -fg black -relief raised
+    .fRange.b4 configure -fg black -relief raised
+    .fRange.b5 configure -fg black -relief raised
+    
+    switch -exact -- $r {
+        100 { .fRange.b1 configure -fg red -relief flat
+              return
+            }
+            
+        75  { .fRange.b2 configure -fg red -relief flat
+              return
+            }
+            
+        50  { .fRange.b3 configure -fg red -relief flat
+              return
+            }
+            
+        25  { .fRange.b4 configure -fg red -relief flat
+              return
+            }
+          
+        5  { .fRange.b5 configure -fg red -relief flat
+              return
+           }
+           
+        default {
+            popup "Unexpected switch fall through in setRangeButtons"
+            exit
+        }
+    }     
+}
+
+proc setRange r {
+      
+  setRangeButtons $r        
+}
+
+proc updateRange {} {
+    global nCurrentMethod arrRange
+    
+    set r $arrRange($nCurrentMethod) 
+    setRangeButtons $r        
+}
+
+#=================================================================
+#       Display Routines
+#=================================================================
+
+proc destroy_frames { } {
+    global nElements
+    global frameArr
+    global nEntriesPerRow
+    set n [array size frameArr]
+    if { $n > 0 } {
+          for  { set i 0 } {$i < $n } {incr i 1 }  {
+             set k [expr $i*$nEntriesPerRow]
+             pack forget $frameArr($k)
+             destroy $frameArr($k)
+             unset frameArr($k)
+        }
+    }
+}
+
+proc sel_all { } {
+    global arrSel nCurrentMethod
+    global nElements
+    for { set i 0 } { $i < $nElements } {incr i 1 } {
+        set arrSel($nCurrentMethod,$i) 1
+   }
+}
+
+proc clear_all { } {
+    global arrSel nCurrentMethod
+    global nElements
+    for { set i 0 } { $i < $nElements } {incr i 1 } {
+        set arrSel($nCurrentMethod,$i) 0
+   }
+}
+
+#======================================================
+# Display Shim Menu
+#
+# eL is the list of elements to display
+# arrSel keeps track of selected elements
+#
+#======================================================
+
+proc display {nMethod  iC} {
+
+    global shimArr;global frameArr;global nElements;global ssColor
+    global lClass;
+    
+    global name
+    global class
+    global lMethods arrSel nMethods nCurrentMethod currentView
+    global nEntriesPerRow
+     
+    
+    set currentView $iC
+    set nCurrentMethod $nMethod
+    
+    
+    set strTitle "Autoshim Setup: Method "
+    append strTitle $nCurrentMethod
+    append strTitle " of "
+    append strTitle $nMethods
+    wm title .  $strTitle
+    
+    
+    destroy_frames
+    
+    set n [array size eL]
+    if { $n > 0 } {unset eL}
+    
+
+    #==================================
+    # prepare list of elements to show
+    #==================================
+
+
+    if { $iC == "All"}  {
+        set iCount $nElements
+        for { set i 0 } {$i < $nElements } {incr i 1 } {
+            set eL($i) $i
+        }
+    } else   {  
+        if { $iC == "Selected" }  {
+              set iCount 0
+              for { set i 0 } {$i < $nElements } {incr i 1 } {
+                   if { $arrSel($nMethod,$i) == 1} {
+                        set eL($iCount) $i
+                        incr iCount 1
+                   }
+             }
+        }  else  {
+            set opt [lindex $lClass $iC]
+            set iCount 0
+            for { set i 0 } {$i < $nElements } {incr i 1 } {
+                if { $shimArr($i,$class) == $opt } {
+                   set eL($iCount) $i
+                   incr iCount 1
+                }
+           }
+        }
+   }
+    
+
+    for {set i 0 }  {$i  <  $iCount}  {incr i $nEntriesPerRow} {
+
+    #
+    #Create a frame to hold nEntriesPerRow checkbuttons
+    #
+
+        frame .fa$i
+        .fa$i configure -width 70
+        set frameArr($i) .fa$i
+
+        for {set nButton 0 } {$nButton < $nEntriesPerRow } {incr nButton 1} {
+            set n [expr $i + $nButton]
+            
+            set idx $eL($n)
+            set str1 $shimArr($idx,$name)
+                    
+            checkbutton .fa$i.$nButton -variable arrSel($nMethod,$idx)  -anchor w -width 5 -justify left \
+                                        -bg $ssColor -text $str1
+                                   
+            pack .fa$i.$nButton -side left  -anchor w -expand y
+
+
+         if {$nButton < 4 } {
+             if { $n == [expr $iCount -1] } {
+                pack .fa$i -anchor w
+                break
+            }
+         }
+         pack .fa$i -side top -fill x  -anchor w
+         }
+  }
+
+}
+
+#===================================================
+#       Program Entry Point
+#===================================================
+
+#
+# Process arguments
+#
+
+set nArgs $argc
+set nShims [expr $nArgs - 1]
+set curExp [lindex $argv 0]
+for {set i 1} {$i <= $nShims } { incr i 1 } {
+    lappend shimList [lindex $argv $i]
+}
+
+#
+# Set paths
+#
+
+set shimFile  $curExp 
+set conparFile "/vnmr/conpar"
+
+append shimFile "/tempShims"
+set tempMethods $curExp 
+append tempMethods "/tempMethods"
+
+#
+# Initialize Globals
+#
+
+set lClass [list "Axial" "LowNon-Spinning" \
+                 "HighNon-Spinning" "Tilted" ]
+                 
+              
+for {set i 0} {$i < 20 } {incr i 1} {
+    set arrRange($i) 100
+}
+                
+for {set i 0} {$i < $nShims } {incr i 1} {
+   for {set j 0} {$j < $nShims } {incr j 1} {
+      set arrSel($i,$j) 0
+   }
+}
+              
+set nCurrentMethod 0
+set nMethods 0
+set lMethods [list 0]
+set currentRange 50
+set nCycles 1
+set nIter 100
+set fTol 0.02
+set nEntriesPerRow 6
+
+#
+# Prepare Shim Params for Viewing
+#
+parseConpar $conparFile
+parseShims  $shimFile
+#
+# Create Menus
+#
+
+set wMain .
+wm title $wMain  "Autoshim Setup: Method 0"
+wm geometry . 575x210
+$wMain configure -bg $ssColor
+
+#create frame to hold a menu bar
+
+frame .mb -bg $ssColor -borderwidth 1 -relief raised
+pack .mb -fill x
+
+#
+#Top Level Menu Button
+#
+
+menubutton .mb.v -text "View" -relief raised -bg $ssColor -menu .mb.v.m
+menubutton .mb.m -text "Method" -relief raised -bg $ssColor -menu .mb.m.m
+menubutton .mb.f -text "File" -relief raised -bg $ssColor -menu .mb.f.m
+
+pack .mb.f .mb.v .mb.m  -side left
+
+#
+#Command Buttons
+#
+
+button .mb.b4 -text "Start"  -bg $ssColor -command {start $tempMethods }
+button .mb.b5 -text "Abort"  -bg $ssColor -command {abort $tempMethods }
+button .mb.b6 -text "Select All" -bg $ssColor -command sel_all
+button .mb.b7 -text "Clear" -bg $ssColor -command clear_all
+
+pack  .mb.b4 .mb.b5 .mb.b6 .mb.b7 -side right
+
+#
+#Create View Menu
+#
+
+menu .mb.v.m -tearoff false
+
+for { set i 0 } { $i < [llength $lClass] } { incr i 1 } {
+    set cmd [list  display $nCurrentMethod $i]
+    .mb.v.m add radio -label [lindex $lClass $i] -background $ssColor -command  $cmd
+}
+ .mb.v.m add radio -label All -background $ssColor -command  {display $nCurrentMethod "All"}
+ .mb.v.m add radio -label Selected -background $ssColor -command  {display $nCurrentMethod "Selected"}
+ 
+#
+#Create Method Menu
+#
+
+menu .mb.m.m -tearoff false
+.mb.m.m add command  -label "Add Method" -command addMethod
+.mb.m.m add command  -label "Delete Method" -command {deleteMethod -99 }
+.mb.m.m add command  -label "Next" -command viewNext 
+.mb.m.m add command  -label "Previous" -command viewPrevious 
+
+#
+#Create File Menu
+#
+ menu .mb.f.m -tearoff false
+.mb.f.m add command  -label "Load  Procedure" -command {load $curExp }
+.mb.f.m add command  -label "Save Procedure" -command {store $curExp }
+
+#
+# List Box to display/select method numbers
+#
+
+frame .flbox -bg $ssColor -borderwidth 1 -relief raised
+frame .flbox.label -bg $ssColor -borderwidth 1 -relief raised
+label .flbox.label.l1 -text "Methods"
+pack  .flbox.label.l1 -side top
+pack  .flbox.label -side top -anchor n -fill x 
+
+listbox .flbox.lb   -width 3 -height 8 -selectmode single -listvariable lMethods \
+                    -selectmode single -yscroll ".flbox.ys set"
+
+scrollbar .flbox.ys -command {.flbox.lb yview } -orient vertical
+
+pack .flbox.ys -fill y -side right 
+pack .flbox.lb -fill y -side top               
+pack .flbox -side left -anchor n 
+
+#
+# listbox bindings
+#
+
+bind .flbox.lb <ButtonRelease-1>  {
+    set method [selection get]
+    viewMethod $method 
+}                           
+
+bind .flbox.lb <ButtonRelease-3>  {
+    set method [selection get]
+    deleteMethod $method
+}  
+
+#
+# Create Range Options
+#
+
+frame .fRange -bg $ssColor -borderwidth 1 -relief raised 
+label .fRange.l  -text "Range" -justify center
+
+button .fRange.b1 -width 4  -text "Full" -background $ssColor  -command  {setRange 100}  
+button .fRange.b2 -width 4  -text "75%"  -background $ssColor  -command  {setRange 75}
+button .fRange.b3 -width 4  -text "50%"  -background $ssColor  -command  {setRange 50}
+button .fRange.b4 -width 4  -text "25%"  -background $ssColor  -command  {setRange 25} 
+button .fRange.b5 -width 4  -text "5%"   -background $ssColor  -command  {setRange 5} 
+ 
+pack .fRange.l .fRange.b1 .fRange.b2 .fRange.b3 .fRange.b4 .fRange.b5 -side top -anchor n
+pack .fRange -side left -fill y
+
+frame .fIter -bg $ssColor -borderwidth 1 -relief raised
+label .fIter.l1 -width 6 -justify right -text "Cycles"
+entry .fIter.e1 -width 4 -textvariable nCycles
+label .fIter.l2  -width 12 -justify right -text "Iterations"
+entry .fIter.e2 -width 4 -textvariable nIter
+label .fIter.l3  -width 12 -justify right -text "Tolerance"
+entry .fIter.e3 -width 5 -textvariable fTol
+
+pack .fIter -side top -fill x
+pack .fIter.l1 .fIter.e1 .fIter.l2 .fIter.e2 .fIter.l3 .fIter.e3  -side left -anchor e
+
+
+setRange $currentRange
+clear_all 
+display 0 "All"
+

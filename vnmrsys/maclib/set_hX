@@ -1,0 +1,60 @@
+// AJN 08/2010 set up a resonable HC cp from the probe file
+// Macro assumes: that your tn and dn are right
+// You've set your srate to the right value
+
+banner('You must set srate, tn, and dn before running this macro')
+
+// Set the pw's from the probe file
+hX
+getsolidsprobedata_cmr('tn')
+getsolidsprobedata_cmr('dn')
+
+exists('tempHX','parameter'):$e
+if $e < 0.5 then
+    create('tempHX','real')
+endif  
+// Set a first guess cp condition based on srate
+
+cp='y'
+flip='n'
+echo='n'
+
+//H at 9/2 wr
+tempHX= (9*srate/2000)
+tempHX=(tempHX/(1000/(pwH90*4)))
+aHhx=4095*tempHX*(aH90/4095)
+
+//X at 7/2 wr
+tempHX=7*srate/2000
+tempHX=(tempHX/(1000/(pwX90*4)))
+aXhx=4095*tempHX*(aX90/4095)
+
+//GB1 like paramters for these
+tHX=1500
+dHX=aXhx*.1
+bHX=dHX/5
+
+// Set a 60 kHz spinal condition
+Hseq='spinal'
+tempHX=(1000/(pwH90*4))
+tempHX=(60/tempHX)
+aHspinal=tempHX*4095*(aH90/4095)
+pwHspinal=(2*pwH90/tempHX)
+phHspinal=4
+alpHspinal=6
+Hseq='spinal'
+
+// Set the window and d1
+d1=2
+sw=100000
+np=4096
+rd=5
+ad=5
+ddrtc=10
+lp=0
+//we could make this keep the window you made in the past but for now have it do this
+
+destroy('tempHX')
+
+
+

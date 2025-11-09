@@ -1,0 +1,321 @@
+#  SolidsPack Version 8/14/07
+#  SIMPLEXER: genTempCommun (version 4)
+#=============================================
+# Program generates communications files
+# required to initite the SIMPLEXER program
+#=============================================
+
+proc popup msg {
+    tk_messageBox -type ok -message $msg
+}
+
+#=====================================
+# build values array from contents of
+# shimFile
+#=====================================
+
+proc searchShimFile {  } {
+    global name value min max shimFile
+    set fd [open $shimFile r]
+    while {[ gets $fd line] >= 0 } {
+        set idx [ index [lindex $line 0] ]
+        gets $fd line
+        if { $idx != -1 } {
+          set value($idx) [lindex $line 1]
+        }
+        gets $fd line
+    }      
+}
+
+#===========================================
+# Return index of $shimName in  name list,
+# or -1 if $shimName not in list
+#===========================================  
+
+proc index { shimName } {
+    global name
+    set idx [lsearch -exact $name $shimName ]
+    return $idx
+}
+
+#==========================================
+# Write tempCommun and tempMinMax
+#==========================================
+
+proc writeTempCommunFile { } {
+    global ERROR
+    global name value min max 
+    global sMax sMin
+    global tempCommunFile tempMinMaxFile
+    global fTol nIter range nElem
+    global nCurrentCycle
+    
+    set pi 3.14156
+    
+    set strTem "ready to write tmpCommun. nCurrentCycle = "
+    append strTem $nCurrentCycle
+    
+    set range [expr double($range)/100.0]
+    
+     
+    if { $fTol <= 0.0 } {
+        popup [list "genTempCommun error: Tolerance is Less Than/Equal  Zero"]
+        return
+    }
+    
+    if {$fTol >= 100.0} {
+        popup [list "genTempCommun error: Tolerance is Greater Than/Equal  100"]
+        return
+    }
+    
+    if { $nIter < 1} {
+        popup "genTempCommun error: Nuber of Iterations < 1"
+        return
+    }
+    
+    
+    
+    #
+    # we must adjust setpoints sMin,sMax
+    # according to current shim value and 
+    # absolute parameter limits min,max
+    #
+    
+    for {set i 0} { $i < $nElem } {incr i 1 } {
+        set dr [expr 0.5*$range*($max($i) - $min($i)) ]
+        set sMin($i) [expr $value($i) - $dr]
+        set sMax($i) [expr $value($i) + $dr]
+        if { $sMin($i) < $min($i) } {
+           set sMin($i) $min($i) 
+        }
+        
+        if {$sMax($i) > $max($i) } {
+            set sMax($i) $max($i)
+        }
+    }
+    
+    
+    for {set i 0 } {$i < [expr $nElem + 1] } {incr i 1} {
+        for {set j 0 } {$j < $nElem} {incr j 1} {
+          set p($i$j) [ theta $j $value($j) ]
+        }
+    }
+    
+    for {set i 1 } {$i < [expr $nElem + 1] } {incr i 1 } {
+        set j [expr $i - 1]
+        set r [expr sin([expr rand()]) ]
+        set p($i$j) [expr $pi*$r]
+    }
+    
+   set fd [open $tempCommunFile w]
+    puts $fd $ERROR
+    puts $fd "shimSum"
+    if {$nCurrentCycle < 0 } {
+        puts $fd "DONE"
+        puts $fd "DONE"
+    } else {
+        puts $fd "INIT"
+        puts $fd "INIT"
+    }
+    puts $fd $nElem
+    puts $fd $nIter
+    puts $fd $fTol
+    puts $fd 0
+    
+    for {set i 0} {$i < [expr $nElem + 1] } {incr i 1} {
+        puts -nonewline $fd 0.0
+        puts -nonewline $fd " "
+    }
+    puts  $fd \t
+    
+    for {set i 0} {$i < [expr $nElem +1] } {incr i 1} {
+        for {set j 0} {$j < $nElem} {incr j 1} {
+            puts -nonewline $fd $p($i$j)
+            puts -nonewline $fd " "
+        }
+        puts $fd \t
+    }
+    
+    
+    for {set i 0} {$i <  $nElem } {incr i 1} {
+        puts -nonewline $fd 0.0
+        puts -nonewline $fd " "
+    }
+    puts  $fd \t
+    
+    for {set i 0} {$i < $nElem } {incr i 1} {
+        puts -nonewline $fd 0.0
+        puts -nonewline $fd " "
+    }
+    puts  $fd \t
+    
+    puts $fd 1
+    puts $fd 2
+    puts $fd 3
+    puts $fd 4
+    puts $fd 5
+     
+    close $fd
+    
+     
+    set idx [string last "/" $tempCommunFile]
+    set fileMinMax [string range $tempCommunFile 0 $idx ]
+    append fileMinMax "tempMinMax"
+   
+    set fd [open $fileMinMax w]
+    puts $fd "simplex_vars"
+    for {set i 0} {$i < $nElem} {incr i 1} {
+        puts -nonewline $fd [lindex $name $i]
+        puts -nonewline $fd \t
+        puts -nonewline $fd $value($i) 
+        puts -nonewline $fd \t
+        puts -nonewline $fd $sMin($i)
+        puts -nonewline $fd \t 
+        puts $fd $sMax($i)
+    }
+ 
+    close $fd
+    
+}
+
+proc theta {idx val} {
+    global sMax; global sMin;
+    set Max $sMax($idx)
+    set Min $sMin($idx)
+    set t1 [expr double($val - $Min)]
+    set t2 [expr double($Max - $Min)]
+    set t1 [expr $t1/$t2]
+    set result [expr asin($t1)]
+    return $result
+}        
+        
+
+
+#===========================================
+#   Program Entry Point
+#===========================================
+
+set expPath [lindex $argv 0]
+ 
+set tempMethodsFile [file join $expPath tempMethods]
+set shimFile [file join $expPath tempShims]
+set curparFile [file join $expPath curpar]
+set tempCommunFile [file join $expPath tempCommun]
+set tempMinMaxFile [file join $expPath tempMinMax] 
+
+set ERROR 0
+
+#==========================================
+# Read first part of tempMethods and 
+# determine where we are
+#===========================================
+
+set fd [open $tempMethodsFile r]
+gets $fd line
+set nCycles $line
+gets $fd line
+set nCurrentCycle $line
+gets $fd line
+set nMethods $line
+gets $fd line
+set nCurrentMethod $line
+gets $fd line
+set  nIter $line
+gets $fd line 
+set fTol $line
+
+
+
+#===========================
+# read previous methods and
+# discard
+#===========================
+
+for {set i 0 } {$i < $nCurrentMethod} {incr i 1} {
+    gets $fd line
+    set nElem $line
+    gets $fd line
+    for {set j 0 } {$j < $nElem} {incr j 1} {
+        gets $fd line
+    }
+}
+
+
+#
+# current method
+#
+
+
+gets $fd line
+set nElem $line
+gets $fd line
+set range $line
+for {set i 0} {$i < $nElem } {incr i 1 } {
+    gets $fd line
+    lappend name [lindex $line 0]
+    set min($i)  [lindex $line 1]
+    set max($i)  [lindex $line 2]
+}
+
+
+close $fd
+
+if {$nElem < 2 } {
+   set strError "Error: genTempCommun. Method Number "
+   append strError $nCurrentMethod
+   append strError "  has only  "
+   append strError $nElem
+   append strError "  parameters"
+   popup $strError
+   set ERROR -999
+}
+   
+
+searchShimFile
+writeTempCommunFile 
+
+#=====================================
+# update the file
+#=====================================
+
+incr nCurrentMethod 1
+if { $nCurrentMethod > $nMethods } {
+    set nCurrentMethod 0
+    incr nCurrentCycle 1
+    if { $nCurrentCycle > $nCycles } {
+        set nCurrentMethod 0
+        set nCurrentCycle -999 
+    }
+}
+
+set fd [open $tempMethodsFile r]
+for {set i 0} { $i < 6} {incr i 1} { 
+    gets $fd line 
+}
+
+
+set k 0
+while { [gets $fd line] != -1 } { 
+  set fContents($k) $line
+  incr k 1 
+}
+close $fd
+
+
+set fd [open $tempMethodsFile w]
+
+puts $fd $nCycles
+puts $fd $nCurrentCycle
+puts $fd $nMethods
+puts  $fd $nCurrentMethod
+puts  $fd $nIter
+puts  $fd $fTol
+
+
+for {set i 0 } {$i < $k } {incr i 1} {
+    puts $fd $fContents($i)
+}
+
+close $fd
+
+exit

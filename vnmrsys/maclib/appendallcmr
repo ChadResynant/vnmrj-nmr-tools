@@ -1,0 +1,30 @@
+"appendallcmr"
+
+"intended to append a series of experiments from &1 to &2"
+"remember to set nfids = 2^(n-1) * nrows for nD experiment"
+" i.e., 2*nrows for 2D, 4*nrows for 3D, 8*nrows for 4D"
+
+$ndim=ndim
+echo('This is a ',ndim,'D experiment')
+$nrows=nrows
+echo('This is the number of rows: ',$nrows)
+pow(2,ndim-1):$fidsperrow
+$nfids=$nrows*$fidsperrow
+echo('Number of fids per row is ',$fidsperrow)
+echo('This is the number of fids: ',$nfids)
+
+$firstexp = $1
+$lastexp = $2
+
+$speccount=0
+repeat
+ $speccount=$speccount+1
+ $source=$firstexp+$speccount
+ $rowcount=0
+ repeat
+	$rowcount=$rowcount+1
+	mfblk($source,$rowcount,$firstexp,$nfids*$speccount+$rowcount)
+	echo($source,$rowcount,$firstexp,$nfids*$speccount+$rowcount)
+ until($rowcount>=$nfids)
+
+until($source>=$lastexp)

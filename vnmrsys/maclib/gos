@@ -1,0 +1,116 @@
+" F. LIN                     <bob> /vnmr/maclib/gos                  08/02/95 "
+"*****************************************************************************"
+" gos - go and save: start experiment and save the data when done.            "
+"  "
+" modify: The original logic doesn't allow you to quit queueing if a directory"
+" already exists---the only way out is Cntrl-C. This constantly give problem"
+" of overwriting things unexpectedly. This updated version REALLY acts on a no"
+" answer for overwrite. By Donghua H. Zhou/Rienstra NMR Group, UIUC/Feb 22, 2005"
+" DWP 1/8/2017: add a check point to make sure dp='y', and add step to copy nus schedule into exp. directory if using nus"
+" DWP 7/28/2017: add command to copy pulse code file ('seqfil') to experiment directory along with data"
+"*****************************************************************************"
+
+checkshim
+
+
+
+exists('dp','parameter'):$edp
+if $edp then
+    getvalue('dp','current'):$dpval
+    if ( not(dp='y') ) then
+        write('line3','Double-precision floats not enabled. Setting dp=\'y\'.')
+	setvalue('dp','y')
+    endif
+endif
+
+
+"# Initialize string variables #"
+$ans='' $fname='' $extension='' $path='' $overwrite='' $comment=''
+
+"# Check and change working directory if required #"
+$curdir='' $teststr='' 
+pwd:$curdir
+shell('sleep 1>/dev/null')
+length($curdir):$slen
+shell('sleep 1>/dev/null')
+
+"# prompt for filename #"
+"repeat"
+
+        if ($# < 1 ) then
+              input('Enter file name to save: '):$fname
+        else 
+           $fname = $1
+        endif
+"	if ($# < 2) then"
+"	      input('Enter an intelligent comment: '):$comment"
+"        else "
+"           $comment = $2"
+"        endif"
+
+        
+        length($fname):$strlen
+
+"# Extract last 4 characters from filename #"
+        if ($strlen > 4) then
+                substr($fname,$strlen - 3,4):$extension
+        endif
+                                     "| If the last four charaters are .fid, |"
+                                     "| remove them from the filename        |"
+        if($extension = '.fid') then  
+                substr($fname,1,$strlen - 4):$fname
+        endif
+
+"# Assign the filename to the string variable 'n1' in current experiment #"
+        pwd:$path
+        n1 = $path + '/' + $fname
+
+"# Check if file already exists #"
+        exists(n1 + '.fid','file'):$e
+        if ($e = 1) then
+           input('File already exists! Overwrite? (y/n) '):$overwrite
+        
+           if ($overwrite = 'y') then              
+              delete(n1)
+           else 
+              write('line3','gosnosafe: .......quit.....')
+              return(-1)
+           endif
+        endif
+
+"make directory to hold this filename"
+shell('mkdir '+n1+'.fid')
+"update the comment in text file (CMR 1/18/21 addition)" 
+write('reset',curexp+'/text')
+write('file',curexp+'/text',$comment)
+newdg
+
+"# Determine path to pulse sequence file to copy to exp directory #"
+exists('seq_file_path','parameter'):$eseq_file_path
+if not $eseq_file_path then
+    create('seq_file_path','string')
+endif
+
+getvalue('seqfil','current'):$seq_file
+setvalue('seq_file_path','/home/rienstra/vnmrsys/seqlib/'+$seq_file+'.c')
+
+
+"### set up and go ###"
+werr='' wbs='' wnt=''
+"wexp = 'svf(n1)'"
+
+"# Check if using nus or not--if so, copy sparse_file to exp directory #"
+exists('sparse_file','parameter'):$esparse_file
+if $esparse_file then
+    if ( SPARSE='y' ) then
+        wexp = `delete(n1) shell('sleep 3 >/dev/null') svf(n1) shell('cp '+seq_file_path+' '+n1+'.fid/') shell('cp '+sparse_file+' '+n1+'.fid/')`
+    else
+        wexp = `delete(n1) shell('sleep 3 >/dev/null') svf(n1) shell('cp '+seq_file_path+' '+n1+'.fid/')`
+    endif
+else
+    wexp = `delete(n1) shell('sleep 3 >/dev/null') svf(n1) shell('cp '+seq_file_path+' '+n1+'.fid/')`
+endif
+
+au('nosafe')
+
+return(0)

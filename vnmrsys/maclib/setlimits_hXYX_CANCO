@@ -1,0 +1,24 @@
+"set safety limits for hXYX"
+setlimit('pwH90',4,2,0.1)
+setlimit('pwX90',4,2,0.1)
+setlimit('pwY90',6,4,0.1)
+setlimit('aHhx',3500,2700,1)
+setlimit('aXhx',3500,2700,1)
+setlimit('dHX',400,-400,1)
+setlimit('bHX',300,50,1)
+setlimit('tHX',800,400,1)
+"CAN condition"
+setlimit('aYxy',2900,2200,1)
+setlimit('aXxy',1200,700,1)
+setlimit('aHxy',3500,3000,1)
+setlimit('dXY',100,-100,1)
+setlimit('bXY',100,10,1)
+setlimit('tXY',6000,2000,1)
+"NCO condition"
+setlimit('aYyx',2700,2200,1)
+setlimit('aXyx',2200,1700,1)
+setlimit('aHyx',3500,3000,1)
+setlimit('dYX',100,-100,1)
+setlimit('bYX',100,10,1)
+setlimit('tYX',6000,2000,1)
+

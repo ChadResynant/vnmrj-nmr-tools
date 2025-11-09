@@ -1,0 +1,47 @@
+"*************************************************************************"
+"setupupdatepars(directory) - runs the lowercase setup macro for each     "
+"                      parameter file in a specified directory and saves  "
+"                      the result - setupupdatepars('/vnmr/parlib')       "
+"*************************************************************************"
+
+exists($1,'directory'):$e
+if ($e < 0.5) then
+   write('error','Directory %s does not exist',$1)
+   abort
+endif
+getfile($1):$entrys
+write('alpha','directory %s has %d entries',$1,$entrys)
+$inode = 0
+$filename = ''
+$ext = ''
+while ($inode < $entrys) do
+   $inode = $inode + 1
+   getfile($1,$inode):$filename,$ext
+   if (($ext = 'fid') or ($ext = 'par')) then
+      $path = $1 + '/' + $filename + '.' + $ext + '/procpar'
+      exists($path,'file'):$e
+   else
+      $e = 0
+   endif
+   if ($e > 0.5) then
+      write('alpha','  Entry %d: Update %s.%s',$inode,$filename,$ext)
+      fread($path) 
+      prune($path)
+      $macroname = ''
+      format($filename,'lower'):$macroname
+      exists($macroname,'maclib'):$em
+      if ($em > 0.5) then 
+         write('alpha','    Run MACRO %s\n',$macroname)
+         exec($macroname)
+      else 
+         write('alpha','    MACRO %s not found\n',$macroname)
+      endif    
+      fsave($path)
+   else
+      $notpar = $filename
+      if ($ext <> '') then
+         $notpar = $filename + '.' + $ext
+      endif
+      write('alpha','  Entry %d:  %s is not a parameter file',$inode,$notpar)
+   endif
+endwhile

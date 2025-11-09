@@ -1,0 +1,9 @@
+$z0init = 0
+lookup('file',userdir+'/.z0init')
+lookup('read'):$z0init
+setprotect('z0','off',8,'global') "do not excecute _z0"
+z0 = $z0init + $1 * $2
+beepoff
+sethw('z0',z0,'nowait')
+setprotect('z0','on',8,'global')
+beepon

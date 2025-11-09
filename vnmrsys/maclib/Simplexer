@@ -1,0 +1,491 @@
+#  SolidsPack Version 8/14/07
+#  SIMPLEXER: initSimplex.tcl (version 4)
+#!/export/home/nmruser/ActiveTcl/bin/tclsh
+#==========================================================
+# Simplexer is called by the Spinsight macro SIMPLEXER.
+# Communication between this program and SIMPLEXER is through
+# the file ($HOME)/data/Buffers/tempCommun.
+#
+# tempCommun contains the state of the simplex routine
+# and some additional information needed by SIMPLEXER
+# to evaluate the error function.
+#
+# SIMPLEXER obtains the next guess(es) from tempCommun,
+# executes the experiment using the new guesses
+# and writes the results of the measurement to tempCommun.
+#
+# Simplexer uses the results of the scan along with state
+# information to generate the next guess(es).
+#
+# The Simplex routine itself is adapted from the Downhill
+# Simplex Method of Press et al in Numerical Recipies in C.
+#
+# INPUT: file ($HOME)/data/Buffers/tempCommun
+# OUTPUT: file ($HOME)/data/Buffers/tempCommun
+#
+# FUNCTIONS
+#
+#    getState: Read tempCommun file.
+#    setState: Write tempCommun file.
+#    dump: Output tempCommun file to stdio - visible in shell 
+#          from which Spinsight is launched. dump is enabled
+#          by setting vb = 1 in the SimplexOptions panel.
+#    genTry: Generatea single  guess.
+#    evalTry: Rank result of previous guess.
+#    
+#    The remaining functions are internal to the simplex routine.
+#    They act like labels to which the code will jump according
+#    to the internal state of the main simplex loop 
+#
+#    Variables
+#        nDim: Number of parameters to be optimized
+#        y: Vector containing the results of the previous nDim + 1 measurements
+#        p: Matrix containing nDim+1 guesses (vertices)
+#        ptry: Vector containing the next try
+#        psum: Internal book-keeping
+#
+#		STATUS: Effectively an enum indicating state of code
+#			0 -  Start
+#           1 -  Converged
+#           2 -  tempCommun file missing, set in SIMPLEXER
+#           3 -  maximum number of iterations exceeded
+#           4 -  generic don't know what happened. Default case of switch.
+#           5 -  Completely recalculated the nDim+1 vertices
+#           6 -  Normal working. Single try in process.
+#============================================================  
+
+   global fileName;global method;global STATUS;global POSITION;
+   global nDim; global nMaxIter;global fTol;global nCurrentIter;
+   global y;global p;global psum;global ptry;global inhi;global ihi;
+   global ilo;global ytry;global ysave; global vb;
+   
+proc popup msg {
+    tk_messageBox -type ok -message $msg
+}   
+
+proc getState { } {
+
+   global fileName;global method;global STATUS;global POSITION;
+   global nDim; global nMaxIter;global fTol;global nCurrentIter;
+   global y;global p;global psum;global ptry;global inhi;global ihi;
+   global ilo;global ytry;global ysave; global vb;
+
+    set fd [open $fileName r]
+    gets $fd line
+    set vb $line
+    gets $fd line
+    set method  $line 
+    gets $fd line
+    set STATUS  $line 
+    gets $fd line
+    set POSITION  $line 
+    gets $fd line
+    set nDim  $line 
+    gets $fd line
+    set nMaxIter  $line
+    gets $fd line
+    set fTol  $line 
+    gets $fd line
+    set nCurrentIter  $line 
+    gets $fd line
+    for { set i 1} {$i <= [expr $nDim +1] } {incr i 1} {
+        set y($i) [lindex $line [expr $i - 1]]
+    }
+    for { set i 1} {$i <= [expr $nDim +1] } {incr i 1} {
+        gets $fd line
+        for {set j 1} {$j <= $nDim} {incr j 1} {
+            set p($i$j) [lindex $line [expr $j -1]]
+        }
+    }
+    gets $fd line
+    for { set i 1} {$i <= $nDim } {incr i 1} {
+        set psum($i) [lindex $line [expr $i - 1] ]
+    }
+    gets $fd line
+    for { set i 1} {$i <= $nDim } {incr i 1} {
+        set ptry($i) [lindex $line [expr $i - 1 ]]
+    }
+    gets $fd line
+    set inhi $line
+    gets $fd line
+    set ihi $line
+    gets $fd line
+    set ilo $line
+    gets $fd line
+    set ytry $line
+    gets $fd line
+    set ysave $line 
+    gets $fd $line
+    close $fd 
+}
+
+proc setState {} {
+
+   global fileName;global method;global STATUS;global POSITION;
+   global nDim; global nMaxIter;global fTol;global nCurrentIter;
+   global y;global p;global psum;global ptry;global inhi;global ihi;
+   global ilo;global ytry;global ysave; global vb; 
+
+    set fd [open $fileName w]
+    if {  ($STATUS == "FAIL_NO_FILE") || ($STATUS == "MAX_ITER_REACHED") \
+       || ($STATUS == "UNKNOWN_ERROR") } {
+        puts $fd $vb;
+        puts $fd $method
+        puts $fd $STATUS
+        close $fd
+        exit
+    }
+    puts $fd $vb
+    puts $fd $method
+    puts $fd $STATUS
+    puts $fd $POSITION
+    puts $fd $nDim
+    puts $fd $nMaxIter
+    puts $fd $fTol
+    puts $fd $nCurrentIter
+    for {set i 1} {$i <= [expr $nDim + 1] } { incr i 1 } { 
+        puts -nonewline $fd $y($i)
+        puts -nonewline $fd " "
+    }
+    puts $fd " "
+    for {set i 1} { $i <= [expr $nDim +1] } {incr i 1} {
+        for {set j 1} {$j <= $nDim} {incr j 1} {
+            puts -nonewline $fd $p($i$j)
+            puts -nonewline $fd " "
+        }
+        puts $fd " "
+    }
+
+    for {set i 1} {$i <= $nDim} {incr i 1} {
+        puts -nonewline $fd $psum($i)
+        puts -nonewline $fd " "
+    }
+    puts $fd " "
+    for {set i 1} {$i <= $nDim} {incr i 1} {
+        puts -nonewline $fd $ptry($i)
+        puts -nonewline $fd " "
+    }
+    puts $fd  " "
+    puts $fd $inhi
+    puts $fd $ihi
+    puts $fd $ilo
+    puts $fd $ytry
+    puts $fd $ysave
+    close $fd
+    exit
+}  
+
+proc dump { } {
+
+   global fileName;global method;global STATUS;global POSITION;
+   global nDim; global nMaxIter;global fTol;global nCurrentIter;
+   global y;global p;global psum;global ptry;global inhi;global ihi;
+   global ilo;global ytry;global ysave; global vb;
+
+    puts stdout $vb
+    puts stdout $method
+    puts stdout $STATUS
+    puts stdout $POSITION
+    puts stdout $nDim
+    puts stdout $nMaxIter
+    puts stdout $fTol
+    puts stdout $nCurrentIter
+    for {set i 1} {$i <= [expr $nDim + 1] } { incr i 1 } {
+        puts -nonewline stdout $y($i)
+        puts -nonewline stdout " " 
+    }
+    puts stdout \t 
+    for {set i 1} { $i <= [expr $nDim +1]} {incr i 1} {
+        for {set j 1} {$j <= $nDim} {incr j 1} {
+            puts -nonewline stdout $p($i$j)
+            puts -nonewline stdout " " 
+        }
+        puts stdout " "
+    }
+
+    for {set i 1} {$i <= $nDim} {incr i 1} {
+        puts -nonewline stdout $psum($i)
+        puts -nonewline stdout " " 
+    }
+    puts stdout " "
+    for {set i 1} {$i <= $nDim} {incr i 1} {
+        puts -nonewline stdout $ptry($i)
+        puts -nonewline stdout " "
+    }
+    puts stdout  " "
+    puts stdout $inhi
+    puts stdout $ihi
+    puts stdout $ilo
+    puts stdout $ytry
+    puts stdout $ysave
+}
+
+proc getpsum { } {
+     
+   global fileName;global method;global STATUS;global POSITION;
+   global nDim; global nMaxIter;global ftol;global nCurrentIter;
+   global y;global p;global psum;global ptry;global inhi;global ihi;
+   global ilo;global ytry;global ysave; global vb;
+
+    if { $vb == 1 } {
+        puts "GET PSUM"
+    }
+
+    for { set j 1} { $j <=  $nDim  } {incr j 1} {
+        set sum 0.0
+        for {set i 1} {$i <= [expr $nDim +1]} {incr i 1} {
+            set sum [expr $sum + $p($i$j)]
+        }
+        set psum($j) $sum  
+    }    
+}
+
+proc generateTry fac {
+
+   global fileName;global method;global STATUS;global POSITION;
+   global nDim; global nMaxIter;global fTol;global nCurrentIter;
+   global y;global p;global psum;global ptry;global inhi;global ihi;
+   global ilo;global ytry;global ysave; global vb;
+   
+    if {$vb == 1} {
+        puts "GEN TRY"
+    }
+
+    set fac1 [expr 1.0 - $fac]
+    set fac1 [expr $fac1/$nDim]
+    set fac2 [expr $fac1 - $fac]
+    for {set j 1} {$j <=$nDim} {incr j 1} {
+        set ptry($j) [expr [expr $psum($j)*$fac1] - [expr $p($ihi$j)*$fac2] ]
+    }
+}
+       
+proc evalTry { } {
+
+   global fileName;global method;global STATUS;global POSITION;
+   global nDim; global nMaxIter;global fTol;global nCurrentIter;
+   global y;global p;global psum;global ptry;global inhi;global ihi;
+   global ilo;global ytry;global ysave; global vb;
+
+    if { $vb == 1} {
+        puts "EVAL TRY"
+    }
+
+    if { $ytry < $y($ihi) } {
+        set y($ihi) $ytry
+        for {set j 1} { $j <= $nDim } {incr j 1} {
+            set psum($j) [expr  $psum($j) +  [expr $ptry($j) - $p($ihi$j)]   ]
+            set p($ihi$j) $ptry($j)
+        }
+    }
+}
+
+proc init {} {
+
+   global fileName;global method;global STATUS;global POSITION;
+   global nDim; global nMaxIter;global ftol;global nCurrentIter;
+   global y;global p;global psum;global ptry;global inhi;global ihi;
+   global ilo;global ytry;global ysave; global vb;
+    if { $vb == 1} {
+        puts "INIT"
+    } 
+    set nCurrentIter 0
+    set POSITION "LOOP"
+    getpsum
+    loop
+}
+
+proc eval_one { } {
+   global vb;
+
+    evalTry
+    loop   
+}
+
+proc loop { } {
+   
+   global fileName;global method;global STATUS;global POSITION;
+   global nDim; global nMaxIter;global fTol;global nCurrentIter;
+   global y;global p;global psum;global ptry;global inhi;global ihi;
+   global ilo;global ytry;global ysave; global vb;
+
+    set ilo 1
+    set i1 1
+    set i2 2
+    if { $y($i1) > $y($i2) } {
+        set ihi 1
+        set inhi 2
+    } else {
+       set inhi 1
+       set ihi 2
+    }
+
+    for { set i 1 } {$i <= [expr $nDim + 1] } {incr i 1 } {
+        if { $y($i) <= $y($ilo) } {
+            set ilo $i
+        }
+        if { $y($i) > $y($ihi) } {
+            set inhi $ihi
+            set ihi $i
+        } else {
+             if { ( $y($i) > $y($ihi) ) && ($i != $ihi) } {
+                set inhi $i
+            }
+        }
+    }
+
+    set t1 [expr abs( [expr $y($ihi) - $y($ilo) ] ) ]
+    set t2 [expr  [expr abs($y($ihi))] + [expr abs($y($ilo))] ]
+    set rtol [expr 2.0 * $t1/$t2]
+
+    if {$rtol < $fTol} {
+        set t1 $y($i1)
+        set y($i1) $y($ilo)
+        set y($ilo) $t1
+        for {set i 1} {$i <= $nDim} {incr i 1} {
+            set t1 $p($i1$i)
+            set p($i1$i) $p($ilo$i)
+            set p($ilo$i) $t1
+        }
+        set STATUS "CONVERGED"
+        if { $vb == 1} {
+            puts "SET TO CONVERGE"
+        }
+        setState
+        exit
+    }
+
+    if { $nCurrentIter >= $nMaxIter } {
+        set STATUS "MAX_ITER_REACHED"
+        if {$vb == 1} {
+            popup "SET TO ITER EXCEED"
+        }
+        setState
+        exit
+    }
+    if {$vb == 1} {
+        popup "JUMP TO try1"
+    }
+
+    incr nCurrentIter 2
+    try1
+}
+
+proc try1 { } {
+
+   global fileName;global method;global STATUS;global POSITION;
+   global nDim; global nMaxIter;global ftol;global nCurrentIter;
+   global y;global p;global psum;global ptry;global inhi;global ihi;
+   global ilo;global ytry;global ysave; global vb;
+
+
+    set tr -1.0
+    generateTry $tr
+    set STATUS "SINGLE_PASS"
+    set POSITION "TEST_ONE"
+    if {$vb == 1} {
+        puts "NEXT STEP IS TEST 1"
+    }
+    setState
+    exit
+}
+
+proc test_one { } {
+
+   global fileName;global method;global STATUS;global POSITION;
+   global nDim; global nMaxIter;global ftol;global nCurrentIter;
+   global y;global p;global psum;global ptry;global inhi;global ihi;
+   global ilo;global ytry;global ysave; global vb;
+     
+    evalTry
+    
+    if { $ytry <= $y($ilo) } {
+        set tr 2.0
+        generateTry $tr
+        set POSITION "EVAL_ONE"
+        set STATUS "SINGLE_PASS"
+        if {$vb == 1} {
+            puts "GOOD GUESS, NEXT IS TO EVALUATE IN EVAL_ONE"
+        }
+        incr nCurrentIter -1
+        setState
+        exit
+    }
+
+    test_two
+}
+
+proc test_two { } {
+  
+   global fileName;global method;global STATUS;global POSITION;
+   global nDim; global nMaxIter;global ftol;global nCurrentIter;
+   global y;global p;global psum;global ptry;global inhi;global ihi;
+   global ilo;global ytry;global ysave; global vb;
+
+
+    if { $ytry >= $y($inhi) } {
+        set ysave $y($ihi)
+        set tr 0.5
+        generateTry $tr
+        set POSITION "TEST_THREE"
+        set STATUS "SINGLE_PASS"
+        setState
+        exit
+    }
+    incr nCurrentIter -1
+    loop
+}
+
+proc test_three { } {
+
+   global fileName;global method;global STATUS;global POSITION;
+   global nDim; global nMaxIter;global ftol;global nCurrentIter;
+   global y;global p;global psum;global ptry;global inhi;global ihi;
+   global ilo;global ytry;global ysave;global vb;
+
+   evalTry
+    
+    if { $ytry >= $ysave } {
+        for { set i 1} {$i <= [expr $nDim + 1] } {incr i 1} {
+            if { $i != $ilo } {
+                for {set j 1} { $j <= $nDim} {incr j 1} {
+                    set psum($j) [expr 0.5*[expr $p($i$j) + $p($ilo$j)]]
+                    set p($i$j) $psum($j)
+                }
+            }
+        }
+        
+        set POSITION "LOOP"
+        set STATUS "RECOMPUTE_ALL"
+        incr nCurrentIter $nDim
+        setState
+        exit
+    }
+    incr nCurrentIter -1
+    loop
+}
+
+set fileName [lindex $argv 0]
+getState
+
+if {$vb == 1} {
+    dump
+}
+if {$STATUS == "RECOMPUTE_ALL" } {
+    getpsum
+}
+
+switch $POSITION {
+    "INIT" {init}
+    "LOOP" {loop}
+    "TEST_ONE" {test_one}
+    "TEST_TWO" {test_two}
+    "TEST_THREE" {test_three}
+    "EVAL_ONE" {eval_one}
+   default {
+    popup "Simplexer Exiting because POSITION is Undefined!"
+    set STATUS "UNKNOWN_ERROR"
+    setState
+    exit
+   }
+}
+

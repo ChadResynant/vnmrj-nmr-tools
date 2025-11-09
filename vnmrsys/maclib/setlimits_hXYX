@@ -1,0 +1,37 @@
+"set safety limits for hXYX; CMR 12/23/22"
+"setlimit('pwH90',3,1,0.1)"
+"setlimit('pwX90',3,1,0.1)"
+"setlimit('pwY90',4,2,0.1)"
+" presume pw90s are OK for now"
+setlimit('aHhx',3250,2000,1)
+setlimit('aXhx',3250,2000,1)
+setlimit('dHX',500,-500,1)
+setlimit('bHX',500,1,1)
+setlimit('tHX',1600,400,1)
+setlimit('aYxy',2000,1000,1)
+setlimit('aXxy',1000,400,1)
+setlimit('aHxy',3500,2000,1)
+setlimit('dXY',100,-100,1)
+setlimit('bXY',100,10,1)
+setlimit('tXY',6000,2000,1)
+setlimit('aYyx',2000,1000,1)
+setlimit('aXyx',1600,800,1)
+setlimit('aHyx',3500,2000,1)
+setlimit('dYX',100,-100,1)
+setlimit('bYX',100,10,1)
+setlimit('tYX',6000,2000,1)
+"optionally set initial values"
+aHhx=2500 aXhx=2500 dHX=50 bHX=200 tHX=600
+"assume CAN at wCA=3/2 wR, wN=5/2 wR, carrier on CA"
+"tof=-40p"
+"measure pwC90=1.8 at 4000, 6.2 at 1000, 3.4 at 2000"
+aXxy=srate*3/2*1000/(250000/6.2)
+"measure pwN90=2.9 at 4000, 5.5 at 2000"
+aYxy=srate*5/2*2000/(250000/5.5)
+aHxy=2500 dXY=20 bXY=50 tXY=3000
+"assume NCO at wCO=7/2 wR, wN=5/2 wR, offset 18 kHz"
+"ofYX=18000 ofXshp2=18000"
+aXyx=srate*7/2*1000/(250000/6.2)
+aYyx=srate*5/2*2000/(250000/5.5)
+aHyx=2500 dYX=20 bYX=50 tYX=3000
+

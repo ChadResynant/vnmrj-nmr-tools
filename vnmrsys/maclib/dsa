@@ -1,0 +1,146 @@
+"dsa"
+"Donghua H. Zhou/UIUC/ Rienstra NMR Group/Jan 29, 2004"
+" CMR 3/12/22:  does not work properly with il='y' due to array counter. Fix later"
+
+"array = width,crossp,tpwrm   tpwrm is in the deepest loop"
+
+$device='graphics'
+$color[1]='red' $color[2]='magenta' 
+$Color[1]='black'  $Color[2]='blue'
+
+if ($#=0 or $#/2 <> arrayelemts) then
+  clear
+  write('alpha','dsa(...,...,j1,j2,i1,i2)     display arrayed spectra with the specified ranges. i1&i2 are the starting and ending indices of the deepest loop. The number of dimensions is unlimited in theory :).')
+
+else
+  $i = 1
+  while (arrayelemts-$i>=0) do
+    $nm[$i]=''
+    $s[$i]=${$#-2*$i+1} $e[$i]=${$#-2*$i+2}   
+    $i=$i+1
+  endwhile 
+
+ length(array):$len
+
+ $j=1 $i=arrayelemts
+ while ($len-$j>=0) do
+   substr(array,$j,1):$ch
+   if ($ch <> ',') then
+     $nm[$i]=$nm[$i]+$ch
+   else
+     $i=$i-1
+   endif
+   $j=$j+1
+  endwhile
+
+  $i=1 $prod[1]=1 
+  while (arrayelemts-$i>=0) do
+   $sz[$i]=size($nm[$i])
+   $prod[$i+1]=$prod[$i]*$sz[$i]
+   $i=$i+1
+  endwhile
+
+  $i = 1 $start=1 $end=1 $prod_n[1]=1
+  while (arrayelemts-$i>=0) do
+
+    if ($s[$i]<1) then $s[$i]=1 endif
+    if ($s[$i]>$sz[$i]) then $s[$i]=$sz[$i] 
+      write('error', 'Reset beginning index of %s to max %d',$nm[$i],$sz[$i])
+    endif  
+    if ($e[$i]<1) then $e[$i]=1 endif
+    if ($e[$i]>$sz[$i]) then $e[$i]=$sz[$i]
+      write('error', 'Reset ending index of %s to max %d',$nm[$i],$sz[$i])
+    endif  
+
+
+    $n[$i]=$e[$i]-$s[$i]+1 
+    $prod_n[$i+1]=$prod_n[$i]*$n[$i]
+    $start=$start+($s[$i]-1)*$prod[$i]
+    $end=$end+($e[$i]-1)*$prod[$i]
+    $i=$i+1
+  endwhile
+
+  clear(2)
+
+"------ index -----"
+
+  $tot=$prod_n[arrayelemts+1]
+  $xs=wcmax/$tot
+  write($device,0,0,''):$ys 
+
+  $offset = 0
+  if (vp >= 10) then $offset = vp - 10  endif  "you will know why I do this"
+  if (vp >= 20) then $offset = vp - 20  endif  "if you have noisy spectra"
+  if (vp >= 30) then $offset = vp - 30  endif
+  if (vp >= 40) then $offset = vp - 40  endif 
+ $i=1  
+  while (arrayelemts-$i>=0) do
+    $y=$offset-($i+0.5)*$ys
+
+
+
+    if ($i-trunc($i/2)*2 = 1) then
+      $Cc='$color'
+    else
+      $Cc='$Color'
+    endif 
+    length($nm[$i]):$len 
+    if ($xs*0.5*$prod_n[$i]>2*$len) then
+      write($device,{$Cc}[1],0,$y,$nm[$i])
+    endif
+
+    $j=1 $int_old[$i]=0 $cnt=0
+    while ($tot-$j>=0) do
+       $int=trunc($j/$prod_n[$i])
+       $x=$xs*($j-$prod_n[$i]*0.5)-1.5
+       if ($int <> $int_old[$i]) then
+          $cnt=$cnt+1
+      	  $block=trunc(($j-1)/$prod_n[$i+1])+1
+          $c_ix=$block-trunc(($block-1)/2)*2
+
+         $val=$int-trunc(($int-1)/$n[$i])*$n[$i]
+         $val=$s[$i]+$val-1
+         write($device,{$Cc}[$c_ix],$x,$y,$val)
+         $int_old[$i]=$int
+       endif
+       $j=$j+1
+    endwhile
+
+    $i=$i+1
+  endwhile
+
+ 
+"-------"
+  "write('line3','%d    %d  %d  %d',$prod_n[1],$prod_n[2],$prod_n[3],$prod_n[4])"
+  "dssh($start,$end) "
+"------- plot ----"
+
+  $tot=$prod_n[arrayelemts+1]
+  $xs=wcmax/$tot
+  wc=$xs*0.94 $r_wc=$xs*0.06
+
+    $j=1 
+    while ($tot-$j>=0) do
+      sc=$xs*($tot-$j)  
+      $index=1
+
+      $i=1  $cnt=0
+      while (arrayelemts-$i>=0) do
+         $int=trunc(($j-1)/$prod_n[$i])+1
+         $val=$int-trunc(($int-1)/$n[$i])*$n[$i]
+         $val=$s[$i]+$val-1
+
+         $index=$index+($val-1)*$prod[$i]
+       "  write('graphics',$i*30,$j*8+10,$val) "
+         $i=$i+1
+       endwhile
+        "write('graphics',0,$j*8+10,$index)"
+    
+       if ($index<=celem) then dssn($index) endif
+       $j=$j+1
+    endwhile
+ 
+
+endif
+
+

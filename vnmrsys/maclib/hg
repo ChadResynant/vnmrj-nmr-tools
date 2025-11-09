@@ -1,0 +1,35 @@
+"hg: horizontal grid. Execute twice to clear"
+"Donghua H. Zhou/UIUC/Rienstra NMR Group/Jan 29 2004; last modify Aug 19, 04"
+"CMR Jan. 2022:  New color schemes for OVJ3.1A"
+
+$color1='red'
+$color2='black'
+
+$color='$color1'
+pen('graphics',$color1)
+
+
+$N=trunc((wc2max-vp)/10)
+$i=-trunc(vp/10)
+while $N-$i > 0 do
+ $y = $i*10 + vp
+ if ($i-trunc($i/5)*5) = 0 then
+    pen('graphics',$color2)
+    $color='$color2'
+ endif
+
+ move(0,$y) draw('xor',wcmax,$y)
+ write('graphics',{$color},'xor',0,$y,$i*10)
+
+ if ($i-trunc($i/5)*5) = 0 then
+    pen('graphics',$color1)
+    $color='$color1'
+ endif
+
+ $i = $i + 1
+endwhile
+
+write('line3','hg  Horizontal grid. Execute again to turn off/on.')
+
+
+

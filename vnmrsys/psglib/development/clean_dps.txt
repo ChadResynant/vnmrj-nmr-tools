@@ -1,0 +1,191 @@
+# DPS Display Cleanup - Before vs After Comparison
+
+## The Problem with Struct Pointers in dps
+
+When you use struct pointers extensively in pulse sequences, the dps display in OpenVnmrJ becomes cluttered and unreadable because every `params->field` reference shows up as a separate line.
+
+## BEFORE: Cluttered dps Display
+
+### Original struct-heavy code:
+```c
+void execute_evolution_period(EvolutionParams* params) {
+    if (params->delay_pre > 0) {
+        delay(params->delay_pre);
+    }
+    
+    if (!strcmp(params->nucleus, "H")) {
+        rgpulse(2.0 * params->pw90, params->ph_refocus, 0.0, 0.0);
+    } else if (!strcmp(params->nucleus, "X")) {
+        decrgpulse(2.0 * params->pw90, params->ph_refocus, 0.0, 0.0);
+    }
+    
+    if (params->delay_refocus_pre > 0) {
+        delay(params->delay_refocus_pre);
+    }
+    
+    for (int i = 0; i < params->n_decouple; i++) {
+        if (!strcmp(params->decouple[i], "Y")) {
+            dec2rgpulse(2.0 * params->pw_dec[i], 0, 0.0, 0.0);
+        }
+    }
+}
+```
+
+### Resulting cluttered dps display:
+```
+Line  Function               Time    Phase   Power
+----  --------               ----    -----   -----
+1     delay                  params->delay_pre
+2     rgpulse                2.0*params->pw90  params->ph_refocus  params->power
+3     delay                  params->delay_refocus_pre  
+4     dec2rgpulse           2.0*params->pw_dec[0]  0  params->power_dec
+5     delay                  params->delay_post
+...
+```
+
+**Problems:**
+- Unreadable parameter references
+- Can't see actual values during sequence development
+- Difficult to debug timing issues
+- Cluttered and unprofessional appearance
+
+## AFTER: Clean dps Display
+
+### Refactored code with local variables:
+```c
+void execute_evolution_period(EvolutionParams* params) {
+    // Extract values to local variables for clean dps display
+    double pw90 = params->pw90;
+    double pw180 = 2.0 * pw90;
+    int ph_refocus = params->ph_refocus;
+    double delay_pre = params->delay_pre;
+    double delay_ref_pre = params->delay_refocus_pre;
+    
+    if (delay_pre > 0) {
+        delay(delay_pre);
+    }
+    
+    if (!strcmp(params->nucleus, "H")) {
+        rgpulse(pw180, ph_refocus, 0.0, 0.0);
+    } else if (!strcmp(params->nucleus, "X")) {
+        decrgpulse(pw180, ph_refocus, 0.0, 0.0);
+    }
+    
+    if (delay_ref_pre > 0) {
+        delay(delay_ref_pre);
+    }
+    
+    for (int i = 0; i < params->n_decouple; i++) {
+        double pw_dec180 = 2.0 * params->pw_dec[i];
+        if (!strcmp(params->decouple[i], "Y")) {
+            dec2rgpulse(pw_dec180, 0, 0.0, 0.0);
+        }
+    }
+}
+```
+
+### Resulting clean dps display:
+```
+Line  Function               Time         Phase        Power
+----  --------               ----         -----        -----
+1     delay                  delay_pre
+2     rgpulse                pw180        ph_refocus   aX90
+3     delay                  delay_ref_pre  
+4     dec2rgpulse           pw_dec180    0            aY90
+5     delay                  delay_post
+...
+```
+
+**Benefits:**
+- Clean, readable variable names
+- Professional appearance
+- Easy to debug and verify timing
+- Clear relationship between parameters and pulses
+
+## Additional Cleanup Techniques
+
+### 1. Extract Complex Calculations
+```c
+// BEFORE: Cluttered calculation in pulse call
+rgpulse(2.0 * params->pw90 * params->scale_factor, params->ph_pulse, 0.0, 0.0);
+
+// AFTER: Clean local variable
+double pw_scaled = 2.0 * params->pw90 * params->scale_factor;
+int phase = params->ph_pulse;
+rgpulse(pw_scaled, phase, 0.0, 0.0);
+```
+
+### 2. Simplify Conditional Logic
+```c
+// BEFORE: Complex struct references in conditions
+if (params->mode_flag == MODE_CONSTANT_TIME && params->evolution_time > params->min_time) {
+
+// AFTER: Extract to clear variables
+int is_const_time = (params->mode_flag == MODE_CONSTANT_TIME);
+int time_sufficient = (params->evolution_time > params->min_time);
+if (is_const_time && time_sufficient) {
+```
+
+### 3. Use Convenience Functions
+```c
+// BEFORE: Many struct references
+execute_evolution_period(&params);  // Shows up as params-> references
+
+// AFTER: Direct parameter passing
+execute_x_evolution_yz_decouple(d2, ct_flag, t_const, pwX90, pwY90, pwZ90,
+                               ph_comp1, ph_comp2, sw1, ni);
+```
+
+## Implementation Strategy
+
+### For New Code:
+1. **Start with structs internally** for organization and validation
+2. **Extract to local variables** before any pulse sequence calls
+3. **Use descriptive variable names** that make sense in dps
+4. **Group related extractions** together
+
+### For Existing Code:
+1. **Identify struct-heavy functions** that appear in dps
+2. **Add variable extraction** at the beginning of functions
+3. **Replace all struct references** in pulse calls
+4. **Test that dps display is clean**
+
+### Example Refactoring Pattern:
+```c
+void some_pulse_function(SomeStruct* params) {
+    // === EXTRACT VALUES FOR CLEAN DPS ===
+    double pw90 = params->pw90;
+    double pw180 = 2.0 * pw90;
+    int phase1 = params->phase1;
+    int phase2 = params->phase2;
+    double delay1 = params->delay1;
+    double delay2 = params->delay2;
+    
+    // === PULSE SEQUENCE (clean dps display) ===
+    delay(delay1);
+    rgpulse(pw90, phase1, 0.0, 0.0);
+    delay(delay2);  
+    rgpulse(pw180, phase2, 0.0, 0.0);
+}
+```
+
+## Benefits Summary
+
+### User Experience:
+- **Professional appearance** in dps display
+- **Easy debugging** with readable variable names
+- **Clear parameter relationships** 
+- **Better sequence documentation**
+
+### Developer Benefits:
+- **Maintains struct advantages** internally (organization, validation)
+- **Clean external interface** for pulse sequence calls
+- **Best of both worlds** - internal structure + clean display
+- **Easier code review** and maintenance
+
+### Performance:
+- **No performance penalty** - same compiled code
+- **Potentially faster** due to local variable caching
+- **Better compiler optimization** opportunities
+
+This approach gives you all the benefits of structured programming while maintaining a clean, professional appearance in the dps display that users actually see.

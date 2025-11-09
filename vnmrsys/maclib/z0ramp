@@ -1,0 +1,7 @@
+exists('z0ramp','tclbin'):$e,$path
+if ($e) then
+  write('line3',$path)
+  shell($path +' "' +vnmraddr +'"'):$dum
+else
+  write('line3','Could not find z0ramp tcl program')
+endif

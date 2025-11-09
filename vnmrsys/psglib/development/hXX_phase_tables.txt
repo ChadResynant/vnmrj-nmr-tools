@@ -1,0 +1,269 @@
+/*
+ * hXX_organized_phases.c - hXX.c with systematically organized phase tables
+ * 
+ * Demonstrates the phase table organization system:
+ * - Logical sequence order (not historical order)
+ * - Consistent naming convention
+ * - Clear functional grouping
+ * - Better documentation
+ * - Easier debugging and maintenance
+ */
+
+#include "standard.h"
+#include "biosolidstandard.h"
+#include "biosolidpboxpulse.h"
+#include "biosolidmixing_simple.h"
+#include "biosolidevolution.h"
+#include "biosolidcp.h"
+#include "biosolidvalidation.h"
+
+// ================================================================
+// PHASE CYCLING STRATEGY
+// ================================================================
+/*
+ * hXX Phase Cycling Strategy:
+ * 
+ * Base 8-step cycle:
+ * - Steps 1-2: Coherence pathway selection for F2 
+ * - Steps 3-4: Remove F2 quadrature artifacts
+ * - Steps 5-8: Spin temperature alternation (essential for homonuclear)
+ * 
+ * Extended to 16/32 steps for mixing sequences:
+ * - Additional artifact suppression during long mixing
+ * - Independent phase cycling for storage vs. readout pulses
+ * - DQF capability for clean spectra
+ */
+
+// ================================================================
+// 1. EXCITATION AND PREPARATION PHASES
+// ================================================================
+
+static int phH90_table[16] = {1,1,1,1,3,3,3,3,          // H excitation
+                              3,3,3,3,1,1,1,1};         // Spin temp alternation
+
+static int phX90_table[16] = {1,3,1,3,1,3,1,3,          // X excitation (no CP)
+                              3,1,3,1,3,1,3,1};         // Quadrature cycling
+
+static int phX90soft_table[16] = {1,1,1,1,3,3,3,3,      // X excitation (soft)
+                                  3,3,3,3,1,1,1,1};     // Matched to H90 for echo
+
+// ================================================================
+// 2. CROSS-POLARIZATION PHASES
+// ================================================================
+
+static int phHhx_table[8] = {0,0,0,0,0,0,0,0};          // H→X CP: H channel
+static int phXhx_table[8] = {0,2,0,2,2,0,2,0};          // H→X CP: X channel
+static int phXhxSoft_table[8] = {0,0,0,0,2,2,2,2};      // H→X CP: X soft
+
+// ================================================================
+// 3. EVOLUTION PERIOD PHASES
+// ================================================================
+
+// F2 evolution composite pulses (for Y decoupling during X evolution)
+static int phCompY1_table[4] = {0,0,0,0};               // Y comp pulse 1
+static int phCompY2_table[4] = {1,1,1,1};               // Y comp pulse 2
+
+// Echo refocusing (for soft pulse option)
+static int phXecho_table[16] = {0,1,0,1,0,1,0,1,        // X echo pulse
+                                0,1,0,1,0,1,0,1};       // Maintains cycling
+
+// ================================================================
+// 4. MIXING SEQUENCE PHASES
+// ================================================================
+
+static int phXmix1_table[16] = {3,3,1,1,1,1,3,3,        // X mixing: storage pulse
+                                3,3,1,1,1,1,3,3};       // RFDR-optimized cycling
+
+static int phXmix2_table[32] = {1,1,3,3,1,1,3,3,        // X mixing: readout pulse
+                                1,1,3,3,1,1,3,3,        // First 16 steps
+                                2,2,0,0,2,2,0,0,        // Extended cycling  
+                                2,2,0,0,2,2,0,0};       // For long sequences
+
+static int phXmix2dqf_table[32] = {1,3,3,1,1,3,3,1,     // DQF mixing readout
+                                   1,3,3,1,1,3,3,1,     // Enhanced artifact
+                                   2,0,0,2,2,0,0,2,     // suppression for
+                                   2,0,0,2,2,0,0,2};    // clean spectra
+
+// Recoupling-specific phases
+static int phXspc5_table[8] = {0,0,0,0,0,0,0,0};        // SPC5 base phase
+static int phXspc5ref_table[8] = {0,1,0,1,0,1,0,1};     // SPC5 reference (DQF)
+
+// ================================================================
+// 5. DETECTION PHASES
+// ================================================================
+
+static int phRec_table[32] = {0,2,0,2,2,0,2,0,          // Standard receiver
+                              2,0,2,0,0,2,0,2,          // F2 cycling
+                              1,3,1,3,3,1,3,1,          // Spin temp  
+                              3,1,3,1,1,3,1,3};         // compensation
+
+static int phRecSoft_table[32] = {0,2,0,2,2,0,2,0,      // Soft pulse receiver
+                                  2,0,2,0,0,2,0,2,      // (same as standard
+                                  1,3,1,3,3,1,3,1,      // but separate for
+                                  3,1,3,1,1,3,1,3};     // clarity)
+
+static int phRecNoMix_table[16] = {0,2,0,2,2,0,2,0,     // No mixing receiver
+                                   2,0,2,0,0,2,0,2};    // (reduced steps)
+
+// ================================================================
+// PHASE ASSIGNMENTS - Sequence Order
+// ================================================================
+
+#define phH90        t1     // 1. Initial H excitation
+#define phHhx        t2     // 2. H→X CP: H channel
+#define phXhx        t3     // 3. H→X CP: X channel  
+#define phXhxSoft    t4     // 4. H→X CP: X channel (soft)
+#define phX90        t5     // 5. X excitation (no CP)
+#define phX90soft    t6     // 6. X excitation (soft)
+#define phCompY1     t7     // 7. F2 evolution: Y comp 1
+#define phCompY2     t8     // 8. F2 evolution: Y comp 2
+#define phXecho      t9     // 9. X echo pulse (soft option)
+#define phXmix1      t10    // 10. X mixing: storage
+#define phXmix2      t11    // 11. X mixing: readout
+#define phXmix2dqf   t12    // 12. X mixing: readout (DQF)
+#define phXspc5      t13    // 13. SPC5 recoupling
+#define phXspc5ref   t14    // 14. SPC5 reference (DQF)
+#define phRec        t15    // 15. Receiver (standard)
+#define phRecSoft    t16    // 16. Receiver (soft)
+#define phRecNoMix   t17    // 17. Receiver (no mixing)
+
+// ================================================================
+// PHASE TABLE SETUP FUNCTION
+// ================================================================
+
+void setup_phase_tables_hxx(void) {
+    printf("Setting up hXX phase tables in sequence order...\n");
+    
+    // 1. Excitation phases
+    settable(phH90,        16, phH90_table);
+    settable(phX90,        16, phX90_table); 
+    settable(phX90soft,    16, phX90soft_table);
+    
+    // 2. Cross-polarization phases
+    settable(phHhx,        8,  phHhx_table);
+    settable(phXhx,        8,  phXhx_table);
+    settable(phXhxSoft,    8,  phXhxSoft_table);
+    
+    // 3. Evolution phases
+    settable(phCompY1,     4,  phCompY1_table);
+    settable(phCompY2,     4,  phCompY2_table);
+    settable(phXecho,      16, phXecho_table);
+    
+    // 4. Mixing phases
+    settable(phXmix1,      16, phXmix1_table);
+    settable(phXmix2,      32, phXmix2_table);
+    settable(phXmix2dqf,   32, phXmix2dqf_table);
+    settable(phXspc5,      8,  phXspc5_table);
+    settable(phXspc5ref,   8,  phXspc5ref_table);
+    
+    // 5. Detection phases
+    settable(phRec,        32, phRec_table);
+    settable(phRecSoft,    32, phRecSoft_table);
+    settable(phRecNoMix,   16, phRecNoMix_table);
+    
+    printf("Phase tables configured for %d-step cycling\n", 32);
+}
+
+// ================================================================
+// PHASE CYCLING LOGIC
+// ================================================================
+
+void setup_phase_cycling_hxx(void) {
+    // F2 indirect dimension phase cycling
+    int id2_ = (int)(d2 * getval("sw1") + 0.1);
+    
+    if ((phase1 == 1) || (phase1 == 2)) {
+        // States/TPPI selection - increment all relevant phases
+        tsadd(phRec,        2*id2_, 4);  // Receiver
+        tsadd(phRecSoft,    2*id2_, 4);  // Soft receiver  
+        tsadd(phRecNoMix,   2*id2_, 4);  // No mix receiver
+        tsadd(phXmix1,      2*id2_, 4);  // Storage pulse (key for F2 selection)
+        
+        printf("F2 phase cycling: States/TPPI mode, increment = %d\n", 2*id2_);
+    }
+    
+    if (phase1 == 2) {
+        // Hypercomplex (States-TPPI) - additional 90° shift
+        tsadd(phXmix1, 3, 4);
+        printf("F2 phase cycling: Hypercomplex mode enabled\n");
+    }
+}
+
+// ================================================================
+// RECEIVER SELECTION LOGIC
+// ================================================================
+
+void select_receiver_hxx(const char* echo, const char* mMix) {
+    if (strcmp(echo, "n") == 0 && strcmp(mMix, "n") != 0) {
+        setreceiver(phRec);
+        printf("Receiver: Standard (hard pulses + mixing)\n");
+    } 
+    else if (strcmp(echo, "soft") == 0 && strcmp(mMix, "n") != 0) {
+        setreceiver(phRecSoft);
+        printf("Receiver: Soft pulse mode (soft + mixing)\n");
+    } 
+    else if (strcmp(echo, "soft") != 0 && strcmp(mMix, "n") == 0) {
+        setreceiver(phRecNoMix);
+        printf("Receiver: No mixing mode\n");
+    } 
+    else {
+        NMR_ABORT("Invalid combination: Must have soft pulse OR mixing enabled");
+    }
+}
+
+// ================================================================
+// MAIN PULSE SEQUENCE WITH ORGANIZED PHASES
+// ================================================================
+
+void pulsesequence() {
+    
+    check_array();
+    
+    // ... [parameter setup as before] ...
+    
+    // Setup phase tables in logical order
+    setup_phase_tables_hxx();
+    
+    // Configure phase cycling
+    setup_phase_cycling_hxx();
+    
+    // Select appropriate receiver
+    char echo[MAXSTR], mMix[MAXSTR];
+    getstr("echo", echo);
+    getstr("mMix", mMix);
+    select_receiver_hxx(echo, mMix);
+    
+    // ... [rest of pulse sequence] ...
+}
+
+/*
+ * ORGANIZATION BENEFITS:
+ * =====================
+ * 
+ * BEFORE (Original hXX.c):
+ * - 15+ phase tables in random historical order
+ * - Hard to trace phase cycling through sequence
+ * - Inconsistent naming (table1, table22, etc.)
+ * - No clear grouping or documentation
+ * - Difficult to debug phase problems
+ * 
+ * AFTER (This organized version):
+ * - Phases in logical sequence order
+ * - Clear functional grouping with comments
+ * - Consistent naming convention
+ * - Self-documenting phase cycling strategy  
+ * - Easy to trace and debug
+ * - Separate setup functions for clarity
+ * 
+ * DEBUGGING IMPROVEMENTS:
+ * - Can easily see which phases are used when
+ * - Clear relationship between pulse and phase
+ * - Logical flow matches sequence execution
+ * - Better error messages and validation
+ * 
+ * MAINTENANCE IMPROVEMENTS:
+ * - Easy to add new phase cycling options
+ * - Clear structure for extending sequences
+ * - Consistent patterns across all sequences
+ * - Much easier to review and modify
+ */

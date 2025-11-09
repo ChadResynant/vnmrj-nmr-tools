@@ -1,0 +1,50 @@
+hXH
+seqfil = 'hXH'
+
+//------------------------------
+//  stppm 
+//------------------------------
+
+exists('aHstppm','parameter'):$e
+if $e < 0.5 then
+    create('aHstppm','real')
+    setlimit('aHstppm',3000,0,10)
+endif
+
+exists('pwHstppm','parameter'):$e
+if $e < 0.5 then
+    create('pwHstppm','pulse')
+    setlimit('pwHstppm',500,5,0.1)
+endif
+
+exists('phHstppm','parameter'):$e
+if $e < 0.5 then
+    create('phHstppm','real')
+    setlimit('phHstppm',90,-90,1)
+endif
+
+exists('ofHstppm','parameter'):$e
+if $e < 0.5 then
+    create('ofHstppm','real')
+    setlimit('ofHstppm',1e5,1e5,1)
+endif
+
+exists('soHstppm','parameter'):$e
+if $e < 0.5 then
+    create('soHstppm','real')
+    setlimit('soHstppm',8,1,1)
+endif
+
+exists('chHstppm','parameter'):$e
+if $e < 0.5 then
+   create('chHstppm','flag')
+endif 
+setvalue('chHstppm','obs')
+
+exists('ruHstppm','parameter'):$e
+if $e < 0.5 then
+    create('ruHstppm','real')
+    setlimit('ruHstppm',50,1,1)
+endif
+
+aHstppm=aHtppm pwHstppm=pwHtppm phHstppm=phHtppm ruHstppm=4 soHstppm=1

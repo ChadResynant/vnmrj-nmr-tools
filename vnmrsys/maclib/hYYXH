@@ -1,0 +1,1004 @@
+seqfil = 'hYYXH'
+
+//------------------------------
+// Axes Assign and Bioref
+//------------------------------
+exists('axAssgn','parameter'):$e
+if $e < 0.5 then
+   create('axAssgn','flag')
+endif
+setvalue('axAssgn','3321')
+
+exists('bioref','parameter'):$e
+if $e < 0.5 then
+   create('bioref','flag')
+endif
+setvalue('bioref','y')
+
+setlimit('d1',2,.4,.001)
+setlimit('at',0.040,0,1e-06)
+
+//------------------------------
+// Spin Rate
+//------------------------------
+
+exists('srate','parameter'):$e
+if $e < 0.5 then
+   create('srate','frequency')
+endif 
+
+exists('hsrotor','parameter'):$e
+if $e < 0.5 then
+   create('hsrotor','flag') 
+endif
+
+//==================
+// 2D acq parameters
+//==================
+
+exists('ni','parameter'):$e
+if ($e = 0) then
+   create('ni','integer')
+endif
+setlimit('ni',32767,0,1)
+
+exists('sw1','parameter'):$e
+if ($e = 0) then
+   create('sw1','real')
+   sw1=50000
+endif
+setlimit('sw1',5e+6,1,parstep[5])
+
+exists('phase','parameter'):$e
+if ($e = 0) then
+   create('phase','integer')
+endif
+
+exists('d2','parameter'):$e
+if ($e = 0) then
+   create('d2','delay')
+   d2 = 0.0
+endif
+setlimit('d2',0.010,0,1.25e-8)
+
+//==================
+// 3D acq parameters
+//==================
+
+exists('ni2','parameter'):$e
+if ($e = 0) then
+   create('ni2','integer')
+endif
+setlimit('ni2',32767,0,1)
+
+exists('sw2','parameter'):$e
+if ($e = 0) then
+   create('sw2','real')
+   sw2=3000
+endif
+setlimit('sw2',5e+6,1,parstep[5])
+
+exists('phase2','parameter'):$e
+if ($e = 0) then
+   create('phase2','integer')
+endif
+setlimit('phase2',20,0,1)
+
+exists('d3','parameter'):$e
+if ($e = 0) then
+   create('d3','delay')
+   d3 = 0.0
+endif
+setlimit('d3',0.010,0,1.25e-8)
+
+
+// =============================
+// NUS parameters
+// =============================
+
+exists('SPARSE','parameter'):$e
+if $e < 0.5 then
+    create('SPARSE','string')
+    setenumeral('SPARSE',2,'y','n')
+    setvalue('SPARSE','n')
+endif
+setvalue('SPARSE','n')
+
+exists('sparse_file','parameter'):$e
+if $e < 0.5 then
+    create('sparse_file','string')
+    setvalue('sparse_file','/home/rienstra/vnmrsys/nus_sched/hYXH_S.sched')
+endif
+
+exists('nimax_s','parameter'):$e
+if $e < 0.5 then
+    create('nimax_s','integer')
+    setvalue('nimax_s',0)
+    setlimit('nimax_s',256,0,1)
+endif
+
+exists('ni2max_s','parameter'):$e
+if $e < 0.5 then
+    create('ni2max_s','integer')
+    setvalue('ni2max_s',0)
+    setlimit('ni2max_s',256,0,1)
+endif
+
+exists('ni3max_s','parameter'):$e
+if $e < 0.5 then
+    create('ni3max_s','integer')
+    setvalue('ni3max_s',0)
+    setlimit('ni3max_s',256,0,1)
+endif
+
+
+
+//------------------------------
+// Receiver Delays
+//------------------------------
+
+exists('rd','parameter'):$e
+if $e < 0.5 then
+   create('rd','pulse')
+   setlimit('rd',8192,0,0.0125)
+endif
+
+exists('ad','parameter'):$e
+if $e < 0.5 then
+   create('ad','pulse')
+   setlimit('ad',8192,0,0.0125)
+endif
+
+exists('ddrtc','parameter'):$e
+if $e < 0.5 then
+   create('ddrtc','pulse')
+   setlimit('ddrtc',8192,0,0.0125)
+endif
+
+//------------------------------
+// Basic Transmitter Properties
+//------------------------------
+
+exists('aX90','parameter'):$e
+if $e < 0.5 then
+   create('aX90','real')
+   setlimit('aX90',4095,0,1)
+endif
+
+exists('aH90','parameter'):$e
+if $e < 0.5 then
+   create('aH90','real')
+   setlimit('aH90',4095,0,1)
+endif
+
+exists('aY90','parameter'):$e
+if $e < 0.5 then
+   create('aY90','real')
+   setlimit('aY90',4095,0,1)
+endif
+
+exists('aZ90','parameter'):$e
+if $e < 0.5 then
+   create('aZ90','real')
+   setlimit('aZ90',4095,0,1)
+endif
+
+exists('pwX90','parameter'):$e
+if $e < 0.5 then
+   create('pwX90','pulse')
+   setlimit('pwX90',8192,0,0.0125)
+endif
+
+exists('pwH90','parameter'):$e
+if $e < 0.5 then
+   create('pwH90','pulse')
+   setlimit('pwH90',8192,0,0.0125)
+endif
+
+exists('pwY90','parameter'):$e
+if $e < 0.5 then
+   create('pwY90','pulse')
+   setlimit('pwY90',8192,0,0.0125)
+endif
+
+exists('pwZ90','parameter'):$e
+if $e < 0.5 then
+   create('pwZ90','pulse')
+   setlimit('pwZ90',8192,0,0.0125)
+endif
+
+//---------------
+// cpHY elements
+//---------------
+
+exists('shHY','parameter'):$e
+if $e < 0.5 then
+    create('shHY','flag')
+endif
+
+exists('toHY','parameter'):$e
+if $e < 0.5 then
+   create('toHY','flag')
+endif
+setvalue('toHY','dec2')
+
+exists('frHY','parameter'):$e
+if $e < 0.5 then
+   create('frHY','flag')
+endif
+setvalue('frHY','obs')
+
+exists('chHY','parameter'):$e
+if $e < 0.5 then
+   create('chHY','flag')
+endif
+
+exists('aHhy','parameter'):$e
+if $e < 0.5 then
+   create('aHhy','real')
+   setlimit('aHhy',4095,0,1)
+endif
+
+exists('aYhy','parameter'):$e
+if $e < 0.5 then
+   create('aYhy','real')
+   setlimit('aYhy',4095,0,1)
+endif
+
+exists('bHY','parameter'):$e
+if $e < 0.5 then
+   create('bHY','real')
+   setlimit('bHY',1000000,0,1.0e-6)
+endif
+
+exists('dHY','parameter'):$e
+if $e < 0.5 then
+   create('dHY','real')
+   setlimit('dHY',4095,-4095,1)
+endif
+
+exists('tHY','parameter'):$e
+if $e < 0.5 then
+   create('tHY','pulse')
+   setlimit('tHY',50000,0,0.0125)
+endif
+
+exists('ofHY','parameter'):$e
+if $e < 0.5 then
+    create('ofHY','frequency')
+endif
+
+//---------------
+// cpYX elements
+//---------------
+
+exists('shYX','parameter'):$e
+if $e < 0.5 then
+    create('shYX','flag')
+endif
+
+exists('toYX','parameter'):$e
+if $e < 0.5 then
+   create('toYX','flag')
+endif
+setvalue('toYX','dec')
+
+exists('frYX','parameter'):$e
+if $e < 0.5 then
+   create('frYX','flag')
+endif
+setvalue('frYX','dec2')
+
+exists('chYX','parameter'):$e
+if $e < 0.5 then
+   create('chYX','flag')
+endif
+
+exists('aXyx','parameter'):$e
+if $e < 0.5 then
+   create('aXyx','real')
+   setlimit('aXyx',4095,0,1)
+endif
+
+exists('aYyx','parameter'):$e
+if $e < 0.5 then
+   create('aYyx','real')
+   setlimit('aYyx',4095,0,1)
+endif
+
+exists('aHyx','parameter'):$e
+if $e < 0.5 then
+   create('aHyx','real')
+   setlimit('aHyx',4095,0,1)
+endif
+
+exists('bYX','parameter'):$e
+if $e < 0.5 then
+   create('bYX','real')
+   setlimit('bYX',1000000,0,1.0e-6)
+endif
+
+exists('dYX','parameter'):$e
+if $e < 0.5 then
+   create('dYX','real')
+   setlimit('dYX',4095,-4095,1)
+endif
+
+exists('tYX','parameter'):$e
+if $e < 0.5 then
+   create('tYX','pulse')
+   setlimit('tYX',50000,0,0.0125)
+endif
+
+exists('ofYX','parameter'):$e
+if $e < 0.5 then
+    create('ofYX','frequency')
+endif
+//=====================
+// decoupling options
+//======================
+
+exists('Hseq','parameter'):$e
+if $e < 0.5 then
+    create('Hseq','flag')
+endif
+
+exists('Xseq','parameter'):$e
+if $e < 0.5 then
+    create('Xseq','flag')
+endif
+setvalue('Xseq','waltz')
+
+//-----------
+// tppm
+//-----------
+
+exists('aHtppm','parameter'):$e
+if $e < 0.5 then
+    create('aHtppm','real')
+    setlimit('aHtppm',4095,0,1)
+endif
+
+exists('pwHtppm','parameter'):$e
+if $e < 0.5 then
+    create('pwHtppm','pulse')
+    setlimit('pwHtppm',8192,0,0.0125)
+endif
+
+exists('phHtppm','parameter'):$e
+if $e < 0.5 then
+    create('phHtppm','real')
+    setlimit('phHtppm',180,-180,0.0)
+endif
+
+exists('chHtppm','parameter'):$e
+if $e < 0.5 then
+   create('chHtppm','flag')
+endif
+setvalue('chHtppm','obs')
+
+//------------------------------
+//  spinal
+//------------------------------
+
+exists('aHspinal','parameter'):$e
+if $e < 0.5 then
+    create('aHspinal','real')
+    setlimit('aHspinal',4095,0,1)
+endif
+
+exists('pwHspinal','parameter'):$e
+if $e < 0.5 then
+    create('pwHspinal','pulse')
+    setlimit('pwHspinal',8192,0,0.0125)
+endif
+
+exists('phHspinal','parameter'):$e
+if $e < 0.5 then
+    create('phHspinal','real')
+    setlimit('phHspinal',180,-180,0.0)
+endif
+
+exists('chHspinal','parameter'):$e
+if $e < 0.5 then
+   create('chHspinal','flag')
+endif
+setvalue('chHspinal','obs')
+
+//=====================================
+// X SPINAL, TPPM, or WALTZ ELEMENTS F2
+//=====================================
+
+exists('aXtppm','parameter'):$e
+if $e < 0.5 then
+    create('aXtppm','real')
+    setlimit('aXtppm',4095,0,1)
+endif
+
+exists('pwXtppm','parameter'):$e
+if $e < 0.5 then
+    create('pwXtppm','pulse')
+    setlimit('pwXtppm',8192,0,0.0125)
+endif
+
+exists('phXtppm','parameter'):$e
+if $e < 0.5 then
+    create('phXtppm','real')
+    setlimit('phXtppm',180,-180,0.0)
+endif
+
+exists('chXtppm','parameter'):$e
+if $e < 0.5 then
+   create('chXtppm','flag')
+endif
+setvalue('chXtppm','dec')
+
+exists('aXspinal','parameter'):$e
+if $e < 0.5 then
+    create('aXspinal','real')
+    setlimit('aXspinal',4095,0,1)
+endif
+
+exists('pwXspinal','parameter'):$e
+if $e < 0.5 then
+    create('pwXspinal','pulse')
+    setlimit('pwXspinal',8192,0,0.0125)
+endif
+
+exists('phXspinal','parameter'):$e
+if $e < 0.5 then
+    create('phXspinal','real')
+    setlimit('phXspinal',180,-180,0.0)
+endif
+
+exists('chXspinal','parameter'):$e
+if $e < 0.5 then
+   create('chXspinal','flag')
+endif
+setvalue('chXspinal','dec')
+
+exists('alpXspinal','parameter'):$e
+if $e < 0.5 then
+    create('alpXspinal','real')
+    setlimit('alpXspinal',180,-180,0.0)
+endif
+
+exists('aXwaltz','parameter'):$e
+if $e < 0.5 then
+    create('aXwaltz','real')
+    setlimit('aXwaltz',4095,0,1)
+endif
+
+exists('pwXwaltz','parameter'):$e
+if $e < 0.5 then
+    create('pwXwaltz','pulse')
+    setlimit('pwXwaltz',8192,0,0.0125)
+endif
+
+exists('chXwaltz','parameter'):$e
+if $e < 0.5 then
+   create('chXwaltz','flag')
+endif
+setvalue('chXwaltz','dec')
+
+//==========================
+// Additional parameters
+//==========================
+
+exists('d2max','parameter'):$e
+if $e < 0.5 then
+   create('d2max','delay')
+endif
+
+exists('d3max','parameter'):$e
+if $e < 0.5 then
+   create('d3max','delay')
+endif
+
+exists('d4max','parameter'):$e
+if $e < 0.5 then
+   create('d4max','delay')
+endif
+
+exists('mix','parameter'):$e
+if $e < 0.5 then
+   create('mix','delay')
+endif
+
+exists('hst','parameter'):$e
+if $e < 0.5 then
+   create('hst','delay')
+endif
+
+exists('hstconst','parameter'):$e
+if $e < 0.5 then
+   create('hstconst','delay')
+endif
+
+hs = 'nn'
+
+gradtype = 'nnh'
+
+pfgon = 'nnn'
+
+//==================
+// H RFDR ELEMENTS
+//==================
+
+exists('qHrfdr','parameter'):$e
+if $e < 0.5 then
+   create('qHrfdr','real')
+   setlimit('qHrfdr',4096,0,1)
+endif
+qHrfdr = 0
+
+exists('chHrfdr','parameter'):$e
+if $e < 0.5 then
+   create('chHrfdr','flag')
+endif
+setvalue('chHrfdr','obs')
+
+exists('ofHrfdr','parameter'):$e
+if $e < 0.5 then
+   create('ofHrfdr','frequency')
+endif
+
+exists('aHrfdr','parameter'):$e
+if $e < 0.5 then
+   create('aHrfdr','real')
+   setlimit('aHrfdr',4095,0,1)
+endif
+
+exists('pwHrfdr','parameter'):$e
+if $e < 0.5 then
+   create('pwHrfdr','pulse')
+   setlimit('pwHrfdr',64,0,0.1)
+endif
+
+//==================
+// H PRESAT XY ELEMENTS
+//==================
+
+exists('qHpxy','parameter'):$e
+if $e < 0.5 then
+   create('qHpxy','real')
+   setlimit('qHpxy',64,0,1)
+   qHpxy = 1.0
+endif
+
+exists('chHpxy','parameter'):$e
+if $e < 0.5 then
+   create('chHpxy','flag')
+endif
+setvalue('chHpxy','obs')
+
+exists('ofHpxy','parameter'):$e
+if $e < 0.5 then
+   create('ofHpxy','frequency')
+endif
+
+exists('aHpxy','parameter'):$e
+if $e < 0.5 then
+   create('aHpxy','real')
+   setlimit('aHpxy',1000,0,1)
+endif
+
+exists('pwHpxy','parameter'):$e
+if $e < 0.5 then
+   create('pwHpxy','pulse')
+   setlimit('pwHpxy',100000,0,0.0125)
+endif
+
+//==================
+// SPCN ELEMENTS
+//==================
+
+exists('mMix','parameter'):$e
+if $e < 0.5 then
+    create('mMix','string')
+    setvalue('mMix','spcn')
+endif
+
+exists('dqf_flag','parameter'):$e
+if $e < 0.5 then
+    create('dqf_flag','flag')
+    setvalue('dqf_flag','1')
+endif
+
+exists('qYspcn','parameter'):$e
+if $e < 0.5 then
+   create('qYspcn','real')
+   setlimit('qYspcn',200,0,10)
+   qYspcn = 80
+endif
+
+exists('chYspcn','parameter'):$e
+if $e < 0.5 then
+   create('chYspcn','flag')
+endif
+setvalue('chYspcn','dec2')
+
+exists('ofYspcn','parameter'):$e
+if $e < 0.5 then
+   create('ofYspcn','frequency')
+endif
+setlimit('ofYspcn',50e3,-50e3,1)
+
+exists('aYspcn','parameter'):$e
+if $e < 0.5 then
+   create('aYspcn','real')
+   setlimit('aYspcn',4095,0,1)
+endif
+aYspcn=3600
+
+exists('pwYspcn','parameter'):$e
+if $e < 0.5 then
+   create('pwYspcn','pulse')
+endif
+setlimit('pwYspcn',100,1,0.1)
+
+exists('NYspcn','parameter'):$e
+if $e < 0.5 then
+   create('NYspcn','real')
+endif
+setlimit('NYspcn',10,5,1)
+NYspcn = 5
+
+exists('aHmixspcn','parameter'):$e
+if $e < 0.5 then
+   create('aHmixspcn','real')
+endif
+setlimit('aHmixspcn',3500,0,1)
+
+//==================
+// Y rfdr ELEMENTS
+//==================
+
+exists('chYrfdr','parameter'):$e
+if $e < 0.5 then
+   create('chYrfdr','flag')
+endif
+setvalue('chYrfdr','dec2')
+
+exists('ofYrfdr','parameter'):$e
+if $e < 0.5 then
+   create('ofYrfdr','frequency')
+endif
+setlimit('ofYrfdr',50e3,-50e3,1)
+
+exists('qYrfdr','parameter'):$e
+if $e < 0.5 then
+   create('qYrfdr','real')
+endif
+setlimit('qYrfdr',256,0,1)
+
+exists('aYrfdr','parameter'):$e
+if $e < 0.5 then
+   create('aYrfdr','real')
+endif
+setlimit('aYrfdr',4095,0,1)
+
+//  CMR note 3/26/23 this does nothing for Y chn RFDR
+//  It only is used for the HH mixing period. Confusing to declare it here
+//exists('aHrfdr','parameter'):$e
+//if $e < 0.5 then
+//   create('aHrfdr','real')
+//   setlimit('aHrfdr',4095,0,1)
+//endif
+
+exists('pwYrfdr','parameter'):$e
+if $e < 0.5 then
+   create('pwYrfdr','pulse')
+endif
+setlimit('pwYrfdr',20,1,0.1)
+pwYrfdr=5
+
+
+//================
+// dream elements
+//================
+
+//chXdream
+ exists('chYdream','parameter'):$e
+if $e < 0.5 then
+   create('chYdream','flag')
+endif
+setvalue('chYdream','dec2')
+
+exists('aYdream','parameter'):$e
+if $e < 0.5 then
+   create('aYdream','real')
+   setlimit('aYdream',4095,0,1)
+endif
+
+exists('ofYdream','parameter'):$e
+if $e < 0.5 then
+   create('ofYdream','frequency')
+endif
+
+exists('dYdream','parameter'):$e
+if $e < 0.5 then
+   create('dYdream','real')
+   setlimit('dYdream',4095,0,1)
+endif
+
+exists('bYdream','parameter'):$e
+if $e < 0.5 then
+   create('bYdream','real')
+   setlimit('bYdream',4095,0,1)
+endif
+
+exists('tYdream','parameter'):$e
+if $e < 0.5 then
+   create('tYdream','pulse')
+   setlimit('tYdream',10000,0,0.0125)
+endif
+
+//================================================
+// PBOX Y Inversion Pulse 1
+//================================================
+
+exists('softpul','parameter'):$e
+if $e < 0.5 then
+    create('softpul','flag')
+    setvalue('softpul','n')
+endif
+
+exists('chYshp1','parameter'):$e
+if $e < 0.5 then
+   create('chYshp1','flag')
+endif
+setvalue('chYshp1','dec2')
+
+exists('wvYshp1','parameter'):$e
+if $e < 0.5 then
+   create('wvYshp1','flag')
+endif
+setvalue('wvYshp1','rsnob')
+
+exists('ofYshp1','parameter'):$e
+if $e < 0.5 then
+   create('ofYshp1','frequency')
+endif
+
+exists('aYshp1','parameter'):$e
+if $e < 0.5 then
+   create('aYshp1','real')
+   setlimit('aYshp1',4095,0,1)
+endif
+
+exists('aHshp1','parameter'):$e
+if $e < 0.5 then
+   create('aHshp1','real')
+   setlimit('aHshp1',4095,0,1)
+endif
+
+exists('dbYshp1','parameter'):$e
+if $e < 0.5 then
+   create('dbYshp1','real')
+   setlimit('dbYshp1',63,-16,1)
+endif
+
+exists('stYshp1','parameter'):$e
+if $e < 0.5 then
+   create('stYshp1','real')
+endif
+
+exists('pwYshp1','parameter'):$e
+if $e < 0.5 then
+   create('pwYshp1','pulse')
+   setlimit('pwYshp1',8192,0,0.0125)
+endif
+
+exists('phYshp1','parameter'):$e
+if $e < 0.5 then
+    create('phYshp1','real')
+    setlimit('phYshp1',180,-180,0.0)
+endif
+
+
+//================================================
+// PBOX Y Inversion Pulse 2
+//================================================
+
+exists('chYshp2','parameter'):$e
+if $e < 0.5 then
+   create('chYshp2','flag')
+endif
+setvalue('chYshp2','dec2')
+
+exists('wvYshp2','parameter'):$e
+if $e < 0.5 then
+   create('wvYshp2','flag')
+endif
+setvalue('wvYshp2','rsnob')
+
+exists('ofYshp2','parameter'):$e
+if $e < 0.5 then
+   create('ofYshp2','frequency')
+endif
+
+exists('aYshp2','parameter'):$e
+if $e < 0.5 then
+   create('aYshp2','real')
+   setlimit('aYshp2',4095,0,1)
+endif
+
+exists('aHshp2','parameter'):$e
+if $e < 0.5 then
+   create('aHshp2','real')
+   setlimit('aHshp2',4095,0,1)
+endif
+
+exists('dbYshp2','parameter'):$e
+if $e < 0.5 then
+   create('dbYshp2','real')
+   setlimit('dbYshp2',63,-16,1)
+endif
+
+exists('stYshp2','parameter'):$e
+if $e < 0.5 then
+   create('stYshp2','real')
+endif
+
+exists('pwYshp2','parameter'):$e
+if $e < 0.5 then
+   create('pwYshp2','pulse')
+   setlimit('pwYshp2',8192,0,0.0125)
+endif
+
+exists('phYshp2','parameter'):$e
+if $e < 0.5 then
+    create('phYshp2','real')
+    setlimit('phYshp2',180,-180,0.0)
+endif
+
+
+//================
+// cpXH elements
+//================
+
+exists('shXH','parameter'):$e
+if $e < 0.5 then
+    create('shXH','flag')
+endif
+
+exists('toXH','parameter'):$e
+if $e < 0.5 then
+   create('toXH','flag')
+endif
+setvalue('toXH','obs')
+
+exists('frXH','parameter'):$e
+if $e < 0.5 then
+   create('frXH','flag')
+endif
+setvalue('frXH','dec')
+
+exists('chXH','parameter'):$e
+if $e < 0.5 then
+   create('chXH','flag')
+endif
+
+exists('aHxh','parameter'):$e
+if $e < 0.5 then
+   create('aHxh','real')
+   setlimit('aHxh',4095,0,1)
+endif
+
+exists('aXxh','parameter'):$e
+if $e < 0.5 then
+   create('aXxh','real')
+   setlimit('aXxh',4095,0,1)
+endif
+
+exists('bXH','parameter'):$e
+if $e < 0.5 then
+   create('bXH','real')
+   setlimit('bXH',1000000,0,1)
+endif
+
+exists('dXH','parameter'):$e
+if $e < 0.5 then
+   create('dXH','real')
+   setlimit('dXH',600,-600,1)
+endif
+
+exists('tXH','parameter'):$e
+if $e < 0.5 then
+   create('tXH','pulse')
+   setlimit('tXH',5000,0,0.1)
+endif
+
+exists('ofXH','parameter'):$e
+if $e < 0.5 then
+    create('ofXH','frequency')
+endif
+
+//-------------------------------------------------
+// H Hahn Echo
+//-------------------------------------------------
+
+exists('tHecho','parameter'):$e
+if $e < 0.5 then
+   create('tHecho','pulse')
+   setlimit('tHecho',50000,0,0.0125)
+endif
+
+//------------------------------------------------
+//  Set Bit 14 for new parameters of the .par file
+//------------------------------------------------
+
+$params = 'frHY toHY chXspinal chHrfdr chHpxy frXH toXH chXwaltz '
+$params = $params + 'decmode aX90 pwX90 aH90 pwH90 tconst mix hst hstconst softpul '
+$params = $params + 'qHrfdr ofHrfdr aHrfdr pwHrfdr '
+$params = $params + 'qHpxy ofHpxy aHpxy pwHpxy '
+$params = $params + 'shXH chXH aHxh aXxh bXH dXH tXH ofXH '
+setprotect('','clear',16384)
+setprotect($params,'on',16384)
+
+//--------------------------------------------------------
+//  Clear parameters in 'clearparams' in the apptype macro
+//--------------------------------------------------------
+
+exists('clearparams','parameter'):$e
+if $e < 0.5 then
+   create('clearparams','string')
+endif
+setprotect('clearparams','on',16384)
+$clearparams = 'frHY toHY chXspinal chHrfdr chHpxy frXH toXH chXwaltz'
+setvalue('clearparams',$clearparams)
+
+//------------------------------------------------
+//  Set the parameter templates
+//------------------------------------------------
+
+setprotect('dg','clear',4)
+$dg = '1:ACQUISITION:sw:1,at:6,np:0,d1:6,nt:0,ct:0,bs:0,'
+$dg = $dg + 'ss:0,rd:1,ad:1,ddrtc:1,rof3(rof3):1,gain:0,temp:0,srate:1;'
+$dg = $dg + '2:cpHY:shHY,chHY,aHhy:0,aYhy:0,bHY:6,dHY:6,tHY:1,ofHY:3;'
+$dg = $dg + '2:cpYX:shYX,chYX,aYyx:0,aXyx:0,bYX:6,dYX:6,tYX:1,ofYX:3;'
+$dg = $dg + '3:cpXH:shXH,chXH,aHxh:0,aXxh:0,bXH:6,dXH:6,tXH:1;' // don't need ,ofXH:3;' 
+$dg = $dg + '3(qYspcn>0):SPCn:qYspcn,aYspcn,pwYspcn,ofYspcn;'
+$dg = $dg + '3(qHrfdr>0):rfdrH:aHrfdr:0,pwHrfdr:1,qHrfdr:0;' // don't need ,ofHrfdr:1;'
+$dg = $dg + '3(tHecho>0):echo:tHecho:1;'
+$dg = $dg + '4(softpul=\'y\'):shp1Y:chYshp1,wvYshp1,ofYshp1:3,dbYshp1:0,aYshp1:0,pwYshp1:1,phYshp1,aHshp1;'
+$dg = $dg + '4(softpul2=\'y\'):shp2Y:chYshp2,wvYshp2,ofYshp2:3,dbYshp2:0,aYshp2:0,pwYshp2:1,phYshp2,aHshp2;'
+dg = $dg
+setprotect('dg','on',4)
+
+setprotect('dg2','clear',4)
+$dg2 = '1:OBSERVE:tn,sfrq:6,tof:1,tpwr:0,aH90:0,pwH90:1;'
+$dg2 = $dg2 + '1(Hseq=\'waltz\'):WALTZ:aHwaltz:0,pwHwaltz:1;'
+//$dg2 = $dg2 + '1:Homospoil:hst:6,hstconst:6;'
+$dg2 = $dg2 + '1:pxyH:aHpxy:0,pwHpxy:1,qHpxy:0,ofHpxy:1;'
+$dg2=$dg2+'2:DECOUPLE:dn,dfrq:6,dof:1,dpwr:0,aX90:0,pwX90:1;'
+$dg2 = $dg2 + '2(Xseq=\'tppm\'):TPPM:aXtppm:0,pwXtppm:1,phXtppm:2;'
+$dg2 = $dg2 + '2(Xseq=\'spinal\'):SPINAL:aXspinal:0,pwXspinal:1,phXspinal:2,alpXspinal:3;'
+$dg2 = $dg2 + '2(Xseq=\'waltz\'):WALTZ:aXwaltz:0,pwXwaltz:1;'
+$dg2 = $dg2 + '3:DECOUPLE2:dn2,dfrq2:6,dof2:1,dpwr2:0,aY90:0,pwY90:1;'
+$dg2 = $dg2 + '3(Yseq=\'waltz\'):WALTZ:aYwaltz:0,pwYwaltz:1;'
+$dg2 = $dg2 + '4:DIGITIZATION:ni,ni2,ni3,nrows,sw1,sw2,sw3,nimax_s,ni2max_s,ni3max_s,ndim,skiprows;'
+dg2 = $dg2
+setprotect('dg2','on',4)
+
+setprotect('ap','clear',4)
+$ap = '1:SAMPLE:date,temp:1,srate:1,file;'
+$ap = $ap + '1:ACQUISITION:tn,sfrq:6,tof:1,tpwr:0,sw:1,at:6,np:0,d1:6,nt:0,ct:0,ss:0,rd:1,ad:1,aX90:0,pwX90:1;'
+$ap = $ap + '1(ni):2D ACQUISITION:d2:6,sw1:1,ni:0,phase:0;'
+$ap = $ap + '1:DECOUPLE:dn,dfrq:6,dof:1,dpwr:0,aH90:0,pwH90:1;'
+$ap = $ap + '1(dfrq2>0):DECOUPLE2:dn2,dfrq2:6,dof2:1,dpwr2:0,aY90:0,pwY90:1;'
+$ap = $ap + '1(dfrq3>0):DECOUPLE3:dn3,dfrq3:6,dof3:1,dpwr3:0,aZ90:0,pwZ90:1;'
+$ap = $ap + '1:cpHY:shHY,chHY,aHhy:0,aYhy:0,bHY:6,dHY:6,tHY:1,ofHY:3;'
+$ap = $ap + '1:cpYX:shYX,chYX,aYyx:0,aXyx:0,bYX:6,dYX:6,tYX:1,ofYX:3;'
+$ap = $ap + '1:tconst:6,CT:6,mix:6,hst:6,hstconst:6;'
+$ap = $ap + '1(Xseq=\'tppm\'):TPPM:aXtppm:0,pwXtppm:1,phXtppm:2;'
+$ap = $ap + '1(Xseq=\'spinal\'):SPINAL:aXspinal:0,pwXspinal:1,phXspinal:2,alpXspinal:3;'
+$ap = $ap + '2(Xseq=\'waltz\'):WALTZ:aXwaltz:0,pwXwaltz:1;'
+$ap = $ap + '1:echo:aHecho:0,t1Hecho:1,pwHecho:1,t2Hecho:1;'
+$ap = $ap + '2:rfdrH:aHrfdr:0,pwHrfdr:1,qHrfdr:0,ofHrfdr:1;'
+$ap = $ap + '2:pxyH:aHpxy:0,pwHpxy:1,qHpxy:0,ofHpxy:1;'
+$ap = $ap + '2:cpXH:shXH,chXH,aHxh:0,aXxh:0,bXH:6,dXH:6,tXH:1,ofXH:3;'
+ap = $ap
+setvalue('ap',$ap,'processed')
+setprotect('ap','on',4)
