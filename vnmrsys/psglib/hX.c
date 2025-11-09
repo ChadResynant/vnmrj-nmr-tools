@@ -113,8 +113,9 @@ void pulsesequence() {
 
    duty = duty/(duty + d1 + 4.0e-6);
 
-   if (duty > 0.2) {
-      abort_message("Duty cycle >20%%. Abort!\n");
+   // 5% duty cycle limit for C-detected sequences (high-power decoupling on X channel)
+   if (duty > 0.05) {
+      abort_message("Duty cycle >5%%. Abort!\n");
    }
 
 // Set Phase Tables
