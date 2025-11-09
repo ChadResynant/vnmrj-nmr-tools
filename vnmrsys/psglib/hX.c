@@ -101,6 +101,8 @@ void pulsesequence() {
 
 // Dutycycle Protection
 
+   double rf_time;  // Save RF time for minimum d1 calculation
+
    if (!strcmp(cp, "n"))  {
    duty = 4.0e-6 + getval("pwH90") + getval("tHX") + getval("ad") + getval("rd") + at;
    }
@@ -111,6 +113,7 @@ void pulsesequence() {
    duty = 4.0e-6 + getval("pwH90") + getval("tHX") + tECHO + pwXecho + tECHOmax + getval("ad") + getval("rd") + at;
    }
 
+   rf_time = duty;  // Save before division
    duty = duty/(duty + d1 + 4.0e-6);
 
    // 5% duty cycle limit for C-detected sequences (high-power decoupling on X channel)
@@ -120,7 +123,12 @@ void pulsesequence() {
    //   - Low-power decoupling (<20 kHz): could allow 10-15%
    //   This requires integrating decoupling power and sequence type into duty cycle calculation
    if (duty > 0.05) {
-      abort_message("Duty cycle >5%%. Abort!\n");
+      double min_d1 = (rf_time / 0.05) - rf_time - 4.0e-6;
+      abort_message("Duty cycle %.1f%% exceeds 5%% limit. Increase d1 to at least %.3f s. Abort!\n",
+                    duty*100, min_d1);
+   }
+   else {
+      printf("Duty cycle %.1f%% < 5%%. Safe to proceed.\n", duty*100);
    }
 
 // Set Phase Tables

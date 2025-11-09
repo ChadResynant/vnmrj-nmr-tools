@@ -244,10 +244,15 @@ void pulsesequence() {
         duty += getval("tECHO");
     }
 
+    double rf_time;    // Save for minimum d1 calculation
+    double overhead;   // Overhead time added to denominator
+
     // Add mixing-specific contributions
     if ((strcmp(mMix, "rad") == 0) || (strcmp(mMix, "paris") == 0)) {
         duty += 2.0*getval("pwX90") + (getval("aHmix")/4095) * (getval("aHmix")/4095) * getval("tXmix");
-        duty = duty/(duty + d1 + getval("tXmix") + 4.0e-6);
+        rf_time = duty;
+        overhead = getval("tXmix") + 4.0e-6;
+        duty = duty/(duty + d1 + overhead);
     }
     else if (strcmp(mMix, "c7") == 0) {
         duty += 2.0*getval("pwX90");
@@ -257,7 +262,9 @@ void pulsesequence() {
         else {
             duty += c7.t;
         }
-        duty = duty/(duty + d1 + 4.0e-6 + 2.0*getval("tZF"));
+        rf_time = duty;
+        overhead = 4.0e-6 + 2.0*getval("tZF");
+        duty = duty/(duty + d1 + overhead);
     }
     else if (strcmp(mMix, "c6") == 0) {
         duty += 2.0*getval("pwX90");
@@ -267,7 +274,9 @@ void pulsesequence() {
         else {
             duty += c6.t;
         }
-        duty = duty/(duty + d1 + 4.0e-6 + 2.0*getval("tZF"));
+        rf_time = duty;
+        overhead = 4.0e-6 + 2.0*getval("tZF");
+        duty = duty/(duty + d1 + overhead);
     }
     else if (strcmp(mMix, "spc5") == 0) {
         duty += 2.0*getval("pwX90");
@@ -277,27 +286,43 @@ void pulsesequence() {
         else {
             duty += spc5.t;
         }
-        duty = duty/(duty + d1 + 4.0e-6 + 2.0*getval("tZF"));
+        rf_time = duty;
+        overhead = 4.0e-6 + 2.0*getval("tZF");
+        duty = duty/(duty + d1 + overhead);
     }
     else if (strcmp(mMix, "par") == 0) {
         duty += 2.0*getval("pwX90") + getval("tPAR");
-        duty = duty/(duty + d1 + 4.0e-6);
+        rf_time = duty;
+        overhead = 4.0e-6;
+        duty = duty/(duty + d1 + overhead);
     }
     else if (strcmp(mMix, "rfdr") == 0) {
         duty += 2.0*taur*getval("qXrfdr") + 2.0*getval("pwX90");
-        duty = duty/(duty + d1 + 4.0e-6);
+        rf_time = duty;
+        overhead = 4.0e-6;
+        duty = duty/(duty + d1 + overhead);
     }
     else if (strcmp(mMix, "r2t") == 0 || strcmp(mMix, "dream") == 0) {
         duty += 2*getval("tZF") + getval("tXr2t_in") + getval("tXr2t_mix") + getval("tXr2t_out") + 2.0*getval("pwX90");
-        duty = duty/(duty + d1 + 4.0e-6);
-    }
-
-    // Enforce 5% duty cycle limit
-    if (duty > 0.05) {
-        abort_message("Duty cycle %.1f%% >5%%. Check d1, d2, tRF, at, tXmix. Abort!\n", duty*100);
+        rf_time = duty;
+        overhead = 4.0e-6;
+        duty = duty/(duty + d1 + overhead);
     }
     else {
-        printf("Duty cycle %.1f%% < 5%%. Safe to proceed. Good luck! \n", duty*100);
+        // Default/unknown mixing mode
+        rf_time = duty;
+        overhead = 4.0e-6;
+        duty = duty/(duty + d1 + overhead);
+    }
+
+    // Enforce 5% duty cycle limit with specific advice
+    if (duty > 0.05) {
+        double min_d1 = (rf_time / 0.05) - rf_time - overhead;
+        abort_message("Duty cycle %.1f%% exceeds 5%% limit. Increase d1 to at least %.3f s. Abort!\n",
+                      duty*100, min_d1);
+    }
+    else {
+        printf("Duty cycle %.1f%% < 5%%. Safe to proceed. Good luck!\n", duty*100);
     }
 
     // ================================================================
