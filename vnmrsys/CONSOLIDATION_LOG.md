@@ -8,7 +8,7 @@
 ### Decision: Use Taurus ovj32user as Base
 
 **Rationale:**
-1. Contains complete July 2024 refactoring infrastructure
+1. Contains complete July 2025 refactoring infrastructure
 2. Has all 5 biosolid*.h modernization headers
 3. Includes comprehensive refactoring documentation
 4. Most recent bug fixes (hX.c Sept 12, 2024)
@@ -226,6 +226,6 @@ Need MD5 checksum or detailed diff:
 
 - All original packages preserved in `/home/chad/vnmrsys_packages/`
 - No data loss risk - all source material backed up
-- Refactoring work from July 2024 successfully preserved
+- Refactoring work from July 2025 successfully preserved
 - Production updates from Ayrshire integrated
 - Ready for git initialization and deployment planning

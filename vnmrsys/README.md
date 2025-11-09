@@ -2,7 +2,7 @@
 
 **Created:** November 9, 2025
 **Purpose:** Unified pulse sequence and macro library combining best code from Taurus and Ayrshire spectrometers
-**Refactoring Project:** July 2024 modernization effort preserved and integrated
+**Refactoring Project:** July 2025 modernization effort preserved and integrated
 
 ## Repository Structure
 
@@ -17,7 +17,7 @@ vnmrsys_consolidated/
 │   └── *.h              # Refactoring header templates
 ├── psglib/drafts/       # Experimental sequences from junk directory
 ├── psg/                 # Header files and libraries
-│   ├── biosolid*.h      # Refactoring infrastructure (July 2024)
+│   ├── biosolid*.h      # Refactoring infrastructure (July 2025)
 │   ├── solid*.h         # Standard solid-state NMR headers
 │   └── backupJuly26/    # Header backups
 ├── maclib/              # Macro library (Taurus ovj32user base)
@@ -28,7 +28,7 @@ vnmrsys_consolidated/
 
 ### Base System
 **Taurus `/mnt/data_4tbSSD/ovj32user/vnmrsys`** - Development/refactoring hub
-- Contains July 2024 refactoring infrastructure
+- Contains July 2025 refactoring infrastructure
 - 71 pulse sequences
 - 158 macros (688 with subdirectories)
 - Most comprehensive header file collection
@@ -44,7 +44,7 @@ vnmrsys_consolidated/
 - `hX-50pctduty.c` - Special duty cycle variant
 - `mtune.c` - Tuning utility
 
-## July 2024 Refactoring Project
+## July 2025 Refactoring Project
 
 ### Goals
 - Better error messages and parameter validation
@@ -110,7 +110,7 @@ From Taurus junk directory:
 - Significantly different phase cycling
 - Modified spin temperature alternation
 - Different receiver phase tables
-- Represents pre-July 2024 refactoring state
+- Represents pre-July 2025 refactoring state
 
 **Recommendation:** Keep these files for reference during debugging but use main versions for production.
 

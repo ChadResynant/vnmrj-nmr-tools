@@ -105,7 +105,7 @@ if (duty > 0.15) {
 ## hXYXX_4D_S.c.backup.JUL1 vs hXYXX_4D_S.c
 
 **Main File:** hXYXX_4D_S.c (Sept 12, 2024 - Taurus)
-**Variant:** hXYXX_4D_S.c.backup.JUL1 (Sept 12, 2024 - pre-July 2024 changes)
+**Variant:** hXYXX_4D_S.c.backup.JUL1 (Sept 12, 2024 - pre-July 2025 changes)
 
 ### Key Differences
 
@@ -125,7 +125,7 @@ may not be optimal with soft pulses off (and I don't care)
 CMR 7/24/24: Now I care. */
 ```
 
-**Impact:** Indicates phase cycle was revisited in July 2024 to optimize for both soft and hard pulse modes.
+**Impact:** Indicates phase cycle was revisited in July 2025 to optimize for both soft and hard pulse modes.
 
 #### 2. Phase Table: phH90 (table1)
 **SIGNIFICANT CHANGE:** Spin temperature alternation added
@@ -281,7 +281,7 @@ strcpy(xy.to,"dec2");
 ### Recommendation
 
 **Use main (current) version** because:
-1. Contains critical July 2024 phase cycling fixes
+1. Contains critical July 2025 phase cycling fixes
 2. Addresses DC offset issues in hard pulse mode
 3. Implements proper spin temperature alternation
 4. Optimized for both soft and hard pulse modes
@@ -289,7 +289,7 @@ strcpy(xy.to,"dec2");
 
 **Keep backup.JUL1 for reference** to:
 - Understand evolution of phase cycling
-- Revert if July 2024 changes cause issues
+- Revert if July 2025 changes cause issues
 - Compare experimental results before/after changes
 
 ---
@@ -324,7 +324,7 @@ strcpy(xy.to,"dec2");
    - Should we maintain separate versions for spectrometers with/without working PFG?
 
 4. **Phase Cycling:**
-   - Are July 2024 phase cycle changes validated by experiments?
+   - Are July 2025 phase cycle changes validated by experiments?
    - Should we test both old and new phase cycles side-by-side?
 
 ### Next Steps:
