@@ -7,18 +7,11 @@
 		    no Y-Y dream mixing yet but will add
 
                     from hXH.c  AJN 03/29/10
-		    based on hYXH.c DHZ 02/07 for inova            
-		    
-		    NUS IMPLEMENTATION ADDED - Consistent with other sequences
-		    FIXED: Removed ni/ni2 variable conflicts */
+		    based on hYXH.c DHZ 02/07 for inova            */
 
 #include "standard.h"
 #include "biosolidstandard.h"
 #include "biosolidpboxpulse.h"
-#include "biosolidnus.h"
-
-/* REMOVED NUS Pt.1 - Legacy static arrays that caused variable conflicts
-   These are now handled internally by biosolidnus.h */
 
 // Define Values for Phasetables
 
@@ -44,6 +37,7 @@ static int table13[8] = {0,2,2,0,2,0,0,2};      // phRec
 static int table20[8] = {0,0,2,2,2,2,0,0};      // phRecsoft
 static int table14[4] = {0,0,0,0};              // phHrfdr H-H mixing
 static int table16[2] = {0,1};                  // phHpxy  H presat pulses
+
 
 static int table23[8] = {0,0,0,0,0,0,0,0};      // phYspc
 static int table24[8] = {0,1,0,1,2,3,2,3};      // phYspcref
@@ -81,17 +75,16 @@ void pulsesequence() {
     
     check_array();
 
-    // Define Variables and Objects and Get Parameter Values
-    double duty;
-    double tRF;
-
     double pwH90 = getval("pwH90");
     double pwX90 = getval("pwX90");
     double pwY90 = getval("pwY90");
     double pwZ90 = getval("pwZ90");
-    
-    /* REMOVED: Local ni and ni2 variables that caused conflicts
-       These are protected PSG variables and should not be redeclared */
+    double ni = getval("ni");
+    double ni2 = getval("ni2");
+    double ni3 = getval("ni3");
+    double sw1 = getval("sw1");
+    double sw2 = getval("sw2");
+    double sw3 = getval("sw3");
 
     double max_pw_XZ = (pwX90 > pwZ90 ? pwX90 : pwZ90);
     double max_pw_YZ = (pwY90 > pwZ90 ? pwY90 : pwZ90);
@@ -159,37 +152,6 @@ void pulsesequence() {
     DSEQ dec3 = getdseq("Y");
     DSEQ dec4 = getdseq("Z");
 
-    tRF = getval("tRF");
-
-    /* NUS Implementation - handles d2 and d3 calculation internally */
-    if (NUS_ACTIVE()) {
-        if (NUS_INIT(3) != 0) psg_abort(1);  // 3D experiment
-        if (NUS_CALC_DELAYS() != 0) psg_abort(1);
-        if (NUS_SAFETY_CHECK(tRF, "n", 0.0) != 0) psg_abort(1);
-    }
-    
-    // Recalculate tmd2 and tmd3 after NUS adjustment
-    tmd3 = getval("d3max") - d3 - pwX90;
-    if (tmd3 < 0.0) {
-        tmd3 = 0.0;
-    }
-
-    tmd2 = getval("d2max") - d2 - pwX90;
-    if (tmd2 < 0.0) {
-        tmd2 = 0.0;
-    }
-
-    // Dutycycle Protection
-    // H-detected sequence: Low-power H decoupling during acquisition allows 15% duty cycle
-    // See SAFETY_STANDARDS.md Section 6: Power-Dependent Duty Cycle Limits
-    duty = 4.0e-6 + 3* getval("pwH90") + getval("tHY") + getval("tYX") + getval("tXH") +
-           d2 + d3 + tmd2 + tmd3 + getval("ad") + getval("rd") + at;
-
-    duty = duty/(duty + d1 + 4.0e-6);
-    if (duty > 0.15) {
-        printf("Duty cycle %.1f%% >15%%. Abort!\n", duty*100);
-        psg_abort(1);
-    }
 
     // Set Phase Tables
 
@@ -445,13 +407,5 @@ void pulsesequence() {
     acquire(np, 1/sw);
     endacq();
     _dseqoff(dec2); _dseqoff(dec3);
-
-    decon();
-
-    if (tRF > d2+d3) {
-        delay(tRF-d2-d3);
-    }
-
-    decoff();
     obsunblank(); decunblank(); _unblank34();
 }
