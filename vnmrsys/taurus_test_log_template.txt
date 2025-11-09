@@ -1,0 +1,266 @@
+TAURUS TESTING SESSION
+==============================================
+Date: [FILL IN]
+Tester: Chad Rienstra
+Sample: [FILL IN - e.g., glycine]
+Spinning Rate: [FILL IN] kHz
+Temperature: [FILL IN] K
+Branch: main (v1.1-stage1-complete)
+
+==============================================
+SAMPLE PREPARATION
+==============================================
+Sample ID: ________________
+Rotor: ________________
+Packing Date: ________________
+Notes:
+
+
+
+==============================================
+SYSTEM STATE
+==============================================
+Probe Tuning (X-channel): ________________
+Decoupling Power (dpwr): ________________
+X-channel Power (tpwr): ________________
+Actual Spinning Rate: ________________ kHz
+
+
+==============================================
+TEST RESULTS
+==============================================
+
+-------------------------------------------
+TEST 1: CRITICAL SAFETY TEST - d1=0.1s
+-------------------------------------------
+Purpose: Verify abort on duty cycle violation
+Expected: ABORT before acquisition (duty ~18%)
+
+Sequence: hX
+Parameters:
+  d1 = 0.1
+  tHX = 2.0m
+  pwH90 = [actual value]
+  at = 0.020
+
+Result: [ ] ABORT  [ ] RAN (check one)
+
+If ABORT:
+  ✅ Error message: _________________________________
+  ✅ Status: PASS - Safety protection working!
+
+If RAN:
+  🚨 STATUS: FAIL - SAFETY PROTECTION NOT WORKING!
+  🚨 ACTION: STOP ALL TESTING IMMEDIATELY
+  🚨 DO NOT use short d1 values until fixed
+
+
+-------------------------------------------
+TEST 2: NORMAL OPERATION - d1=2.0s
+-------------------------------------------
+Purpose: Verify normal operation with safe parameters
+Expected: Runs normally (duty ~1%)
+
+Sequence: hX
+Parameters:
+  d1 = 2.0
+  tHX = 2.0m
+  pwH90 = [actual value]
+  at = 0.020
+  nt = 4
+
+Result: [ ] RAN  [ ] ABORT (check one)
+
+If RAN:
+  Signal-to-Noise: ________________
+  Spectrum Quality: [ ] Excellent  [ ] Good  [ ] Poor
+  Any Artifacts: [ ] No  [ ] Yes - describe: ________
+  Status: ✅ PASS
+
+If ABORT:
+  Error message: _________________________________
+  Status: ⚠️ INVESTIGATE - Should not abort
+
+
+-------------------------------------------
+TEST 3: MINIMUM SAFE d1 BOUNDARY
+-------------------------------------------
+Purpose: Find exact d1 where duty = 5%
+Expected: Minimum d1 ~0.42s for standard hX
+
+Try incrementally:
+d1 = 0.3s:  [ ] RAN  [ ] ABORT
+d1 = 0.4s:  [ ] RAN  [ ] ABORT
+d1 = 0.42s: [ ] RAN  [ ] ABORT
+d1 = 0.45s: [ ] RAN  [ ] ABORT
+
+Minimum d1 that passes: ________ s
+Calculated duty at minimum: ________ %
+Status: ________________
+
+
+-------------------------------------------
+TEST 4: 2D hXX DARR
+-------------------------------------------
+Purpose: Verify 2D sequences work normally
+Expected: Runs with duty ~2%
+
+Sequence: hXX
+Parameters:
+  d1 = 2.0
+  tHX = 2.0m
+  tXmix = 20.0m
+  ni = 8 (small 2D for quick test)
+  nt = 2
+
+Result: [ ] RAN  [ ] ABORT
+
+If RAN:
+  t1 increments properly: [ ] Yes  [ ] No
+  Data quality normal: [ ] Yes  [ ] No
+  Duty cycle message shown: _____________________
+  Status: ✅ PASS
+
+If ABORT:
+  Error message: _________________________________
+  Status: ⚠️ INVESTIGATE
+
+
+-------------------------------------------
+TEST 5: 2D LONG MIXING (Should ABORT)
+-------------------------------------------
+Purpose: Verify protection for long mixing times
+Expected: ABORT (duty ~6.7% with d1=1.0s)
+
+Sequence: hXX
+Parameters:
+  d1 = 1.0
+  tXmix = 50.0m
+  tHX = 2.0m
+
+Result: [ ] ABORT  [ ] RAN
+
+If ABORT:
+  Error message: _________________________________
+  Suggested d1 from message: ________ s
+  Status: ✅ PASS - Protection working
+
+If RAN:
+  Status: ⚠️ Should have aborted - check calculation
+
+
+-------------------------------------------
+TEST 6: PERFORMANCE COMPARISON
+-------------------------------------------
+Purpose: Verify S/N unchanged from previous data
+
+Sequence: hX
+Parameters: (standard)
+  d1 = 2.0, tHX = 2.0m, nt = 4
+
+New Code S/N: ________________
+Previous S/N (if available): ________________
+Ratio (new/old): ________
+
+Lineshape: [ ] Same  [ ] Different - describe: ________
+Phase behavior: [ ] Normal  [ ] Abnormal
+T2* decay: [ ] Normal  [ ] Abnormal
+
+Status: ________________
+
+
+==============================================
+ADDITIONAL TESTS (if time permits)
+==============================================
+
+TEST 7: hXH (H-detected)
+-------------------------
+Expected: Should run normally (may not have 15% limit yet)
+
+Result: [ ] RAN  [ ] ABORT
+S/N: ________________
+Notes:
+
+
+TEST 8: Long CP Time
+-------------------------
+Parameters: d1=3.0, tHX=10.0m
+Expected duty: ~0.4% (should run)
+
+Result: [ ] RAN  [ ] ABORT
+Notes:
+
+
+==============================================
+PROBE MONITORING
+==============================================
+
+Check probe temperature every 15 minutes:
+
+Time: ______  Temp: ______  Notes: ________________
+Time: ______  Temp: ______  Notes: ________________
+Time: ______  Temp: ______  Notes: ________________
+
+Any unusual heating: [ ] No  [ ] Yes - describe:
+
+
+==============================================
+ISSUES ENCOUNTERED
+==============================================
+
+[List any problems, unexpected behavior, or questions]
+
+
+
+
+
+==============================================
+OVERALL ASSESSMENT
+==============================================
+
+Critical Tests:
+  [ ] Safety abort works (Test 1)
+  [ ] Normal operation works (Test 2)
+  [ ] No probe damage
+
+Performance Tests:
+  [ ] S/N maintained
+  [ ] Timing accurate
+  [ ] 2D sequences work
+
+Stage 1 Safety Fixes Status:
+  [ ] PRODUCTION READY - All tests passed
+  [ ] NEEDS WORK - List issues: ________________
+
+Recommendation:
+  [ ] Merge to production
+  [ ] Requires fixes before production
+  [ ] Continue testing
+
+
+==============================================
+NEXT STEPS
+==============================================
+
+[ ] Update TESTING_CHECKLIST.md
+[ ] Create summary report
+[ ] Commit results to git
+[ ] Push to origin
+[ ] Test on other spectrometers (Ayrshire, Ribeye)
+
+
+==============================================
+SIGN-OFF
+==============================================
+
+Tested By: Chad Rienstra
+Date: ________________
+Duration: ________ hours
+Status: ________________
+
+Signature: ________________
+
+
+==============================================
+END OF TEST LOG
+==============================================

@@ -1,0 +1,173 @@
+TAURUS TESTING - REMOTE SAFETY VALIDATION
+Date: November 9, 2025
+Tester: Chad Rienstra (via Claude Code)
+Branch: main (v1.1-stage1-complete)
+
+=========================================================
+REMOTE TEST 1: Safety Fix Verification (Code Review)
+=========================================================
+
+Key Sequences Reviewed:
+-----------------------
+
+1. hX.c (Most Critical - #1 used sequence)
+   Location: vnmrsys/psglib/hX.c
+   Safety Fix: Line 122
+   Code: if (duty > 0.05) { abort_message("Duty cycle >5%%. Abort!\n"); }
+
+   Duty Calculation (lines 104-114):
+   - RF time = pwH90 + tHX + at + delays
+   - duty = RF_time / (RF_time + d1)
+
+   Status: ✅ CONFIRMED - 5% limit enforced
+
+2. hXX.c (2D sequences - DARR, RFDR, etc.)
+   Location: vnmrsys/psglib/hXX.c
+   Safety Fix: Line 296-297
+   Code: if (duty > 0.05) {
+           abort_message("Duty cycle %.1f%% >5%%. Check d1, d2, tRF, at, tXmix. Abort!\n", duty*100);
+         }
+
+   Enhanced Features:
+   - Shows actual duty cycle percentage
+   - Suggests which parameters to adjust
+   - Prints confirmation when safe: "Duty cycle X% < 5%. Safe to proceed."
+
+   Status: ✅ CONFIRMED - 5% limit enforced with enhanced feedback
+
+=========================================================
+REMOTE TEST 2: Duty Cycle Calculation Validation
+=========================================================
+
+Test Case 1: Standard hX Parameters (Should PASS)
+--------------------------------------------------
+Parameters:
+  d1 = 2.0s
+  pwH90 = 2.5µs
+  tHX = 2.0ms (2000µs)
+  at = 0.020s (20000µs)
+
+Calculation:
+  RF_time = 2.5µs + 2000µs + 20000µs = 22002.5µs = 22.0025ms
+  Total_time = 22.0025ms + 2000ms = 2022.0025ms
+  Duty = 22.0025 / 2022.0025 = 0.0109 = 1.09%
+
+Expected Result: ✅ SHOULD RUN (1.09% < 5%)
+Status: PASS - Calculation valid
+
+Test Case 2: Intentional Violation (Should ABORT)
+--------------------------------------------------
+Parameters:
+  d1 = 0.1s (100ms)
+  pwH90 = 2.5µs
+  tHX = 2.0ms
+  at = 0.020s (20ms)
+
+Calculation:
+  RF_time = 2.5µs + 2000µs + 20000µs = 22002.5µs = 22.0025ms
+  Total_time = 22.0025ms + 100ms = 122.0025ms
+  Duty = 22.0025 / 122.0025 = 0.1803 = 18.03%
+
+Expected Result: ✅ SHOULD ABORT (18.03% >> 5%)
+Status: PASS - Calculation shows violation
+
+Test Case 3: Minimum Safe d1 (Boundary Test)
+---------------------------------------------
+Parameters:
+  pwH90 = 2.5µs
+  tHX = 2.0ms
+  at = 0.020s (20ms)
+  RF_time = 22.0025ms
+
+Find minimum d1 where duty = 5%:
+  duty = RF_time / (RF_time + d1) = 0.05
+  0.05 = 22.0025 / (22.0025 + d1)
+  0.05 * (22.0025 + d1) = 22.0025
+  1.100125 + 0.05*d1 = 22.0025
+  0.05*d1 = 20.902375
+  d1 = 418.0475ms = 0.418s
+
+Expected Minimum d1: ~0.42s
+At d1=0.40s: duty = 22.0025/422.0025 = 5.21% (ABORT)
+At d1=0.42s: duty = 22.0025/442.0025 = 4.98% (PASS)
+
+Status: PASS - Math checks out
+
+Test Case 4: hXX 2D DARR (Should PASS)
+---------------------------------------
+Parameters:
+  d1 = 2.0s
+  pwH90 = 2.5µs
+  tHX = 2.0ms
+  tXmix = 20.0ms (DARR mixing)
+  at = 0.020s (20ms)
+  ni = 128 (2D increments)
+
+Calculation:
+  RF_time = 2.5µs + 2000µs + 20000µs + 20000µs = 42002.5µs = 42.0025ms
+  Total_time = 42.0025ms + 2000ms = 2042.0025ms
+  Duty = 42.0025 / 2042.0025 = 0.0206 = 2.06%
+
+Expected Result: ✅ SHOULD RUN (2.06% < 5%)
+Status: PASS - Safe for overnight 2D
+
+Test Case 5: hXX Long Mixing (Boundary Test)
+---------------------------------------------
+Parameters:
+  d1 = 1.0s
+  tHX = 2.0ms
+  tXmix = 50.0ms (long mixing)
+  at = 0.020s
+
+Calculation:
+  RF_time = 2.5µs + 2000µs + 50000µs + 20000µs = 72002.5µs = 72.0025ms
+  Total_time = 72.0025ms + 1000ms = 1072.0025ms
+  Duty = 72.0025 / 1072.0025 = 0.0672 = 6.72%
+
+Expected Result: ✅ SHOULD ABORT (6.72% > 5%)
+Status: PASS - Protection working
+
+Minimum safe d1 for this case:
+  duty = 72.0025 / (72.0025 + d1) = 0.05
+  d1 = 1368.0475ms = 1.368s
+
+Suggested d1: ≥ 1.4s
+
+=========================================================
+SUMMARY OF REMOTE TESTS
+=========================================================
+
+✅ Code Review: PASSED
+   - hX.c has 5% duty cycle limit (line 122)
+   - hXX.c has 5% duty cycle limit with enhanced messages (line 296)
+   - Both sequences calculate duty correctly
+   - abort_message() will prevent acquisition
+
+✅ Duty Cycle Math: VALIDATED
+   - All test cases calculate correctly
+   - Boundary conditions identified
+   - Minimum safe d1 values determined
+
+✅ Safety Protection: CONFIRMED
+   - Short d1 (0.1s) will abort at 18% duty
+   - Normal d1 (2.0s) will run at ~1-2% duty
+   - Long mixing requires d1 ≥ 1.4s
+
+=========================================================
+READY FOR ON-SITE TESTING
+=========================================================
+
+Next Steps (On Taurus):
+1. Load glycine sample, spin at 10-12 kHz
+2. Test Case 2 first: d1=0.1s should ABORT (critical safety test)
+3. Test Case 1: d1=2.0s should RUN normally
+4. Test Case 3: Find actual minimum d1 (~0.42s predicted)
+5. Test Case 4: Run small 2D to verify overnight safety
+
+Critical Safety Check:
+🚨 If Test Case 2 does NOT abort, STOP immediately!
+   This would indicate the safety fix is not active.
+
+=========================================================
+END OF REMOTE VALIDATION
+=========================================================
