@@ -1,0 +1,254 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<!--
+  hX Acquisition Tab
+  Basic acquisition and sample parameters
+-->
+<template name="Acquisition" element="pages" type="acquisition" >
+  <group size="750 280"
+    style="Heading1"
+    label="Acquisition"
+    vq="panellevel"
+    show="$SHOW=(panellevel&gt;0)"
+    border="None"
+    side="Top"
+    justify="Left"
+    tab="yes"
+    enable="no"
+    reference="Acquisition"
+    useref="no"
+    subtype="Basic"
+    expanded="yes"
+    >
+
+    <!-- Basic Acquisition Parameters -->
+    <group loc="10 10" size="350 120"
+      style="Heading2"
+      label="Basic Acquisition"
+      border="Etched"
+      side="Top"
+      justify="Left"
+      tab="no"
+      enable="no"
+      useref="no"
+      subtype="Basic"
+      >
+      <label loc="10 20" size="80 20"
+        style="Label1"
+        label="Spectral Width"
+        justify="Left"
+        />
+      <entry loc="100 20" size="80 20"
+        style="PlainText"
+        vq="sw"
+        vc="sw=$VALUE"
+        set="$VALUE=sw"
+        digits="1"
+        />
+      <label loc="190 20" size="30 20"
+        style="Label1"
+        label="Hz"
+        />
+
+      <label loc="10 45" size="80 20"
+        style="Label1"
+        label="Acq. Time"
+        justify="Left"
+        />
+      <entry loc="100 45" size="80 20"
+        style="PlainText"
+        vq="at"
+        vc="at=$VALUE"
+        set="$VALUE=at"
+        digits="4"
+        />
+      <label loc="190 45" size="30 20"
+        style="Label1"
+        label="s"
+        />
+
+      <label loc="10 70" size="80 20"
+        style="Label1"
+        label="Relaxation d1"
+        justify="Left"
+        />
+      <entry loc="100 70" size="80 20"
+        style="PlainText"
+        vq="d1"
+        vc="d1=$VALUE"
+        set="$VALUE=d1"
+        digits="3"
+        tooltip="Recycle delay - must be sufficient for duty cycle safety"
+        />
+      <label loc="190 70" size="30 20"
+        style="Label1"
+        label="s"
+        />
+      <label loc="230 70" size="100 20"
+        style="Label3"
+        label="(see duty cycle)"
+        />
+    </group>
+
+    <!-- Scans -->
+    <group loc="370 10" size="200 120"
+      style="Heading2"
+      label="Scans"
+      border="Etched"
+      side="Top"
+      justify="Left"
+      tab="no"
+      enable="no"
+      useref="no"
+      subtype="Basic"
+      >
+      <label loc="10 20" size="80 20"
+        style="Label1"
+        label="Transients"
+        justify="Left"
+        />
+      <entry loc="100 20" size="70 20"
+        style="PlainText"
+        vq="nt"
+        vc="nt=$VALUE"
+        set="$VALUE=nt"
+        digits="0"
+        />
+
+      <label loc="10 45" size="80 20"
+        style="Label1"
+        label="Completed"
+        justify="Left"
+        />
+      <entry loc="100 45" size="70 20"
+        style="PlainText"
+        vq="ct"
+        vc=""
+        set="$VALUE=ct"
+        digits="0"
+        disable="Grayed out"
+        />
+
+      <label loc="10 70" size="80 20"
+        style="Label1"
+        label="Steady State"
+        justify="Left"
+        />
+      <entry loc="100 70" size="70 20"
+        style="PlainText"
+        vq="ss"
+        vc="ss=$VALUE"
+        set="$VALUE=ss"
+        digits="0"
+        />
+    </group>
+
+    <!-- Sample Parameters -->
+    <group loc="10 140" size="350 120"
+      style="Heading2"
+      label="Sample"
+      border="Etched"
+      side="Top"
+      justify="Left"
+      tab="no"
+      enable="no"
+      useref="no"
+      subtype="Basic"
+      >
+      <label loc="10 20" size="80 20"
+        style="Label1"
+        label="MAS Rate"
+        justify="Left"
+        />
+      <entry loc="100 20" size="80 20"
+        style="PlainText"
+        vq="srate"
+        vc="srate=$VALUE"
+        set="$VALUE=srate"
+        digits="0"
+        tooltip="Magic angle spinning rate in Hz"
+        />
+      <label loc="190 20" size="30 20"
+        style="Label1"
+        label="Hz"
+        />
+
+      <label loc="10 45" size="80 20"
+        style="Label1"
+        label="Temperature"
+        justify="Left"
+        />
+      <entry loc="100 45" size="80 20"
+        style="PlainText"
+        vq="temp"
+        vc="temp=$VALUE"
+        set="$VALUE=temp"
+        digits="1"
+        />
+      <label loc="190 45" size="30 20"
+        style="Label1"
+        label="°C"
+        />
+
+      <label loc="10 70" size="80 20"
+        style="Label1"
+        label="Gain"
+        justify="Left"
+        />
+      <entry loc="100 70" size="80 20"
+        style="PlainText"
+        vq="gain"
+        vc="gain=$VALUE"
+        set="$VALUE=gain"
+        digits="0"
+        />
+    </group>
+
+    <!-- Timing -->
+    <group loc="370 140" size="200 120"
+      style="Heading2"
+      label="Receiver Timing"
+      border="Etched"
+      side="Top"
+      justify="Left"
+      tab="no"
+      enable="no"
+      useref="no"
+      subtype="Basic"
+      >
+      <label loc="10 20" size="50 20"
+        style="Label1"
+        label="rd"
+        justify="Left"
+        />
+      <entry loc="70 20" size="60 20"
+        style="PlainText"
+        vq="rd"
+        vc="rd=$VALUE"
+        set="$VALUE=rd"
+        digits="2"
+        />
+      <label loc="135 20" size="30 20"
+        style="Label1"
+        label="µs"
+        />
+
+      <label loc="10 45" size="50 20"
+        style="Label1"
+        label="ad"
+        justify="Left"
+        />
+      <entry loc="70 45" size="60 20"
+        style="PlainText"
+        vq="ad"
+        vc="ad=$VALUE"
+        set="$VALUE=ad"
+        digits="2"
+        />
+      <label loc="135 45" size="30 20"
+        style="Label1"
+        label="µs"
+        />
+    </group>
+
+  </group>
+</template>
