@@ -1,0 +1,32 @@
+sAt 55 kHz MAS, we often do:
+* H-N CP : 
+1H: 90-95 kHz (cnst42), ramp 90-100; 15N 35-40 (cnst52)
+Duration 800-1000 µs
+* H-C CP: either a similar condition as for H-N, or:
+1H 10 kHz (cnst41), ramp 50-100, 13C 45 kHz or 65 kHz (cnst31)
+Duration 500 µs
+* N-CA CA=10-16 kHz (cnst34), N=38-40 kHz (cnst54), ramp 70-100, duration=8ms
+
+
+At 100 kHz:
+* H-N CP:
+1H: 130 kHz (cnst42), ramp 90-100; 15N: 30 kHz (cnst52)
+Duration 800-1000 µs
+
+* H-C CP:
+1H: 30 kHz (cnst41), ramp 50-100; 13C: 70 kHz (cnst31)
+Or
+1H: 130 kHz (cnst41), ramp 90-100, 13C 30 kHz. (cnst31)
+Duration 500 µs
+
+At 38 kHz
+N-H CP: H=79 kHz (cnst40), N=50 kHz (cnst56), ramp 100-90, duration=1.1ms
+
+H-N CP: H=80 kHz (cnst42), N=50 kHz (cnst52), ramp 90-100, duration=1ms
+
+CA-N: CA=13.2 kHz (cnst34), N=25 kHz (cnst54), ramp 70-100, duration=8ms
+
+CO-N: CO=11 kHz (cnst33), N=25 kHz (cnst53), ramp 70-100, duration=8ms
+
+H-CA = H=82 kHz (cnst41), CA=59 kHz (cnst31), ramp 90-100, duration=3ms
+

@@ -1,276 +1,246 @@
-# VNMRJ NMR Tools
+# NMR Tools
 
-**PUBLIC REPOSITORY** - Open source NMR utilities and workflows
+**Platform-agnostic NMR utilities and optimization tools**
 
 ## Overview
 
-Collection of macros, Python scripts, and utilities for NMR data acquisition, processing, and analysis using OpenVNMRJ/VNMRJ. This repository contains general-purpose tools developed across multiple NMR facilities and spectrometer systems.
+Comprehensive collection of NMR tools, utilities, and workflows for data acquisition, optimization, and analysis. This repository contains platform-agnostic tools (OPTO, BPHON, etc.) alongside platform-specific implementations for both Varian/OpenVNMRJ and Bruker/Topspin systems.
 
+**Licensed Technology**: All NMRFAM technology licensed to Resynant through WARF
 **Status**: Active development
-**Version**: 1.0
-**Last Updated**: 2025-11-04
-
-## Features
-
-- **OPTO workflows** - Optimal-parameter NMR automation
-- **Acquisition utilities** - Custom macros for routine and advanced experiments
-- **Processing scripts** - Python tools for data conversion and analysis
-- **File organization** - Utilities for managing large NMR datasets
-- **Multi-system support** - Code tested across 400-750 MHz spectrometers
-
-## Quick Start
-
-### Installation
-
-```bash
-# Clone repository
-git clone https://github.com/YOUR_USERNAME/vnmrj-nmr-tools.git
-cd vnmrj-nmr-tools
-
-# Copy macros to OpenVNMRJ
-cp macros/*/*.* ~/vnmrsys/maclib/
-
-# Copy Python scripts
-cp python/*/*.py ~/vnmrsys/bin/
-chmod +x ~/vnmrsys/bin/*.py
-
-# Add to Python path (optional, for processing-only workstations)
-echo "export PYTHONPATH=\$PYTHONPATH:$(pwd)/python" >> ~/.bashrc
-```
-
-### Requirements
-
-- **OpenVNMRJ** 1.1A or later (or VNMRJ 4.2+)
-- **Python** 3.6+ with NumPy, SciPy
-- **Optional**: NMRPipe, TopSpin (for conversion utilities)
+**Version**: 2.0-alpha
+**Last Updated**: 2025-11-09
 
 ## Repository Structure
 
 ```
-vnmrj-nmr-tools/
-├── macros/
-│   ├── opto/                         # OPTO workflow macros
-│   │   ├── gosopto                   # OPTO submission macro
-│   │   └── opto_fidarea_measure      # FID area measurement
-│   │
-│   ├── acquisition/                  # Acquisition utilities
-│   │   ├── mydsa                     # Custom dsa (array setup)
-│   │   └── gos-default               # Modified gos (go and save)
-│   │
-│   └── processing/                   # Processing macros
-│       └── [to be collected]
+nmr-tools/
+├── varian/                         # Varian/OpenVNMRJ specific
+│   ├── vnmrsys/                   # Pulse sequences, macros
+│   └── macros/                    # Custom acquisition macros
+│       ├── opto/                  # OPTO integration
+│       └── acquisition/           # Acquisition utilities
 │
-├── python/
-│   ├── conversion/                   # Format conversion scripts
-│   │   └── [to be collected]
-│   │
-│   ├── analysis/                     # Analysis tools
-│   │   └── [to be collected]
-│   │
-│   └── utilities/                    # General utilities
-│       ├── organize_nmr_data.py      # File organization
-│       ├── organize_nmr_data_v2.py   # Enhanced version
-│       ├── supercleanup.py           # Data cleanup
-│       └── superclean_v2.py          # Enhanced cleanup
+├── bruker/                         # Bruker/Topspin specific
+│   └── topspin/
+│       ├── installation/          # Installation guides
+│       ├── pulse-sequences/       # Bruker pulse programs
+│       ├── au-programs/           # AU automation programs
+│       └── docs/                  # Topspin-specific documentation
 │
-├── pulsesequences/                   # Custom pulse sequences
-│   └── [to be collected]
+├── opto/                          # Platform-agnostic OPTO
+│   ├── utilities/                 # OPTO tools
+│   │   └── opto_stripchart4.py   # Real-time monitoring
+│   ├── examples/
+│   │   ├── job-files/            # Example OPTO job files
+│   │   └── parameters/           # Parameter sets (CP conditions)
+│   └── docs/                     # OPTO documentation
+│       ├── manual/               # User manual
+│       ├── troubleshooting/      # Common issues & solutions
+│       ├── quick-start/          # Getting started guides
+│       ├── beta-testing/         # Beta tester feedback
+│       ├── workarounds/          # Known issues & workarounds
+│       └── platform-specific/    # Platform differences
 │
-├── docs/                             # Documentation
-│   └── [to be added]
+├── bphon/                         # BPHON tools
+│   ├── utilities/
+│   └── docs/
 │
-├── examples/                         # Example workflows
-│   └── [to be added]
+├── sparky/                        # Sparky extensions
+│   └── docs/
 │
-├── .gitignore
-└── README.md                         # This file
+├── nmrsimulator/                  # NMR simulator
+│   └── docs/
+│
+├── python/                        # Shared Python utilities
+│   └── utilities/                # General NMR utilities
+│       ├── organize_nmr_data.py  # Data organization
+│       └── superclean_v2.py      # Workspace cleanup
+│
+├── docs/                          # Top-level documentation
+│   └── platform-guides/          # Cross-platform guides
+│
+├── README.md                      # This file
+└── LICENSE
 ```
 
-## Components
+## Core Tools
 
-### OPTO Workflows
+### OPTO - Optimal Parameter Estimation
 
-OPTO (Optimal Parameter Estimation) automation for high-throughput NMR.
+Platform-agnostic NMR parameter optimization using Bayesian methods.
 
-**Files**:
-- `macros/opto/gosopto` - Submit jobs to OPTO queue
-- `macros/opto/opto_fidarea_measure` - Measure FID integral for optimization
+**Features**:
+- CP optimization (cross-polarization conditions)
+- Shimming automation
+- Magic angle setting
+- Real-time monitoring with stripchart utility
+- Multi-pass optimization strategies
 
-**Usage**:
+**Quick Start**:
 ```bash
-# In OpenVNMRJ:
-gosopto  # Submit current experiment to OPTO
+# Monitor OPTO optimization in real-time
+./opto/utilities/opto_stripchart4.py . --monitor-dir -p
+
+# See platform-specific setup:
+# - Varian: varian/macros/opto/
+# - Bruker: bruker/topspin/docs/
 ```
 
-**Note**: Full OPTO infrastructure to be collected from NMRFAM systems.
+**Documentation**: See `opto/docs/` for comprehensive guides
 
-### Acquisition Macros
+### BPHON - Biomolecular Proton Detection
 
-Custom acquisition macros for specialized experiments.
+Tools for optimizing biomolecular NMR experiments.
 
-**Files**:
-- `macros/acquisition/mydsa` - Custom array setup (dsa replacement)
-- `macros/acquisition/gos-default` - Modified gos with enhanced features
+**Status**: Coming soon
 
-**Usage**:
+### Platform-Specific Tools
+
+#### Varian/OpenVNMRJ
+- Custom macros for acquisition (`varian/macros/`)
+- Pulse sequence library (`varian/vnmrsys/psglib/`)
+- OPTO integration macros
+
+#### Bruker/Topspin
+- Installation guides (`bruker/topspin/installation/`)
+- OPTO manual v1.2.34 (`bruker/topspin/docs/`)
+- AU programs (coming soon)
+
+## Installation
+
+### OPTO Stripchart Utility
+
 ```bash
-# In OpenVNMRJ:
-mydsa     # Set up arrayed experiment
-gos       # Go and save with enhancements
+# Make executable
+chmod +x opto/utilities/opto_stripchart4.py
+
+# Install dependencies
+pip3 install numpy matplotlib
+
+# Run (monitors directory for latest OPTO files)
+./opto/utilities/opto_stripchart4.py /path/to/opto/logs --monitor-dir -p
 ```
 
-### Python Utilities
+### Varian/OpenVNMRJ
 
-General-purpose Python scripts for NMR data management.
-
-**organize_nmr_data.py** - Organize and archive NMR datasets
 ```bash
-python3 organize_nmr_data.py --source ~/vnmrsys --dest ~/data/archive/
+# Copy macros
+cp varian/macros/*/*.* ~/vnmrsys/maclib/
+
+# Copy pulse sequences
+cp varian/vnmrsys/psglib/*.c ~/vnmrsys/psglib/
 ```
 
-**supercleanup.py** - Clean up temporary files and organize workspace
-```bash
-python3 supercleanup.py ~/vnmrsys/
-```
+### Bruker/Topspin
+
+See `bruker/topspin/installation/` for platform-specific installation instructions.
+
+## Beta Testing
+
+**Active beta testers**:
+- Paul Schanda's group (Grenoble) - Bruker NEO, Topspin 4.5, 55-100 kHz MAS
+- NMRFAM (Madison) - Multiple systems
+
+**Feedback & Issues**: See `opto/docs/beta-testing/` for current issues and resolutions
 
 ## System Compatibility
 
-This code has been tested and used across multiple NMR systems:
+### Tested Systems
 
-| System | Field | Location | Status |
-|--------|-------|----------|--------|
-| Ayrshire | 750 MHz | NMRFAM | In use |
-| Ribeye | 600 MHz | NMRFAM | In use |
-| Taurus | 600 MHz | NMRFAM | In use |
-| Fyfe | 400 MHz | Resynant | In use |
-| Fyddle | 600 MHz | Resynant | In use |
-| Eagle | - | Home | Processing only |
+| System | Field | Platform | Location | Status |
+|--------|-------|----------|----------|--------|
+| Ayrshire | 750 MHz | Varian | NMRFAM | In use |
+| Ribeye | 600 MHz | Varian | NMRFAM | In use |
+| Taurus | 600 MHz | Varian | NMRFAM | In use |
+| Girolando | 1.1 GHz | Bruker | NMRFAM | Testing |
+| Schanda Group | 700 MHz | Bruker NEO | Grenoble | Beta testing |
 
-## Development
+### Platform Support
 
-### Contributing
-
-Contributions welcome! This repository collects useful NMR tools from the community.
-
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/new-tool`)
-3. Add your tool with documentation
-4. Test on your system
-5. Submit a pull request
-
-### Code Standards
-
-- **Macros**: Document with header comments, include usage examples
-- **Python**: PEP 8 style, include docstrings
-- **Documentation**: README for each tool/workflow
-- **Testing**: Include example data or test cases when possible
-
-### Adding New Tools
-
-```bash
-# Add a new macro
-cp your_macro ~/github/vnmrj-nmr-tools/macros/processing/
-# Document in README
-# Test deployment to ~/vnmrsys/maclib/
-# Commit and push
-
-# Add a new Python script
-cp your_script.py ~/github/vnmrj-nmr-tools/python/analysis/
-chmod +x ~/github/vnmrj-nmr-tools/python/analysis/your_script.py
-# Add docstrings and usage examples
-# Commit and push
-```
-
-## Collection Status
-
-This repository is actively being populated with code from 6 different NMR workstations. See `COLLECTION_NEEDED.txt` in the staging area for tracking.
-
-**Current status** (as of 2025-11-04):
-- ✅ Eagle (home processing workstation) - Initial collection complete
-- ⏳ NMRFAM systems - Collection in progress
-- ⏳ Resynant systems - Collection planned
-- ⏳ Pulse sequences - To be collected
-- ⏳ Complete OPTO infrastructure - To be collected
-
-## Roadmap
-
-### Version 1.0 (Current)
-- [x] Basic OPTO macros
-- [x] File organization utilities
-- [ ] Complete OPTO infrastructure
-- [ ] Custom pulse sequence collection
-
-### Version 1.1 (Planned)
-- [ ] Data conversion utilities (FID → NMRPipe, nmrML, etc.)
-- [ ] Standard processing pipelines
-- [ ] Enhanced documentation with examples
-- [ ] Automated testing framework
-
-### Version 2.0 (Future)
-- [ ] Web interface for job submission
-- [ ] Automated quality control
-- [ ] Integration with LIMS systems
-- [ ] Machine learning tools for spectral analysis
+- **Varian/OpenVNMRJ**: 1.1A or later, VNMRJ 4.2+
+- **Bruker/Topspin**: 4.x (NEO consoles), Alma Linux 9
+- **Python**: 3.6+ with NumPy, SciPy, Matplotlib
 
 ## Documentation
 
-- **README.md** (this file) - Overview and quick start
-- **docs/** - Detailed documentation for each tool (to be added)
-- **examples/** - Example workflows and use cases (to be added)
+### Quick Links
 
-## Troubleshooting
+- **OPTO Manual**: `opto/docs/manual/`
+- **Troubleshooting**: `opto/docs/troubleshooting/`
+- **Beta Testing Issues**: `opto/docs/beta-testing/`
+- **Example Parameters**: `opto/examples/parameters/`
 
-### Macros don't work after copying
-- Ensure macros are executable: `chmod +x ~/vnmrsys/maclib/macro_name`
-- Check for path dependencies in macro code
-- Verify OpenVNMRJ version compatibility
+### Key Documentation Files
 
-### Python scripts fail with import errors
-- Install required packages: `pip3 install numpy scipy`
-- Check Python version: `python3 --version` (need 3.6+)
-- Verify script has execute permissions
+1. **Getting Started**:
+   - OPTO Quick Start: `opto/docs/quick-start/`
+   - Platform Setup: `docs/platform-guides/`
 
-### OPTO workflows fail
-- Check OPTO server configuration
-- Verify network connectivity to OPTO system
-- Ensure proper authentication/credentials
+2. **User Guides**:
+   - OPTO Topspin Manual: `opto/docs/manual/OPTO_Topspin_Manual_1.2.34.docx`
+   - Stripchart Utility: `opto/utilities/opto_stripchart4.py --help`
+
+3. **Troubleshooting**:
+   - Common Issues: `opto/docs/troubleshooting/`
+   - Workarounds: `opto/docs/workarounds/`
+   - Beta Tester Feedback: `opto/docs/beta-testing/`
+
+## Development
+
+### Branch Structure
+
+- `main` - Stable releases
+- `restructure-nmr-tools` - Current reorganization (v2.0)
+- Development branches as needed
+
+### Contributing
+
+This is a commercial repository for Resynant. Development coordination with NMRFAM team (Barry Dezonia, Thiru).
+
+### Roadmap
+
+**Version 2.0 (In Progress)**:
+- [x] Restructure repository for platform-agnostic organization
+- [x] Add OPTO stripchart utility
+- [ ] Complete OPTO documentation (troubleshooting, workarounds)
+- [ ] Add default job files for common experiments
+- [ ] Document beta tester issues and resolutions
+- [ ] Add BPHON tools
+
+**Version 2.1 (Planned)**:
+- [ ] Bruker pulse sequence collection
+- [ ] Enhanced CP optimization with HH intelligence
+- [ ] Automated data saving for ML applications
+- [ ] Web interface for OPTO monitoring
 
 ## Support
 
-- **Issues**: File bug reports or feature requests in GitHub Issues
-- **Discussions**: Use GitHub Discussions for questions and community support
-- **Contributing**: See CONTRIBUTING.md for development guidelines
+**Primary Contact**: Chad Rienstra
+**Development Team**: NMRFAM (Barry Dezonia, Thiru)
+**Beta Testers**: Paul Schanda (Grenoble), Petra Rovó
 
 ## License
 
-MIT License - See LICENSE file for details
+MIT License - See LICENSE file
 
-This is open source software. Use freely for research and analysis. Attribution appreciated but not required.
-
-## Acknowledgments
-
-Code developed and tested at:
-- **NMRFAM** (National Magnetic Resonance Facility at Madison)
-- **Resynant**
-- Various home/remote processing workstations
-
-Thanks to the NMR community for tools, techniques, and inspiration.
+Licensed NMRFAM technology for commercial use by Resynant through WARF.
 
 ## Citation
 
-If you use these tools in publications, please cite:
 ```
-[To be determined - add DOI/citation after publication]
+[To be determined - pending publications]
 ```
 
-## Contact
+## Acknowledgments
 
-**Maintainer**: Chad
-**Status**: Active development
-**Repository**: https://github.com/YOUR_USERNAME/vnmrj-nmr-tools
+- **NMRFAM** (National Magnetic Resonance Facility at Madison)
+- **Resynant**
+- **Beta Testers**: Paul Schanda, Petra Rovó (Grenoble)
+- **WARF** (Wisconsin Alumni Research Foundation)
 
 ---
 
-**Last Updated**: 2025-11-04
-**Version**: 1.0-beta
-**Status**: Collection in progress
+**Repository**: https://github.com/ChadResynant/vnmrj-nmr-tools
+**Last Updated**: 2025-11-09
+**Version**: 2.0-alpha
