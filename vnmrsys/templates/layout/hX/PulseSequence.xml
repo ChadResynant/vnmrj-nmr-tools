@@ -231,7 +231,7 @@
       style="Heading2"
       label="Echo Refocusing"
       vq="echo"
-      show="$SHOW=(echo!='n')"
+      show="if ((echo='hard')or(echo='soft')) then $SHOW=1 else $SHOW=0 endif"
       border="Etched"
       side="Top"
       justify="Left"
