@@ -5,7 +5,7 @@
   Topology: H → HY CP → [X-dec Y evolution d4 F4] → [Y-Y mixing] → [X-dec Y evolution d3 F3] → YX CP → [Y-dec X evolution d2 F2] → XH CP → [optional HH-RFDR] → H acquisition (F1)
 -->
 <template name="Acquisition" element="pages" type="acquisition" >
-  <group size="750 360"
+  <group size="800 300"
     style="Heading1"
     label="Acquisition"
     vq="panellevel"
@@ -21,8 +21,26 @@
     expanded="yes"
     >
 
+    <!-- Experiment Time Display -->
+    <label loc="600 10" size="180 20"
+      style="Heading2"
+      label="Est. Time:"
+      justify="Left"
+      />
+    <textmessage loc="680 10" size="100 20"
+      style="Heading2"
+      vq="ni ni2 ni3 nt d1 at"
+      set="$VALUE=(ni*ni2*ni3*nt*(d1+at))/3600"
+      digits="1"
+      />
+    <label loc="780 10" size="20 20"
+      style="Heading2"
+      label="h"
+      justify="Left"
+      />
+
     <!-- F1 Direct Dimension (H observe) -->
-    <group loc="10 10" size="230 160"
+    <group loc="10 10" size="250 180"
       style="Heading2"
       label="F1 Acquisition (Direct, H)"
       border="Etched"
@@ -44,6 +62,7 @@
         vc="sw=$VALUE"
         set="$VALUE=sw"
         digits="1"
+        tooltip="Spectral width - sets chemical shift range"
         />
       <label loc="190 20" size="30 20"
         style="Label1"
@@ -58,14 +77,20 @@
       <entry loc="100 45" size="80 20"
         style="PlainText"
         vq="at"
+        vc="at=$VALUE*0.001"
+        set="$VALUE=at*1000"
+        digits="2"
+        />
+      <menu loc="190 45" size="50 20"
+        style="PlainText"
+        vq="at"
         vc="at=$VALUE"
         set="$VALUE=at"
-        digits="4"
-        />
-      <label loc="190 45" size="30 20"
-        style="Label1"
-        label="s"
-        />
+        editable="No"
+        >
+        <mlabel label="ms" chval="at*1000" />
+        <mlabel label="sec" chval="at" />
+      </menu>
 
       <label loc="10 70" size="80 20"
         style="Label1"
@@ -78,7 +103,7 @@
         vc="d1=$VALUE"
         set="$VALUE=d1"
         digits="3"
-        tooltip="Recycle delay - must be sufficient for 15% duty cycle safety (H-detected)"
+        tooltip="Recycle delay - must allow magnetization recovery and thermal equilibration"
         />
       <label loc="190 70" size="30 20"
         style="Label1"
@@ -87,34 +112,41 @@
 
       <label loc="10 95" size="80 20"
         style="Label1"
+        label="Duty Cycle"
+        justify="Left"
+        />
+      <textmessage loc="100 95" size="80 20"
+        style="Label1"
+        vq="tRF d1"
+        set="if (d1&gt;0) then $VALUE=(tRF/d1)*100 else $VALUE=0 endif"
+        digits="2"
+        />
+      <label loc="190 95" size="30 20"
+        style="Label1"
+        label="%"
+        />
+      <textmessage loc="10 115" size="230 20"
+        style="Label3"
+        vq="tRF d1"
+        set="if (d1&gt;0) then $dc=(tRF/d1)*100 if ($dc&gt;25) then $safe5=tRF/0.05 $safe15=tRF/0.15 if ($safe5&gt;10) then $VALUE='Safe d1 ≥ '+$safe15+' s (15%)' else $VALUE='Safe d1 ≥ '+$safe5+' s (5%)' endif else $VALUE='(target &lt; 25%)' endif else $VALUE='(target &lt; 25%)' endif"
+        />
+
+      <label loc="10 140" size="80 20"
+        style="Label1"
         label="Transients"
         justify="Left"
         />
-      <entry loc="100 95" size="80 20"
+      <entry loc="100 140" size="80 20"
         style="PlainText"
         vq="nt"
         vc="nt=$VALUE"
         set="$VALUE=nt"
         digits="0"
         />
-
-      <label loc="10 120" size="80 20"
-        style="Label1"
-        label="NUS nrows"
-        justify="Left"
-        />
-      <entry loc="100 120" size="80 20"
-        style="PlainText"
-        vq="nrows"
-        vc="nrows=$VALUE"
-        set="$VALUE=nrows"
-        digits="0"
-        tooltip="Total NUS sampling points (ni*ni2*ni3)"
-        />
     </group>
 
     <!-- F2 Indirect Dimension (X evolution via d2) -->
-    <group loc="250 10" size="240 160"
+    <group loc="270 10" size="240 160"
       style="Heading2"
       label="F2 Acquisition (Indirect, X)"
       border="Etched"
@@ -154,6 +186,13 @@
         vc="ni=$VALUE"
         set="$VALUE=ni"
         digits="0"
+        tooltip="Number of increments - affects resolution and experiment time"
+        />
+      <textmessage loc="10 65" size="220 20"
+        style="Label3"
+        vq="ni sw1"
+        set="if ni&gt;1 then $VALUE='Resolution: '+(sw1/ni)+' Hz' else $VALUE='' endif"
+        digits="1"
         />
 
       <label loc="10 70" size="80 20"
@@ -182,7 +221,7 @@
     </group>
 
     <!-- F3 Indirect Dimension (Y evolution via d3) -->
-    <group loc="500 10" size="240 160"
+    <group loc="520 10" size="240 160"
       style="Heading2"
       label="F3 Acquisition (Indirect, Y)"
       border="Etched"
@@ -222,6 +261,13 @@
         vc="ni2=$VALUE"
         set="$VALUE=ni2"
         digits="0"
+        tooltip="Number of increments - affects resolution and experiment time"
+        />
+      <textmessage loc="10 65" size="220 20"
+        style="Label3"
+        vq="ni2 sw2"
+        set="if ni2&gt;1 then $VALUE='Resolution: '+(sw2/ni2)+' Hz' else $VALUE='' endif"
+        digits="1"
         />
 
       <label loc="10 70" size="80 20"
@@ -290,6 +336,13 @@
         vc="ni3=$VALUE"
         set="$VALUE=ni3"
         digits="0"
+        tooltip="Number of increments - affects resolution and experiment time"
+        />
+      <textmessage loc="10 65" size="220 20"
+        style="Label3"
+        vq="ni3 sw3"
+        set="if ni3&gt;1 then $VALUE='Resolution: '+(sw3/ni3)+' Hz' else $VALUE='' endif"
+        digits="1"
         />
 
       <label loc="10 70" size="80 20"
@@ -318,7 +371,7 @@
     </group>
 
     <!-- Sample Parameters -->
-    <group loc="260 180" size="300 90"
+    <group loc="260 180" size="240 160"
       style="Heading2"
       label="Sample"
       border="Etched"
@@ -340,35 +393,35 @@
         vc="srate=$VALUE"
         set="$VALUE=srate"
         digits="0"
-        tooltip="Magic angle spinning rate in Hz"
+        tooltip="MAS rate - must be stable for rotor-synchronized sequences"
         />
       <label loc="190 20" size="30 20"
         style="Label1"
         label="Hz"
         />
 
-      <label loc="10 50" size="80 20"
+      <label loc="10 45" size="80 20"
         style="Label1"
         label="Temperature"
         justify="Left"
         />
-      <entry loc="100 50" size="80 20"
+      <entry loc="100 45" size="80 20"
         style="PlainText"
         vq="temp"
         vc="temp=$VALUE"
         set="$VALUE=temp"
         digits="1"
         />
-      <label loc="190 50" size="30 20"
+      <label loc="190 45" size="30 20"
         style="Label1"
         label="°C"
         />
     </group>
 
-    <!-- Receiver Timing -->
-    <group loc="570 180" size="170 90"
+    <!-- Receiver Settings -->
+    <group loc="10 200" size="400 90"
       style="Heading2"
-      label="Receiver Timing"
+      label="Receiver Settings"
       border="Etched"
       side="Top"
       justify="Left"
@@ -379,77 +432,62 @@
       >
       <label loc="10 20" size="50 20"
         style="Label1"
-        label="rd"
+        label="Gain"
         justify="Left"
         />
       <entry loc="70 20" size="60 20"
+        style="PlainText"
+        vq="gain"
+        vc="gain=$VALUE"
+        set="$VALUE=gain"
+        digits="0"
+        />
+
+      <label loc="150 20" size="50 20"
+        style="Label1"
+        label="rd"
+        justify="Left"
+        />
+      <entry loc="210 20" size="60 20"
         style="PlainText"
         vq="rd"
         vc="rd=$VALUE"
         set="$VALUE=rd"
         digits="2"
         />
-      <label loc="140 20" size="30 20"
+      <label loc="280 20" size="30 20"
         style="Label1"
         label="µs"
         />
 
-      <label loc="10 50" size="50 20"
+      <label loc="150 45" size="50 20"
         style="Label1"
         label="ad"
         justify="Left"
         />
-      <entry loc="70 50" size="60 20"
+      <entry loc="210 45" size="60 20"
         style="PlainText"
         vq="ad"
         vc="ad=$VALUE"
         set="$VALUE=ad"
         digits="2"
         />
-      <label loc="140 50" size="30 20"
+      <label loc="280 45" size="30 20"
         style="Label1"
         label="µs"
         />
-    </group>
 
-    <!-- NUS Parameters -->
-    <group loc="10 280" size="250 70"
-      style="Heading2"
-      label="NUS Parameters"
-      border="Etched"
-      side="Top"
-      justify="Left"
-      tab="no"
-      enable="no"
-      useref="no"
-      subtype="Basic"
-      >
-      <label loc="10 20" size="80 20"
+      <label loc="320 20" size="50 20"
         style="Label1"
-        label="ndim"
+        label="ddrtc"
         justify="Left"
         />
-      <entry loc="100 20" size="80 20"
+      <entry loc="320 45" size="60 20"
         style="PlainText"
-        vq="ndim"
-        vc="ndim=$VALUE"
-        set="$VALUE=ndim"
-        digits="0"
-        tooltip="Number of dimensions (set to 4 for 4D NUS)"
-        />
-
-      <label loc="10 45" size="80 20"
-        style="Label1"
-        label="skiprows"
-        justify="Left"
-        />
-      <entry loc="100 45" size="80 20"
-        style="PlainText"
-        vq="skiprows"
-        vc="skiprows=$VALUE"
-        set="$VALUE=skiprows"
-        digits="0"
-        tooltip="NUS concatenation (skip first N rows)"
+        vq="ddrtc"
+        vc="ddrtc=$VALUE"
+        set="$VALUE=ddrtc"
+        digits="2"
         />
     </group>
 

@@ -4,7 +4,7 @@
   2D H-detected with indirect X evolution
 -->
 <template name="Acquisition" element="pages" type="acquisition" >
-  <group size="750 300"
+  <group size="800 300"
     style="Heading1"
     label="Acquisition"
     vq="panellevel"
@@ -20,8 +20,26 @@
     expanded="yes"
     >
 
+    <!-- Experiment Time Display -->
+    <label loc="600 10" size="180 20"
+      style="Heading2"
+      label="Est. Time:"
+      justify="Left"
+      />
+    <textmessage loc="680 10" size="100 20"
+      style="Heading2"
+      vq="ni nt d1 at"
+      set="$VALUE=(ni*nt*(d1+at))/3600"
+      digits="1"
+      />
+    <label loc="780 10" size="20 20"
+      style="Heading2"
+      label="h"
+      justify="Left"
+      />
+
     <!-- F1 Direct Dimension (H observe) -->
-    <group loc="10 10" size="240 160"
+    <group loc="10 10" size="250 180"
       style="Heading2"
       label="F1 Acquisition (Direct, H)"
       border="Etched"
@@ -43,6 +61,7 @@
         vc="sw=$VALUE"
         set="$VALUE=sw"
         digits="1"
+        tooltip="Spectral width - sets chemical shift range"
         />
       <label loc="190 20" size="30 20"
         style="Label1"
@@ -57,14 +76,20 @@
       <entry loc="100 45" size="80 20"
         style="PlainText"
         vq="at"
+        vc="at=$VALUE*0.001"
+        set="$VALUE=at*1000"
+        digits="2"
+        />
+      <menu loc="190 45" size="50 20"
+        style="PlainText"
+        vq="at"
         vc="at=$VALUE"
         set="$VALUE=at"
-        digits="4"
-        />
-      <label loc="190 45" size="30 20"
-        style="Label1"
-        label="s"
-        />
+        editable="No"
+        >
+        <mlabel label="ms" chval="at*1000" />
+        <mlabel label="sec" chval="at" />
+      </menu>
 
       <label loc="10 70" size="80 20"
         style="Label1"
@@ -77,23 +102,40 @@
         vc="d1=$VALUE"
         set="$VALUE=d1"
         digits="3"
-        tooltip="Recycle delay - must be sufficient for duty cycle safety (15% for H-detect)"
+        tooltip="Recycle delay - must allow magnetization recovery and thermal equilibration"
         />
       <label loc="190 70" size="30 20"
         style="Label1"
         label="s"
         />
-      <label loc="10 90" size="100 20"
+
+      <label loc="10 95" size="80 20"
+        style="Label1"
+        label="Duty Cycle"
+        justify="Left"
+        />
+      <textmessage loc="100 95" size="80 20"
+        style="Label1"
+        vq="tRF d1"
+        set="if (d1&gt;0) then $VALUE=(tRF/d1)*100 else $VALUE=0 endif"
+        digits="2"
+        />
+      <label loc="190 95" size="30 20"
+        style="Label1"
+        label="%"
+        />
+      <textmessage loc="10 115" size="230 20"
         style="Label3"
-        label="(see duty cycle)"
+        vq="tRF d1"
+        set="if (d1&gt;0) then $dc=(tRF/d1)*100 if ($dc&gt;25) then $safe5=tRF/0.05 $safe15=tRF/0.15 if ($safe5&gt;10) then $VALUE='Safe d1 ≥ '+$safe15+' s (15%)' else $VALUE='Safe d1 ≥ '+$safe5+' s (5%)' endif else $VALUE='(target &lt; 25%)' endif else $VALUE='(target &lt; 25%)' endif"
         />
 
-      <label loc="10 115" size="80 20"
+      <label loc="10 140" size="80 20"
         style="Label1"
         label="Transients"
         justify="Left"
         />
-      <entry loc="100 115" size="80 20"
+      <entry loc="100 140" size="80 20"
         style="PlainText"
         vq="nt"
         vc="nt=$VALUE"
@@ -103,7 +145,7 @@
     </group>
 
     <!-- F2 Indirect Dimension (X evolution) -->
-    <group loc="260 10" size="240 160"
+    <group loc="270 10" size="240 160"
       style="Heading2"
       label="F2 Acquisition (Indirect, X)"
       border="Etched"
@@ -143,6 +185,13 @@
         vc="ni=$VALUE"
         set="$VALUE=ni"
         digits="0"
+        tooltip="Number of increments - affects resolution and experiment time"
+        />
+      <textmessage loc="10 65" size="220 20"
+        style="Label3"
+        vq="ni sw1"
+        set="if ni&gt;1 then $VALUE='Resolution: '+(sw1/ni)+' Hz' else $VALUE='' endif"
+        digits="1"
         />
 
       <label loc="10 70" size="80 20"
@@ -187,7 +236,7 @@
     </group>
 
     <!-- Sample Parameters -->
-    <group loc="510 10" size="230 160"
+    <group loc="520 10" size="240 160"
       style="Heading2"
       label="Sample"
       border="Etched"
@@ -209,7 +258,7 @@
         vc="srate=$VALUE"
         set="$VALUE=srate"
         digits="0"
-        tooltip="Magic angle spinning rate in Hz"
+        tooltip="MAS rate - must be stable for rotor-synchronized sequences"
         />
       <label loc="190 20" size="30 20"
         style="Label1"
@@ -232,13 +281,26 @@
         style="Label1"
         label="°C"
         />
+    </group>
 
-      <label loc="10 70" size="80 20"
+    <!-- Receiver Settings -->
+    <group loc="10 200" size="400 90"
+      style="Heading2"
+      label="Receiver Settings"
+      border="Etched"
+      side="Top"
+      justify="Left"
+      tab="no"
+      enable="no"
+      useref="no"
+      subtype="Basic"
+      >
+      <label loc="10 20" size="50 20"
         style="Label1"
         label="Gain"
         justify="Left"
         />
-      <entry loc="100 70" size="80 20"
+      <entry loc="70 20" size="60 20"
         style="PlainText"
         vq="gain"
         vc="gain=$VALUE"
@@ -246,38 +308,51 @@
         digits="0"
         />
 
-      <label loc="10 100" size="80 20"
+      <label loc="150 20" size="50 20"
         style="Label1"
         label="rd"
         justify="Left"
         />
-      <entry loc="100 100" size="60 20"
+      <entry loc="210 20" size="60 20"
         style="PlainText"
         vq="rd"
         vc="rd=$VALUE"
         set="$VALUE=rd"
         digits="2"
         />
-      <label loc="170 100" size="30 20"
+      <label loc="280 20" size="30 20"
         style="Label1"
         label="µs"
         />
 
-      <label loc="10 125" size="80 20"
+      <label loc="150 45" size="50 20"
         style="Label1"
         label="ad"
         justify="Left"
         />
-      <entry loc="100 125" size="60 20"
+      <entry loc="210 45" size="60 20"
         style="PlainText"
         vq="ad"
         vc="ad=$VALUE"
         set="$VALUE=ad"
         digits="2"
         />
-      <label loc="170 125" size="30 20"
+      <label loc="280 45" size="30 20"
         style="Label1"
         label="µs"
+        />
+
+      <label loc="320 20" size="50 20"
+        style="Label1"
+        label="ddrtc"
+        justify="Left"
+        />
+      <entry loc="320 45" size="60 20"
+        style="PlainText"
+        vq="ddrtc"
+        vc="ddrtc=$VALUE"
+        set="$VALUE=ddrtc"
+        digits="2"
         />
     </group>
 

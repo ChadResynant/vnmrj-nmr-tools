@@ -257,9 +257,9 @@
       <entry loc="120 20" size="80 20"
         style="PlainText"
         vq="tHX"
-        vc="tHX=$VALUE"
-        set="$VALUE=tHX"
-        digits="3"
+        vc="tHX=$VALUE*1000"
+        set="$VALUE=tHX/1000"
+        digits="2"
         />
       <label loc="210 20" size="30 20"
         style="Label1"

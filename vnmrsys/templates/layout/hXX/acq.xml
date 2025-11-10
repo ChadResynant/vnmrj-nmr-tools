@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+
+<template name="Acquire" element="panels" type="acquisition" >
+  <group loc="0 0" size="736 248"
+    style="PlainText"
+    label="Acquisition"
+    bg="transparent"
+    border="None"
+    side="Top"
+    justify="Left"
+    tab="yes"
+    enable="no"
+    reference="Acquisition"
+    useref="yes"
+    subtype="Basic"
+    expanded="no"
+    >
+  </group>
+  <group loc="0 0" size="680 260"
+    style="PlainText"
+    label="Pulse Sequence"
+    bg="transparent"
+    border="None"
+    side="Top"
+    justify="Left"
+    tab="yes"
+    enable="no"
+    reference="PulseSequence"
+    useref="yes"
+    subtype="Basic"
+    expanded="no"
+    >
+  </group>
+  <group loc="0 0" size="784 243"
+    style="PlainText"
+    label="Decoupling"
+    bg="transparent"
+    border="None"
+    side="Top"
+    justify="Left"
+    tab="yes"
+    enable="no"
+    reference="Decoupling"
+    useref="yes"
+    subtype="Basic"
+    expanded="no"
+    >
+  </group>
+  <group loc="0 0" size="784 243"
+    style="PlainText"
+    label="Calibration"
+    bg="transparent"
+    border="None"
+    side="Top"
+    justify="Left"
+    tab="yes"
+    enable="no"
+    reference="Calibration"
+    useref="yes"
+    subtype="Basic"
+    expanded="no"
+    >
+  </group>
+</template>

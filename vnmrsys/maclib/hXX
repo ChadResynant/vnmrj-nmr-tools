@@ -1,4 +1,5 @@
 seqfil = 'hXX'
+layout = seqfil
 //------------------------------
 // axAssgn and bioref
 //------------------------------

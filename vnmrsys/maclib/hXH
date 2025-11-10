@@ -1,4 +1,5 @@
 seqfil = 'hXH'
+layout = seqfil
 
 //------------------------------
 // Axes Assign

@@ -86,7 +86,7 @@
       style="Heading2"
       label="Cross-Polarization (H → X)"
       vq="cp"
-      show="$SHOW=(cp='y')"
+      show="if cp='y' then $SHOW=1 else $SHOW=0 endif"
       border="Etched"
       side="Top"
       justify="Left"
@@ -121,9 +121,9 @@
       <entry loc="140 50" size="80 20"
         style="PlainText"
         vq="tHX"
-        vc="tHX=$VALUE"
-        set="$VALUE=tHX"
-        digits="3"
+        vc="tHX=$VALUE*1000"
+        set="$VALUE=tHX/1000"
+        digits="2"
         tooltip="H to X cross-polarization contact time"
         />
       <label loc="230 50" size="30 20"
@@ -213,17 +213,6 @@
         style="Label1"
         label="Hz"
         />
-
-      <label loc="10 160" size="250 20"
-        style="Label3"
-        label="Tip: Match Hartmann-Hahn condition"
-        justify="Left"
-        />
-      <label loc="10 180" size="250 20"
-        style="Label3"
-        label="aHhx × pwH90 ≈ aXhx × pwX90"
-        justify="Left"
-        />
     </group>
 
     <!-- Echo Parameters -->
@@ -278,7 +267,7 @@
       <!-- Hard Echo -->
       <group loc="0 75" size="240 70"
         vq="echo"
-        show="$SHOW=(echo='hard')"
+        show="if echo='hard' then $SHOW=1 else $SHOW=0 endif"
         >
         <label loc="10 0" size="100 20"
           style="Label1"
@@ -314,7 +303,7 @@
       <!-- Soft Echo -->
       <group loc="0 75" size="240 100"
         vq="echo"
-        show="$SHOW=(echo='soft')"
+        show="if echo='soft' then $SHOW=1 else $SHOW=0 endif"
         >
         <label loc="10 0" size="100 20"
           style="Label1"

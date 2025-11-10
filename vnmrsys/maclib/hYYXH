@@ -1,4 +1,5 @@
 seqfil = 'hYYXH'
+layout = seqfil
 
 //------------------------------
 // Axes Assign and Bioref
