@@ -8,7 +8,7 @@
     style="Heading1"
     label="Decoupling"
     vq="panellevel"
-    show="$SHOW=(panellevel>0)"
+    show="$SHOW=(panellevel&gt;0)"
     border="None"
     side="Top"
     justify="Left"
@@ -54,7 +54,7 @@
       <!-- TPPM Parameters -->
       <group loc="0 50" size="360 100"
         vq="Hseq"
-        show="$SHOW=(Hseq='tppm')"
+        show="if Hseq='tppm' then $SHOW=1 else $SHOW=0 endif"
         >
         <label loc="10 0" size="100 20"
           style="Label1"
@@ -111,7 +111,7 @@
       <!-- SPINAL Parameters -->
       <group loc="0 50" size="360 125"
         vq="Hseq"
-        show="$SHOW=(Hseq='spinal')"
+        show="if Hseq='spinal' then $SHOW=1 else $SHOW=0 endif"
         >
         <label loc="10 0" size="100 20"
           style="Label1"
@@ -181,7 +181,7 @@
       <!-- WALTZ Parameters -->
       <group loc="0 50" size="360 75"
         vq="Hseq"
-        show="$SHOW=(Hseq='waltz')"
+        show="if Hseq='waltz' then $SHOW=1 else $SHOW=0 endif"
         >
         <label loc="10 0" size="100 20"
           style="Label1"
@@ -250,7 +250,7 @@
       <!-- TPPM Parameters -->
       <group loc="0 50" size="360 100"
         vq="Yseq"
-        show="$SHOW=(Yseq='tppm')"
+        show="if Yseq='tppm' then $SHOW=1 else $SHOW=0 endif"
         >
         <label loc="10 0" size="100 20"
           style="Label1"
@@ -303,7 +303,7 @@
       <!-- SPINAL Parameters -->
       <group loc="0 50" size="360 125"
         vq="Yseq"
-        show="$SHOW=(Yseq='spinal')"
+        show="if Yseq='spinal' then $SHOW=1 else $SHOW=0 endif"
         >
         <label loc="10 0" size="100 20"
           style="Label1"
@@ -373,7 +373,7 @@
       <!-- PIPS Parameters -->
       <group loc="0 50" size="360 100"
         vq="Yseq"
-        show="$SHOW=(Yseq='pips')"
+        show="if Yseq='pips' then $SHOW=1 else $SHOW=0 endif"
         >
         <label loc="10 0" size="100 20"
           style="Label1"
@@ -425,7 +425,7 @@
       style="Heading2"
       label="Z Channel Decoupling"
       vq="dfrq3"
-      show="$SHOW=(dfrq3>0)"
+      show="$SHOW=(dfrq3&gt;0)"
       border="Etched"
       side="Top"
       justify="Left"
@@ -456,7 +456,7 @@
       <!-- TPPM Parameters -->
       <group loc="0 50" size="360 100"
         vq="Zseq"
-        show="$SHOW=(Zseq='tppm')"
+        show="if Zseq='tppm' then $SHOW=1 else $SHOW=0 endif"
         >
         <label loc="10 0" size="100 20"
           style="Label1"
@@ -509,7 +509,7 @@
       <!-- SPINAL Parameters -->
       <group loc="0 50" size="360 125"
         vq="Zseq"
-        show="$SHOW=(Zseq='spinal')"
+        show="if Zseq='spinal' then $SHOW=1 else $SHOW=0 endif"
         >
         <label loc="10 0" size="100 20"
           style="Label1"
