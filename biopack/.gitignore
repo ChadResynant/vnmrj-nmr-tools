@@ -1,0 +1,28 @@
+# Compiled sequences (binary executables)
+seqlib/
+
+# Temporary files
+*.tmp
+*~
+.*.swp
+.*.swo
+
+# Log files
+*.log
+/tmp/
+
+# Shape generation temporary files
+/shapelib/*.tmp
+Pbox.inp
+
+# VnmrJ temporary files
+.fid
+.RF
+
+# System files
+.DS_Store
+Thumbs.db
+
+# Editor backups
+*.bak
+*.orig
