@@ -1,0 +1,372 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<!--
+  hXH PulseSequence Tab
+  Two CP stages (HX, XH), constant-time option, H-H RFDR, Hahn echo, homospoil
+-->
+<template name="PulseSequence" element="pages" type="acquisition" >
+  <group size="750 500"
+    style="Heading1"
+    label="Pulse Sequence"
+    vq="panellevel"
+    show="$SHOW=(panellevel&gt;0)"
+    border="None"
+    side="Top"
+    justify="Left"
+    tab="yes"
+    enable="no"
+    reference="PulseSequence"
+    useref="no"
+    subtype="Basic"
+    expanded="yes"
+    >
+
+    <!-- Sequence Control -->
+    <group loc="10 10" size="360 110"
+      style="Heading2"
+      label="Sequence Control"
+      border="Etched"
+      side="Top"
+      justify="Left"
+      tab="no"
+      enable="no"
+      useref="no"
+      subtype="Basic"
+      >
+      <label loc="10 20" size="120 20"
+        style="Label1"
+        label="Constant-Time Mode"
+        justify="Left"
+        />
+      <menu loc="140 20" size="120 20"
+        style="PlainText"
+        vq="CT"
+        vc="parunits('set','CT','$VALUE')"
+        set="$VALUE=CT"
+        editable="No"
+        tooltip="Enable constant-time evolution"
+        >
+        <mlabel label="Off (n)" chval="n" />
+        <mlabel label="On (y)" chval="y" />
+      </menu>
+
+      <label loc="10 50" size="120 20"
+        style="Label1"
+        label="Const-Time Period"
+        justify="Left"
+        vq="CT"
+        show="if CT='y' then $SHOW=1 else $SHOW=0 endif"
+        />
+      <entry loc="140 50" size="80 20"
+        style="PlainText"
+        vq="tconst CT"
+        vc="tconst=$VALUE"
+        set="$VALUE=tconst"
+        digits="3"
+        show="if CT='y' then $SHOW=1 else $SHOW=0 endif"
+        tooltip="Total constant-time evolution period"
+        />
+      <label loc="230 50" size="30 20"
+        style="Label1"
+        label="ms"
+        vq="CT"
+        show="if CT='y' then $SHOW=1 else $SHOW=0 endif"
+        />
+
+      <label loc="10 80" size="120 20"
+        style="Label1"
+        label="Homospoil Mode"
+        justify="Left"
+        />
+      <menu loc="140 80" size="120 20"
+        style="PlainText"
+        vq="HS"
+        vc="parunits('set','HS','$VALUE')"
+        set="$VALUE=HS"
+        editable="No"
+        tooltip="Homospoil gradient mode: hs/z/none"
+        >
+        <mlabel label="none" chval="none" />
+        <mlabel label="hs" chval="hs" />
+        <mlabel label="z" chval="z" />
+      </menu>
+    </group>
+
+    <!-- Cross-Polarization H→X -->
+    <group loc="10 130" size="360 140"
+      style="Heading2"
+      label="Cross-Polarization (H → X)"
+      border="Etched"
+      side="Top"
+      justify="Left"
+      tab="no"
+      enable="no"
+      useref="no"
+      subtype="Basic"
+      >
+      <label loc="10 20" size="100 20"
+        style="Label1"
+        label="Contact Time"
+        justify="Left"
+        />
+      <entry loc="120 20" size="80 20"
+        style="PlainText"
+        vq="tHX"
+        vc="tHX=$VALUE"
+        set="$VALUE=tHX"
+        digits="3"
+        tooltip="H to X cross-polarization contact time"
+        />
+      <label loc="210 20" size="30 20"
+        style="Label1"
+        label="ms"
+        />
+
+      <label loc="10 50" size="100 20"
+        style="Label1"
+        label="H Amplitude"
+        justify="Left"
+        />
+      <entry loc="120 50" size="80 20"
+        style="PlainText"
+        vq="aHhx"
+        vc="aHhx=$VALUE"
+        set="$VALUE=aHhx"
+        digits="0"
+        />
+
+      <label loc="10 80" size="100 20"
+        style="Label1"
+        label="X Amplitude"
+        justify="Left"
+        />
+      <entry loc="120 80" size="80 20"
+        style="PlainText"
+        vq="aXhx"
+        vc="aXhx=$VALUE"
+        set="$VALUE=aXhx"
+        digits="0"
+        />
+
+      <label loc="10 110" size="100 20"
+        style="Label1"
+        label="CP Shape"
+        justify="Left"
+        />
+      <menu loc="120 110" size="100 20"
+        style="PlainText"
+        vq="shHX"
+        vc="parunits('set','shHX','$VALUE')"
+        set="$VALUE=shHX"
+        editable="No"
+        >
+        <mlabel label="ramp" chval="ramp" />
+        <mlabel label="linear" chval="linear" />
+        <mlabel label="tangent" chval="tangent" />
+      </menu>
+    </group>
+
+    <!-- Cross-Polarization X→H -->
+    <group loc="380 130" size="360 140"
+      style="Heading2"
+      label="Cross-Polarization (X → H)"
+      border="Etched"
+      side="Top"
+      justify="Left"
+      tab="no"
+      enable="no"
+      useref="no"
+      subtype="Basic"
+      >
+      <label loc="10 20" size="100 20"
+        style="Label1"
+        label="Contact Time"
+        justify="Left"
+        />
+      <entry loc="120 20" size="80 20"
+        style="PlainText"
+        vq="tXH"
+        vc="tXH=$VALUE"
+        set="$VALUE=tXH"
+        digits="3"
+        tooltip="X to H cross-polarization contact time"
+        />
+      <label loc="210 20" size="30 20"
+        style="Label1"
+        label="ms"
+        />
+
+      <label loc="10 50" size="100 20"
+        style="Label1"
+        label="H Amplitude"
+        justify="Left"
+        />
+      <entry loc="120 50" size="80 20"
+        style="PlainText"
+        vq="aHxh"
+        vc="aHxh=$VALUE"
+        set="$VALUE=aHxh"
+        digits="0"
+        />
+
+      <label loc="10 80" size="100 20"
+        style="Label1"
+        label="X Amplitude"
+        justify="Left"
+        />
+      <entry loc="120 80" size="80 20"
+        style="PlainText"
+        vq="aXxh"
+        vc="aXxh=$VALUE"
+        set="$VALUE=aXxh"
+        digits="0"
+        />
+
+      <label loc="10 110" size="100 20"
+        style="Label1"
+        label="CP Shape"
+        justify="Left"
+        />
+      <menu loc="120 110" size="100 20"
+        style="PlainText"
+        vq="shXH"
+        vc="parunits('set','shXH','$VALUE')"
+        set="$VALUE=shXH"
+        editable="No"
+        >
+        <mlabel label="ramp" chval="ramp" />
+        <mlabel label="linear" chval="linear" />
+        <mlabel label="tangent" chval="tangent" />
+      </menu>
+    </group>
+
+    <!-- H-H RFDR Mixing -->
+    <group loc="10 280" size="360 100"
+      style="Heading2"
+      label="H-H RFDR Mixing (Optional)"
+      border="Etched"
+      side="Top"
+      justify="Left"
+      tab="no"
+      enable="no"
+      useref="no"
+      subtype="Basic"
+      >
+      <label loc="10 20" size="100 20"
+        style="Label1"
+        label="RFDR Mixing"
+        justify="Left"
+        />
+      <entry loc="120 20" size="80 20"
+        style="PlainText"
+        vq="qHrfdr"
+        vc="qHrfdr=$VALUE"
+        set="$VALUE=qHrfdr"
+        digits="0"
+        tooltip="Number of H-H RFDR cycles (0 to disable)"
+        />
+      <label loc="210 20" size="80 20"
+        style="Label1"
+        label="cycles"
+        />
+
+      <label loc="10 50" size="100 20"
+        style="Label1"
+        label="H Amplitude"
+        justify="Left"
+        />
+      <entry loc="120 50" size="80 20"
+        style="PlainText"
+        vq="aHrfdr"
+        vc="aHrfdr=$VALUE"
+        set="$VALUE=aHrfdr"
+        digits="0"
+        />
+
+      <label loc="10 70" size="250 20"
+        style="Label3"
+        label="Note: RFDR applied between XH-CP and echo"
+        />
+    </group>
+
+    <!-- Hahn Echo on H -->
+    <group loc="380 280" size="360 100"
+      style="Heading2"
+      label="Hahn Echo on H (Optional)"
+      border="Etched"
+      side="Top"
+      justify="Left"
+      tab="no"
+      enable="no"
+      useref="no"
+      subtype="Basic"
+      >
+      <label loc="10 20" size="100 20"
+        style="Label1"
+        label="Echo Time"
+        justify="Left"
+        />
+      <entry loc="120 20" size="80 20"
+        style="PlainText"
+        vq="tHecho"
+        vc="tHecho=$VALUE"
+        set="$VALUE=tHecho"
+        digits="3"
+        tooltip="Hahn echo delay on H (0 to disable)"
+        />
+      <label loc="210 20" size="30 20"
+        style="Label1"
+        label="ms"
+        />
+
+      <label loc="10 50" size="100 20"
+        style="Label1"
+        label="Echo Pulse"
+        justify="Left"
+        />
+      <entry loc="120 50" size="80 20"
+        style="PlainText"
+        vq="pwHecho"
+        vc="pwHecho=$VALUE"
+        set="$VALUE=pwHecho"
+        digits="2"
+        tooltip="H 180° pulse width for echo"
+        />
+      <label loc="210 50" size="30 20"
+        style="Label1"
+        label="µs"
+        />
+
+      <label loc="10 70" size="250 20"
+        style="Label3"
+        label="Note: Echo applied before acquisition"
+        />
+    </group>
+
+    <!-- Duty Cycle Warning -->
+    <group loc="10 390" size="730 80"
+      style="Heading2"
+      label="Important: H-Detected Duty Cycle"
+      border="Etched"
+      side="Top"
+      justify="Left"
+      tab="no"
+      enable="no"
+      useref="no"
+      subtype="Basic"
+      >
+      <label loc="10 15" size="700 20"
+        style="Label3"
+        label="WARNING: H-detected sequences have strict 15% duty cycle limit (vs 25% for X-detect)"
+        />
+      <label loc="10 35" size="700 20"
+        style="Label3"
+        label="Duty cycle includes: HX-CP, XH-CP, H decoupling, H-H RFDR, and Hahn echo"
+        />
+      <label loc="10 55" size="700 20"
+        style="Label3"
+        label="Increase d1 if duty cycle exceeds 15%. See pulse program for automatic error checking."
+        />
+    </group>
+
+  </group>
+</template>

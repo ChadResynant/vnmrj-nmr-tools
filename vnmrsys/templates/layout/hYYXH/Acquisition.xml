@@ -1,0 +1,457 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<!--
+  hYYXH Acquisition Tab
+  4D H-detected: F1(direct H), F2(indirect X via d2), F3(indirect Y via d3), F4(indirect Y via d4)
+  Topology: H → HY CP → [X-dec Y evolution d4 F4] → [Y-Y mixing] → [X-dec Y evolution d3 F3] → YX CP → [Y-dec X evolution d2 F2] → XH CP → [optional HH-RFDR] → H acquisition (F1)
+-->
+<template name="Acquisition" element="pages" type="acquisition" >
+  <group size="750 360"
+    style="Heading1"
+    label="Acquisition"
+    vq="panellevel"
+    show="$SHOW=(panellevel&gt;0)"
+    border="None"
+    side="Top"
+    justify="Left"
+    tab="yes"
+    enable="no"
+    reference="Acquisition"
+    useref="no"
+    subtype="Basic"
+    expanded="yes"
+    >
+
+    <!-- F1 Direct Dimension (H observe) -->
+    <group loc="10 10" size="230 160"
+      style="Heading2"
+      label="F1 Acquisition (Direct, H)"
+      border="Etched"
+      side="Top"
+      justify="Left"
+      tab="no"
+      enable="no"
+      useref="no"
+      subtype="Basic"
+      >
+      <label loc="10 20" size="80 20"
+        style="Label1"
+        label="Spectral Width"
+        justify="Left"
+        />
+      <entry loc="100 20" size="80 20"
+        style="PlainText"
+        vq="sw"
+        vc="sw=$VALUE"
+        set="$VALUE=sw"
+        digits="1"
+        />
+      <label loc="190 20" size="30 20"
+        style="Label1"
+        label="Hz"
+        />
+
+      <label loc="10 45" size="80 20"
+        style="Label1"
+        label="Acq. Time"
+        justify="Left"
+        />
+      <entry loc="100 45" size="80 20"
+        style="PlainText"
+        vq="at"
+        vc="at=$VALUE"
+        set="$VALUE=at"
+        digits="4"
+        />
+      <label loc="190 45" size="30 20"
+        style="Label1"
+        label="s"
+        />
+
+      <label loc="10 70" size="80 20"
+        style="Label1"
+        label="Relaxation d1"
+        justify="Left"
+        />
+      <entry loc="100 70" size="80 20"
+        style="PlainText"
+        vq="d1"
+        vc="d1=$VALUE"
+        set="$VALUE=d1"
+        digits="3"
+        tooltip="Recycle delay - must be sufficient for 15% duty cycle safety (H-detected)"
+        />
+      <label loc="190 70" size="30 20"
+        style="Label1"
+        label="s"
+        />
+
+      <label loc="10 95" size="80 20"
+        style="Label1"
+        label="Transients"
+        justify="Left"
+        />
+      <entry loc="100 95" size="80 20"
+        style="PlainText"
+        vq="nt"
+        vc="nt=$VALUE"
+        set="$VALUE=nt"
+        digits="0"
+        />
+
+      <label loc="10 120" size="80 20"
+        style="Label1"
+        label="NUS nrows"
+        justify="Left"
+        />
+      <entry loc="100 120" size="80 20"
+        style="PlainText"
+        vq="nrows"
+        vc="nrows=$VALUE"
+        set="$VALUE=nrows"
+        digits="0"
+        tooltip="Total NUS sampling points (ni*ni2*ni3)"
+        />
+    </group>
+
+    <!-- F2 Indirect Dimension (X evolution via d2) -->
+    <group loc="250 10" size="240 160"
+      style="Heading2"
+      label="F2 Acquisition (Indirect, X)"
+      border="Etched"
+      side="Top"
+      justify="Left"
+      tab="no"
+      enable="no"
+      useref="no"
+      subtype="Basic"
+      >
+      <label loc="10 20" size="80 20"
+        style="Label1"
+        label="Spectral Width"
+        justify="Left"
+        />
+      <entry loc="100 20" size="80 20"
+        style="PlainText"
+        vq="sw1"
+        vc="sw1=$VALUE"
+        set="$VALUE=sw1"
+        digits="1"
+        show="if (ni&lt;2) then $VALUE=0 else $VALUE=1 endif"
+        />
+      <label loc="190 20" size="30 20"
+        style="Label1"
+        label="Hz"
+        />
+
+      <label loc="10 45" size="80 20"
+        style="Label1"
+        label="Increments"
+        justify="Left"
+        />
+      <entry loc="100 45" size="80 20"
+        style="PlainText"
+        vq="ni"
+        vc="ni=$VALUE"
+        set="$VALUE=ni"
+        digits="0"
+        />
+
+      <label loc="10 70" size="80 20"
+        style="Label1"
+        label="Max Acq. Time"
+        justify="Left"
+        />
+      <textmessage loc="100 70" size="80 20"
+        style="Label1"
+        vq="ni sw1"
+        set="if ni&gt;1 then $VALUE=ni/sw1 else $VALUE=0 endif"
+        digits="4"
+        />
+      <label loc="190 70" size="30 20"
+        style="Label1"
+        label="s"
+        />
+
+      <check loc="10 100" size="150 20"
+        label="Half-Dwell Delay"
+        vq="f1180"
+        vc="f1180='y'"
+        vc2="f1180='n'"
+        set="if f1180='y' then $VALUE=1 else $VALUE=0 endif"
+        />
+    </group>
+
+    <!-- F3 Indirect Dimension (Y evolution via d3) -->
+    <group loc="500 10" size="240 160"
+      style="Heading2"
+      label="F3 Acquisition (Indirect, Y)"
+      border="Etched"
+      side="Top"
+      justify="Left"
+      tab="no"
+      enable="no"
+      useref="no"
+      subtype="Basic"
+      >
+      <label loc="10 20" size="80 20"
+        style="Label1"
+        label="Spectral Width"
+        justify="Left"
+        />
+      <entry loc="100 20" size="80 20"
+        style="PlainText"
+        vq="sw2"
+        vc="sw2=$VALUE"
+        set="$VALUE=sw2"
+        digits="1"
+        show="if (ni2&lt;2) then $VALUE=0 else $VALUE=1 endif"
+        />
+      <label loc="190 20" size="30 20"
+        style="Label1"
+        label="Hz"
+        />
+
+      <label loc="10 45" size="80 20"
+        style="Label1"
+        label="Increments"
+        justify="Left"
+        />
+      <entry loc="100 45" size="80 20"
+        style="PlainText"
+        vq="ni2"
+        vc="ni2=$VALUE"
+        set="$VALUE=ni2"
+        digits="0"
+        />
+
+      <label loc="10 70" size="80 20"
+        style="Label1"
+        label="Max Acq. Time"
+        justify="Left"
+        />
+      <textmessage loc="100 70" size="80 20"
+        style="Label1"
+        vq="ni2 sw2"
+        set="if ni2&gt;1 then $VALUE=ni2/sw2 else $VALUE=0 endif"
+        digits="4"
+        />
+      <label loc="190 70" size="30 20"
+        style="Label1"
+        label="s"
+        />
+
+      <check loc="10 100" size="150 20"
+        label="Half-Dwell Delay"
+        vq="f2180"
+        vc="f2180='y'"
+        vc2="f2180='n'"
+        set="if f2180='y' then $VALUE=1 else $VALUE=0 endif"
+        />
+    </group>
+
+    <!-- F4 Indirect Dimension (Y evolution via d4) -->
+    <group loc="10 180" size="240 160"
+      style="Heading2"
+      label="F4 Acquisition (Indirect, Y)"
+      border="Etched"
+      side="Top"
+      justify="Left"
+      tab="no"
+      enable="no"
+      useref="no"
+      subtype="Basic"
+      >
+      <label loc="10 20" size="80 20"
+        style="Label1"
+        label="Spectral Width"
+        justify="Left"
+        />
+      <entry loc="100 20" size="80 20"
+        style="PlainText"
+        vq="sw3"
+        vc="sw3=$VALUE"
+        set="$VALUE=sw3"
+        digits="1"
+        show="if (ni3&lt;2) then $VALUE=0 else $VALUE=1 endif"
+        />
+      <label loc="190 20" size="30 20"
+        style="Label1"
+        label="Hz"
+        />
+
+      <label loc="10 45" size="80 20"
+        style="Label1"
+        label="Increments"
+        justify="Left"
+        />
+      <entry loc="100 45" size="80 20"
+        style="PlainText"
+        vq="ni3"
+        vc="ni3=$VALUE"
+        set="$VALUE=ni3"
+        digits="0"
+        />
+
+      <label loc="10 70" size="80 20"
+        style="Label1"
+        label="Max Acq. Time"
+        justify="Left"
+        />
+      <textmessage loc="100 70" size="80 20"
+        style="Label1"
+        vq="ni3 sw3"
+        set="if ni3&gt;1 then $VALUE=ni3/sw3 else $VALUE=0 endif"
+        digits="4"
+        />
+      <label loc="190 70" size="30 20"
+        style="Label1"
+        label="s"
+        />
+
+      <check loc="10 100" size="150 20"
+        label="Half-Dwell Delay"
+        vq="f3180"
+        vc="f3180='y'"
+        vc2="f3180='n'"
+        set="if f3180='y' then $VALUE=1 else $VALUE=0 endif"
+        />
+    </group>
+
+    <!-- Sample Parameters -->
+    <group loc="260 180" size="300 90"
+      style="Heading2"
+      label="Sample"
+      border="Etched"
+      side="Top"
+      justify="Left"
+      tab="no"
+      enable="no"
+      useref="no"
+      subtype="Basic"
+      >
+      <label loc="10 20" size="80 20"
+        style="Label1"
+        label="MAS Rate"
+        justify="Left"
+        />
+      <entry loc="100 20" size="80 20"
+        style="PlainText"
+        vq="srate"
+        vc="srate=$VALUE"
+        set="$VALUE=srate"
+        digits="0"
+        tooltip="Magic angle spinning rate in Hz"
+        />
+      <label loc="190 20" size="30 20"
+        style="Label1"
+        label="Hz"
+        />
+
+      <label loc="10 50" size="80 20"
+        style="Label1"
+        label="Temperature"
+        justify="Left"
+        />
+      <entry loc="100 50" size="80 20"
+        style="PlainText"
+        vq="temp"
+        vc="temp=$VALUE"
+        set="$VALUE=temp"
+        digits="1"
+        />
+      <label loc="190 50" size="30 20"
+        style="Label1"
+        label="°C"
+        />
+    </group>
+
+    <!-- Receiver Timing -->
+    <group loc="570 180" size="170 90"
+      style="Heading2"
+      label="Receiver Timing"
+      border="Etched"
+      side="Top"
+      justify="Left"
+      tab="no"
+      enable="no"
+      useref="no"
+      subtype="Basic"
+      >
+      <label loc="10 20" size="50 20"
+        style="Label1"
+        label="rd"
+        justify="Left"
+        />
+      <entry loc="70 20" size="60 20"
+        style="PlainText"
+        vq="rd"
+        vc="rd=$VALUE"
+        set="$VALUE=rd"
+        digits="2"
+        />
+      <label loc="140 20" size="30 20"
+        style="Label1"
+        label="µs"
+        />
+
+      <label loc="10 50" size="50 20"
+        style="Label1"
+        label="ad"
+        justify="Left"
+        />
+      <entry loc="70 50" size="60 20"
+        style="PlainText"
+        vq="ad"
+        vc="ad=$VALUE"
+        set="$VALUE=ad"
+        digits="2"
+        />
+      <label loc="140 50" size="30 20"
+        style="Label1"
+        label="µs"
+        />
+    </group>
+
+    <!-- NUS Parameters -->
+    <group loc="10 280" size="250 70"
+      style="Heading2"
+      label="NUS Parameters"
+      border="Etched"
+      side="Top"
+      justify="Left"
+      tab="no"
+      enable="no"
+      useref="no"
+      subtype="Basic"
+      >
+      <label loc="10 20" size="80 20"
+        style="Label1"
+        label="ndim"
+        justify="Left"
+        />
+      <entry loc="100 20" size="80 20"
+        style="PlainText"
+        vq="ndim"
+        vc="ndim=$VALUE"
+        set="$VALUE=ndim"
+        digits="0"
+        tooltip="Number of dimensions (set to 4 for 4D NUS)"
+        />
+
+      <label loc="10 45" size="80 20"
+        style="Label1"
+        label="skiprows"
+        justify="Left"
+        />
+      <entry loc="100 45" size="80 20"
+        style="PlainText"
+        vq="skiprows"
+        vc="skiprows=$VALUE"
+        set="$VALUE=skiprows"
+        digits="0"
+        tooltip="NUS concatenation (skip first N rows)"
+        />
+    </group>
+
+  </group>
+</template>

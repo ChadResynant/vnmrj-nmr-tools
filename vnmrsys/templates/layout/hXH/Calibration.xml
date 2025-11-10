@@ -1,0 +1,412 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<!--
+  hXH Calibration Tab
+  Pulse width and power calibrations for all four channels
+-->
+<template name="Calibration" element="pages" type="acquisition" >
+  <group size="750 400"
+    style="Heading1"
+    label="Calibration"
+    vq="panellevel"
+    show="$SHOW=(panellevel&gt;0)"
+    border="None"
+    side="Top"
+    justify="Left"
+    tab="yes"
+    enable="no"
+    reference="Calibration"
+    useref="no"
+    subtype="Basic"
+    expanded="yes"
+    >
+
+    <!-- Transmitter Channel (tn) - H observe -->
+    <group loc="10 10" size="360 180"
+      style="Heading2"
+      vq="tn"
+      show="$LABEL='Transmitter ('+tn+')'"
+      border="Etched"
+      side="Top"
+      justify="Left"
+      tab="no"
+      enable="no"
+      useref="no"
+      subtype="Basic"
+      >
+      <label loc="10 20" size="120 20"
+        style="Label1"
+        label="Nucleus"
+        justify="Left"
+        />
+      <entry loc="140 20" size="80 20"
+        style="PlainText"
+        vq="tn"
+        vc="tn='$VALUE'"
+        set="$VALUE=tn"
+        disable="Grayed out"
+        />
+
+      <label loc="10 50" size="120 20"
+        style="Label1"
+        label="Frequency"
+        justify="Left"
+        />
+      <entry loc="140 50" size="80 20"
+        style="PlainText"
+        vq="sfrq"
+        vc="sfrq=$VALUE"
+        set="$VALUE=sfrq"
+        digits="6"
+        />
+      <label loc="230 50" size="30 20"
+        style="Label1"
+        label="MHz"
+        />
+
+      <label loc="10 80" size="120 20"
+        style="Label1"
+        label="90° Pulse (pwH90)"
+        justify="Left"
+        />
+      <entry loc="140 80" size="80 20"
+        style="PlainText"
+        vq="pwH90"
+        vc="pwH90=$VALUE"
+        set="$VALUE=pwH90"
+        digits="2"
+        tooltip="90 degree pulse width for H observe"
+        />
+      <label loc="230 80" size="30 20"
+        style="Label1"
+        label="µs"
+        />
+
+      <label loc="10 110" size="120 20"
+        style="Label1"
+        label="Power Level (tpwr)"
+        justify="Left"
+        />
+      <entry loc="140 110" size="80 20"
+        style="PlainText"
+        vq="tpwr"
+        vc="tpwr=$VALUE"
+        set="$VALUE=tpwr"
+        digits="0"
+        tooltip="Transmitter power level"
+        />
+      <label loc="230 110" size="60 20"
+        style="Label1"
+        label="dB"
+        />
+
+      <label loc="10 140" size="120 20"
+        style="Label1"
+        label="Offset"
+        justify="Left"
+        />
+      <entry loc="140 140" size="80 20"
+        style="PlainText"
+        vq="tof"
+        vc="tof=$VALUE"
+        set="$VALUE=tof"
+        digits="1"
+        />
+      <label loc="230 140" size="30 20"
+        style="Label1"
+        label="Hz"
+        />
+    </group>
+
+    <!-- Decoupler Channel 1 (dn) - X -->
+    <group loc="380 10" size="360 180"
+      style="Heading2"
+      vq="dn"
+      show="$LABEL='Decoupler 1 ('+dn+')'"
+      border="Etched"
+      side="Top"
+      justify="Left"
+      tab="no"
+      enable="no"
+      useref="no"
+      subtype="Basic"
+      >
+      <label loc="10 20" size="120 20"
+        style="Label1"
+        label="Nucleus"
+        justify="Left"
+        />
+      <entry loc="140 20" size="80 20"
+        style="PlainText"
+        vq="dn"
+        vc="dn='$VALUE'"
+        set="$VALUE=dn"
+        disable="Grayed out"
+        />
+
+      <label loc="10 50" size="120 20"
+        style="Label1"
+        label="Frequency"
+        justify="Left"
+        />
+      <entry loc="140 50" size="80 20"
+        style="PlainText"
+        vq="dfrq"
+        vc="dfrq=$VALUE"
+        set="$VALUE=dfrq"
+        digits="6"
+        />
+      <label loc="230 50" size="30 20"
+        style="Label1"
+        label="MHz"
+        />
+
+      <label loc="10 80" size="120 20"
+        style="Label1"
+        label="90° Pulse (pwX90)"
+        justify="Left"
+        />
+      <entry loc="140 80" size="80 20"
+        style="PlainText"
+        vq="pwX90"
+        vc="pwX90=$VALUE"
+        set="$VALUE=pwX90"
+        digits="2"
+        tooltip="90 degree pulse width for X nucleus"
+        />
+      <label loc="230 80" size="30 20"
+        style="Label1"
+        label="µs"
+        />
+
+      <label loc="10 110" size="120 20"
+        style="Label1"
+        label="Power Level (dpwr)"
+        justify="Left"
+        />
+      <entry loc="140 110" size="80 20"
+        style="PlainText"
+        vq="dpwr"
+        vc="dpwr=$VALUE"
+        set="$VALUE=dpwr"
+        digits="0"
+        tooltip="Decoupler 1 power level"
+        />
+      <label loc="230 110" size="60 20"
+        style="Label1"
+        label="dB"
+        />
+
+      <label loc="10 140" size="120 20"
+        style="Label1"
+        label="Offset"
+        justify="Left"
+        />
+      <entry loc="140 140" size="80 20"
+        style="PlainText"
+        vq="dof"
+        vc="dof=$VALUE"
+        set="$VALUE=dof"
+        digits="1"
+        />
+      <label loc="230 140" size="30 20"
+        style="Label1"
+        label="Hz"
+        />
+    </group>
+
+    <!-- Decoupler Channel 2 (dn2) - Y -->
+    <group loc="10 200" size="360 180"
+      style="Heading2"
+      vq="dn2"
+      show="if dn2&lt;&gt;'' then $SHOW=1 $LABEL='Decoupler 2 ('+dn2+')' else $SHOW=0 endif"
+      border="Etched"
+      side="Top"
+      justify="Left"
+      tab="no"
+      enable="no"
+      useref="no"
+      subtype="Basic"
+      >
+      <label loc="10 20" size="120 20"
+        style="Label1"
+        label="Nucleus"
+        justify="Left"
+        />
+      <entry loc="140 20" size="80 20"
+        style="PlainText"
+        vq="dn2"
+        vc="dn2='$VALUE'"
+        set="$VALUE=dn2"
+        disable="Grayed out"
+        />
+
+      <label loc="10 50" size="120 20"
+        style="Label1"
+        label="Frequency"
+        justify="Left"
+        />
+      <entry loc="140 50" size="80 20"
+        style="PlainText"
+        vq="dfrq2"
+        vc="dfrq2=$VALUE"
+        set="$VALUE=dfrq2"
+        digits="6"
+        />
+      <label loc="230 50" size="30 20"
+        style="Label1"
+        label="MHz"
+        />
+
+      <label loc="10 80" size="120 20"
+        style="Label1"
+        label="90° Pulse (pwY90)"
+        justify="Left"
+        />
+      <entry loc="140 80" size="80 20"
+        style="PlainText"
+        vq="pwY90"
+        vc="pwY90=$VALUE"
+        set="$VALUE=pwY90"
+        digits="2"
+        tooltip="90 degree pulse width for Y nucleus"
+        />
+      <label loc="230 80" size="30 20"
+        style="Label1"
+        label="µs"
+        />
+
+      <label loc="10 110" size="120 20"
+        style="Label1"
+        label="Power Level (dpwr2)"
+        justify="Left"
+        />
+      <entry loc="140 110" size="80 20"
+        style="PlainText"
+        vq="dpwr2"
+        vc="dpwr2=$VALUE"
+        set="$VALUE=dpwr2"
+        digits="0"
+        tooltip="Decoupler 2 power level"
+        />
+      <label loc="230 110" size="60 20"
+        style="Label1"
+        label="dB"
+        />
+
+      <label loc="10 140" size="120 20"
+        style="Label1"
+        label="Offset"
+        justify="Left"
+        />
+      <entry loc="140 140" size="80 20"
+        style="PlainText"
+        vq="dof2"
+        vc="dof2=$VALUE"
+        set="$VALUE=dof2"
+        digits="1"
+        />
+      <label loc="230 140" size="30 20"
+        style="Label1"
+        label="Hz"
+        />
+    </group>
+
+    <!-- Decoupler Channel 3 (dn3) - Z -->
+    <group loc="380 200" size="360 180"
+      style="Heading2"
+      vq="dn3"
+      show="if dn3&lt;&gt;'' then $SHOW=1 $LABEL='Decoupler 3 ('+dn3+')' else $SHOW=0 endif"
+      border="Etched"
+      side="Top"
+      justify="Left"
+      tab="no"
+      enable="no"
+      useref="no"
+      subtype="Basic"
+      >
+      <label loc="10 20" size="120 20"
+        style="Label1"
+        label="Nucleus"
+        justify="Left"
+        />
+      <entry loc="140 20" size="80 20"
+        style="PlainText"
+        vq="dn3"
+        vc="dn3='$VALUE'"
+        set="$VALUE=dn3"
+        disable="Grayed out"
+        />
+
+      <label loc="10 50" size="120 20"
+        style="Label1"
+        label="Frequency"
+        justify="Left"
+        />
+      <entry loc="140 50" size="80 20"
+        style="PlainText"
+        vq="dfrq3"
+        vc="dfrq3=$VALUE"
+        set="$VALUE=dfrq3"
+        digits="6"
+        />
+      <label loc="230 50" size="30 20"
+        style="Label1"
+        label="MHz"
+        />
+
+      <label loc="10 80" size="120 20"
+        style="Label1"
+        label="90° Pulse (pwZ90)"
+        justify="Left"
+        />
+      <entry loc="140 80" size="80 20"
+        style="PlainText"
+        vq="pwZ90"
+        vc="pwZ90=$VALUE"
+        set="$VALUE=pwZ90"
+        digits="2"
+        tooltip="90 degree pulse width for Z nucleus"
+        />
+      <label loc="230 80" size="30 20"
+        style="Label1"
+        label="µs"
+        />
+
+      <label loc="10 110" size="120 20"
+        style="Label1"
+        label="Power Level (dpwr3)"
+        justify="Left"
+        />
+      <entry loc="140 110" size="80 20"
+        style="PlainText"
+        vq="dpwr3"
+        vc="dpwr3=$VALUE"
+        set="$VALUE=dpwr3"
+        digits="0"
+        tooltip="Decoupler 3 power level"
+        />
+      <label loc="230 110" size="60 20"
+        style="Label1"
+        label="dB"
+        />
+
+      <label loc="10 140" size="120 20"
+        style="Label1"
+        label="Offset"
+        justify="Left"
+        />
+      <entry loc="140 140" size="80 20"
+        style="PlainText"
+        vq="dof3"
+        vc="dof3=$VALUE"
+        set="$VALUE=dof3"
+        digits="1"
+        />
+      <label loc="230 140" size="30 20"
+        style="Label1"
+        label="Hz"
+        />
+    </group>
+
+  </group>
+</template>

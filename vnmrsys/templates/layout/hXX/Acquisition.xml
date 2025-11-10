@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <!--
-  hX Acquisition Tab
-  Basic acquisition and sample parameters
+  hXX Acquisition Tab
+  2D X-X correlation with mixing
 -->
 <template name="Acquisition" element="pages" type="acquisition" >
-  <group size="800 280"
+  <group size="800 300"
     style="Heading1"
     label="Acquisition"
     vq="panellevel"
@@ -20,10 +20,10 @@
     expanded="yes"
     >
 
-    <!-- Basic Acquisition Parameters -->
-    <group loc="10 10" size="400 150"
+    <!-- F2 Direct Dimension (X observe) -->
+    <group loc="10 10" size="280 180"
       style="Heading2"
-      label="Basic Acquisition"
+      label="F2 Acquisition (Direct, X)"
       border="Etched"
       side="Top"
       justify="Left"
@@ -105,16 +105,29 @@
         style="Label1"
         label="%"
         />
-      <label loc="230 95" size="150 20"
+      <label loc="10 115" size="230 20"
         style="Label3"
         label="(target &lt; 25%)"
         />
+
+      <label loc="10 140" size="80 20"
+        style="Label1"
+        label="Transients"
+        justify="Left"
+        />
+      <entry loc="100 140" size="80 20"
+        style="PlainText"
+        vq="nt"
+        vc="nt=$VALUE"
+        set="$VALUE=nt"
+        digits="0"
+        />
     </group>
 
-    <!-- Scans -->
-    <group loc="420 10" size="200 150"
+    <!-- F1 Indirect Dimension (X evolution) -->
+    <group loc="300 10" size="240 160"
       style="Heading2"
-      label="Scans"
+      label="F1 Acquisition (Indirect, X)"
       border="Etched"
       side="Top"
       justify="Left"
@@ -125,47 +138,78 @@
       >
       <label loc="10 20" size="80 20"
         style="Label1"
-        label="Transients"
+        label="Spectral Width"
         justify="Left"
         />
-      <entry loc="100 20" size="70 20"
+      <entry loc="100 20" size="80 20"
         style="PlainText"
-        vq="nt"
-        vc="nt=$VALUE"
-        set="$VALUE=nt"
-        digits="0"
+        vq="sw1"
+        vc="sw1=$VALUE"
+        set="$VALUE=sw1"
+        digits="1"
+        show="if (ni&lt;2) then $VALUE=0 else $VALUE=1 endif"
+        />
+      <label loc="190 20" size="30 20"
+        style="Label1"
+        label="Hz"
         />
 
       <label loc="10 45" size="80 20"
         style="Label1"
-        label="Completed"
+        label="Increments"
         justify="Left"
         />
-      <entry loc="100 45" size="70 20"
+      <entry loc="100 45" size="80 20"
         style="PlainText"
-        vq="ct"
-        vc=""
-        set="$VALUE=ct"
+        vq="ni"
+        vc="ni=$VALUE"
+        set="$VALUE=ni"
         digits="0"
-        disable="Grayed out"
         />
 
       <label loc="10 70" size="80 20"
         style="Label1"
-        label="Steady State"
+        label="Max Acq. Time"
         justify="Left"
         />
-      <entry loc="100 70" size="70 20"
-        style="PlainText"
-        vq="ss"
-        vc="ss=$VALUE"
-        set="$VALUE=ss"
-        digits="0"
+      <textmessage loc="100 70" size="80 20"
+        style="Label1"
+        vq="ni sw1"
+        set="if ni&gt;1 then $VALUE=ni/sw1 else $VALUE=0 endif"
+        digits="4"
         />
+      <label loc="190 70" size="30 20"
+        style="Label1"
+        label="s"
+        />
+
+      <check loc="10 100" size="150 20"
+        label="Half-Dwell Delay"
+        vq="f1180"
+        vc="f1180='y'"
+        vc2="f1180='n'"
+        set="if f1180='y' then $VALUE=1 else $VALUE=0 endif"
+        />
+
+      <label loc="10 125" size="80 20"
+        style="Label1"
+        label="Phase Mode"
+        justify="Left"
+        />
+      <menu loc="100 125" size="120 20"
+        style="PlainText"
+        vq="phase"
+        vc="phase=$VALUE"
+        set="$VALUE=phase"
+        editable="No"
+        >
+        <mlabel label="1 (first incr)" chval="1" />
+        <mlabel label="1,2 (States)" chval="1,2" />
+      </menu>
     </group>
 
     <!-- Sample Parameters -->
-    <group loc="10 170" size="350 100"
+    <group loc="550 10" size="240 160"
       style="Heading2"
       label="Sample"
       border="Etched"
@@ -213,7 +257,7 @@
     </group>
 
     <!-- Receiver Settings -->
-    <group loc="370 170" size="250 100"
+    <group loc="10 200" size="400 90"
       style="Heading2"
       label="Receiver Settings"
       border="Etched"
@@ -237,46 +281,46 @@
         digits="0"
         />
 
-      <label loc="10 45" size="50 20"
+      <label loc="150 20" size="50 20"
         style="Label1"
         label="rd"
         justify="Left"
         />
-      <entry loc="70 45" size="60 20"
+      <entry loc="210 20" size="60 20"
         style="PlainText"
         vq="rd"
         vc="rd=$VALUE"
         set="$VALUE=rd"
         digits="2"
         />
-      <label loc="135 45" size="30 20"
+      <label loc="280 20" size="30 20"
         style="Label1"
         label="µs"
         />
 
-      <label loc="10 70" size="50 20"
+      <label loc="150 45" size="50 20"
         style="Label1"
         label="ad"
         justify="Left"
         />
-      <entry loc="70 70" size="60 20"
+      <entry loc="210 45" size="60 20"
         style="PlainText"
         vq="ad"
         vc="ad=$VALUE"
         set="$VALUE=ad"
         digits="2"
         />
-      <label loc="135 70" size="30 20"
+      <label loc="280 45" size="30 20"
         style="Label1"
         label="µs"
         />
 
-      <label loc="175 45" size="50 20"
+      <label loc="320 20" size="50 20"
         style="Label1"
         label="ddrtc"
         justify="Left"
         />
-      <entry loc="175 70" size="60 20"
+      <entry loc="320 45" size="60 20"
         style="PlainText"
         vq="ddrtc"
         vc="ddrtc=$VALUE"

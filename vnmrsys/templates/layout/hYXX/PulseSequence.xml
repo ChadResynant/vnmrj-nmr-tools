@@ -1,0 +1,429 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<!--
+  hYXX PulseSequence Tab
+  3D sequence: H→Y(F2)→Y-Y mixing→Y→YX CP→X(F1)→X-X mixing→X→XH CP→H(direct)
+-->
+<template name="PulseSequence" element="pages" type="acquisition" >
+  <group size="750 500"
+    style="Heading1"
+    label="Pulse Sequence"
+    vq="panellevel"
+    show="$SHOW=(panellevel&gt;0)"
+    border="None"
+    side="Top"
+    justify="Left"
+    tab="yes"
+    enable="no"
+    reference="PulseSequence"
+    useref="no"
+    subtype="Basic"
+    expanded="yes"
+    >
+
+    <!-- Sequence Control -->
+    <group loc="10 10" size="350 150"
+      style="Heading2"
+      label="Sequence Control"
+      border="Etched"
+      side="Top"
+      justify="Left"
+      tab="no"
+      enable="no"
+      useref="no"
+      subtype="Basic"
+      >
+      <check loc="10 20" size="150 20"
+        label="Soft Pulse"
+        vq="softpul"
+        vc="softpul='y'"
+        vc2="softpul='n'"
+        set="if softpul='y' then $VALUE=1 else $VALUE=0 endif"
+        tooltip="Enable soft pulse excitation"
+        />
+
+      <check loc="10 50" size="180 20"
+        label="Constant-Time N Evolution"
+        vq="ctN"
+        vc="ctN='y'"
+        vc2="ctN='n'"
+        set="if ctN='y' then $VALUE=1 else $VALUE=0 endif"
+        tooltip="Enable constant-time N evolution"
+        />
+
+      <check loc="10 80" size="180 20"
+        label="Offset Switching (decN)"
+        vq="decN"
+        vc="decN='y'"
+        vc2="decN='n'"
+        set="if decN='y' then $VALUE=1 else $VALUE=0 endif"
+        tooltip="Enable N offset switching during t1"
+        />
+
+      <check loc="10 110" size="150 20"
+        label="Double Quantum Filter"
+        vq="dqf_flag"
+        vc="dqf_flag='2'"
+        vc2="dqf_flag='n'"
+        set="if dqf_flag='2' then $VALUE=1 else $VALUE=0 endif"
+        tooltip="Enable DQF for mixing sequences"
+        />
+    </group>
+
+    <!-- Cross-Polarization HY -->
+    <group loc="370 10" size="370 150"
+      style="Heading2"
+      label="Cross-Polarization (H → Y)"
+      border="Etched"
+      side="Top"
+      justify="Left"
+      tab="no"
+      enable="no"
+      useref="no"
+      subtype="Basic"
+      >
+      <label loc="10 20" size="100 20"
+        style="Label1"
+        label="Contact Time"
+        justify="Left"
+        />
+      <entry loc="120 20" size="80 20"
+        style="PlainText"
+        vq="tHY"
+        vc="tHY=$VALUE"
+        set="$VALUE=tHY"
+        digits="3"
+        />
+      <label loc="210 20" size="30 20"
+        style="Label1"
+        label="ms"
+        />
+
+      <label loc="10 50" size="100 20"
+        style="Label1"
+        label="H Amplitude"
+        justify="Left"
+        />
+      <entry loc="120 50" size="80 20"
+        style="PlainText"
+        vq="aHhy"
+        vc="aHhy=$VALUE"
+        set="$VALUE=aHhy"
+        digits="0"
+        />
+
+      <label loc="10 80" size="100 20"
+        style="Label1"
+        label="Y Amplitude"
+        justify="Left"
+        />
+      <entry loc="120 80" size="80 20"
+        style="PlainText"
+        vq="aYhy"
+        vc="aYhy=$VALUE"
+        set="$VALUE=aYhy"
+        digits="0"
+        />
+
+      <label loc="10 110" size="100 20"
+        style="Label1"
+        label="Ramp Profile"
+        justify="Left"
+        />
+      <entry loc="120 110" size="80 20"
+        style="PlainText"
+        vq="shHY"
+        vc="shHY='$VALUE'"
+        set="$VALUE=shHY"
+        tooltip="Ramp shape for H→Y CP"
+        />
+    </group>
+
+    <!-- Y-Y Mixing -->
+    <group loc="10 170" size="730 160"
+      style="Heading2"
+      label="Y-Y Mixing"
+      border="Etched"
+      side="Top"
+      justify="Left"
+      tab="no"
+      enable="no"
+      useref="no"
+      subtype="Basic"
+      >
+      <label loc="10 20" size="100 20"
+        style="Heading3"
+        label="Mixing Method"
+        justify="Left"
+        />
+      <menu loc="120 20" size="120 20"
+        style="PlainText"
+        vq="mMix"
+        vc="parunits('set','mMix','$VALUE')"
+        set="$VALUE=mMix"
+        editable="No"
+        tooltip="Y-Y mixing sequence type"
+        >
+        <mlabel label="none" chval="n" />
+        <mlabel label="SPC5" chval="spc5" />
+        <mlabel label="C7" chval="c7" />
+        <mlabel label="RAD/DARR" chval="rad" />
+        <mlabel label="PAR" chval="par" />
+      </menu>
+
+      <label loc="10 50" size="100 20"
+        style="Label1"
+        label="Mixing Time"
+        justify="Left"
+        />
+      <entry loc="120 50" size="80 20"
+        style="PlainText"
+        vq="tYmix"
+        vc="tYmix=$VALUE"
+        set="$VALUE=tYmix"
+        digits="3"
+        tooltip="Y-Y mixing period (rounded to rotor cycles)"
+        />
+      <label loc="210 50" size="30 20"
+        style="Label1"
+        label="ms"
+        />
+
+      <label loc="10 80" size="100 20"
+        style="Label1"
+        label="Zero-Field Delay"
+        justify="Left"
+        />
+      <entry loc="120 80" size="80 20"
+        style="PlainText"
+        vq="tZF_Y"
+        vc="tZF_Y=$VALUE"
+        set="$VALUE=tZF_Y"
+        digits="3"
+        tooltip="Used in SPC5, C7, PAR"
+        />
+      <label loc="210 80" size="30 20"
+        style="Label1"
+        label="µs"
+        />
+
+      <!-- Y Mixing Amplitudes Column 1 -->
+      <label loc="280 20" size="200 20"
+        style="Heading3"
+        label="Y Mixing Amplitudes"
+        />
+
+      <label loc="280 45" size="100 20"
+        style="Label1"
+        label="SPC5 (aYspc5)"
+        justify="Left"
+        />
+      <entry loc="390 45" size="60 20"
+        style="PlainText"
+        vq="aYspc5"
+        vc="aYspc5=$VALUE"
+        set="$VALUE=aYspc5"
+        digits="0"
+        />
+
+      <label loc="280 70" size="100 20"
+        style="Label1"
+        label="C7 (aYc7)"
+        justify="Left"
+        />
+      <entry loc="390 70" size="60 20"
+        style="PlainText"
+        vq="aYc7"
+        vc="aYc7=$VALUE"
+        set="$VALUE=aYc7"
+        digits="0"
+        />
+
+      <label loc="280 95" size="100 20"
+        style="Label1"
+        label="PAR Y (aYpar)"
+        justify="Left"
+        />
+      <entry loc="390 95" size="60 20"
+        style="PlainText"
+        vq="aYpar"
+        vc="aYpar=$VALUE"
+        set="$VALUE=aYpar"
+        digits="0"
+        />
+
+      <!-- Y Mixing Amplitudes Column 2 -->
+      <label loc="470 45" size="100 20"
+        style="Label1"
+        label="PAR H (aHpar_Y)"
+        justify="Left"
+        />
+      <entry loc="580 45" size="60 20"
+        style="PlainText"
+        vq="aHpar_Y"
+        vc="aHpar_Y=$VALUE"
+        set="$VALUE=aHpar_Y"
+        digits="0"
+        />
+
+      <label loc="470 70" size="100 20"
+        style="Label1"
+        label="RAD H (aHmix_Y)"
+        justify="Left"
+        />
+      <entry loc="580 70" size="60 20"
+        style="PlainText"
+        vq="aHmix_Y"
+        vc="aHmix_Y=$VALUE"
+        set="$VALUE=aHmix_Y"
+        digits="0"
+        />
+    </group>
+
+    <!-- Cross-Polarization YX -->
+    <group loc="10 340" size="350 150"
+      style="Heading2"
+      label="Cross-Polarization (Y → X)"
+      border="Etched"
+      side="Top"
+      justify="Left"
+      tab="no"
+      enable="no"
+      useref="no"
+      subtype="Basic"
+      >
+      <label loc="10 20" size="100 20"
+        style="Label1"
+        label="Contact Time"
+        justify="Left"
+        />
+      <entry loc="120 20" size="80 20"
+        style="PlainText"
+        vq="tYX"
+        vc="tYX=$VALUE"
+        set="$VALUE=tYX"
+        digits="3"
+        />
+      <label loc="210 20" size="30 20"
+        style="Label1"
+        label="ms"
+        />
+
+      <label loc="10 50" size="100 20"
+        style="Label1"
+        label="Y Amplitude"
+        justify="Left"
+        />
+      <entry loc="120 50" size="80 20"
+        style="PlainText"
+        vq="aYyx"
+        vc="aYyx=$VALUE"
+        set="$VALUE=aYyx"
+        digits="0"
+        />
+
+      <label loc="10 80" size="100 20"
+        style="Label1"
+        label="X Amplitude"
+        justify="Left"
+        />
+      <entry loc="120 80" size="80 20"
+        style="PlainText"
+        vq="aXyx"
+        vc="aXyx=$VALUE"
+        set="$VALUE=aXyx"
+        digits="0"
+        />
+
+      <label loc="10 110" size="100 20"
+        style="Label1"
+        label="Ramp Profile"
+        justify="Left"
+        />
+      <entry loc="120 110" size="80 20"
+        style="PlainText"
+        vq="shYX"
+        vc="shYX='$VALUE'"
+        set="$VALUE=shYX"
+        tooltip="Ramp shape for Y→X CP"
+        />
+    </group>
+
+    <!-- X-X Mixing -->
+    <group loc="370 340" size="370 150"
+      style="Heading2"
+      label="X-X Mixing"
+      border="Etched"
+      side="Top"
+      justify="Left"
+      tab="no"
+      enable="no"
+      useref="no"
+      subtype="Basic"
+      >
+      <label loc="10 20" size="100 20"
+        style="Heading3"
+        label="Mixing Method"
+        justify="Left"
+        />
+      <menu loc="120 20" size="120 20"
+        style="PlainText"
+        vq="mMix1"
+        vc="parunits('set','mMix1','$VALUE')"
+        set="$VALUE=mMix1"
+        editable="No"
+        tooltip="X-X mixing sequence type"
+        >
+        <mlabel label="none" chval="n" />
+        <mlabel label="SPC5" chval="spc5" />
+        <mlabel label="C7" chval="c7" />
+        <mlabel label="RAD/DARR" chval="rad" />
+        <mlabel label="PAR" chval="par" />
+      </menu>
+
+      <label loc="10 50" size="100 20"
+        style="Label1"
+        label="Mixing Time"
+        justify="Left"
+        />
+      <entry loc="120 50" size="80 20"
+        style="PlainText"
+        vq="tXmix"
+        vc="tXmix=$VALUE"
+        set="$VALUE=tXmix"
+        digits="3"
+        tooltip="X-X mixing period (rounded to rotor cycles)"
+        />
+      <label loc="210 50" size="30 20"
+        style="Label1"
+        label="ms"
+        />
+
+      <label loc="10 80" size="100 20"
+        style="Label1"
+        label="SPC5 (aXspc5)"
+        justify="Left"
+        />
+      <entry loc="120 80" size="60 20"
+        style="PlainText"
+        vq="aXspc5"
+        vc="aXspc5=$VALUE"
+        set="$VALUE=aXspc5"
+        digits="0"
+        />
+
+      <label loc="10 110" size="100 20"
+        style="Label1"
+        label="C7 (aXc7)"
+        justify="Left"
+        />
+      <entry loc="120 110" size="60 20"
+        style="PlainText"
+        vq="aXc7"
+        vc="aXc7=$VALUE"
+        set="$VALUE=aXc7"
+        digits="0"
+        />
+    </group>
+
+  </group>
+</template>

@@ -1,0 +1,581 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<!--
+  hXXX Decoupling Tab
+  H, Y, and Z channel decoupling parameters
+-->
+<template name="Decoupling" element="pages" type="acquisition" >
+  <group size="750 450"
+    style="Heading1"
+    label="Decoupling"
+    vq="panellevel"
+    show="$SHOW=(panellevel&gt;0)"
+    border="None"
+    side="Top"
+    justify="Left"
+    tab="yes"
+    enable="no"
+    reference="Decoupling"
+    useref="no"
+    subtype="Basic"
+    expanded="yes"
+    >
+
+    <!-- H Channel Decoupling -->
+    <group loc="10 10" size="360 200"
+      style="Heading2"
+      label="H Channel Decoupling"
+      border="Etched"
+      side="Top"
+      justify="Left"
+      tab="no"
+      enable="no"
+      useref="no"
+      subtype="Basic"
+      >
+      <label loc="10 20" size="100 20"
+        style="Label1"
+        label="Sequence"
+        justify="Left"
+        />
+      <menu loc="120 20" size="120 20"
+        style="PlainText"
+        vq="Hseq"
+        vc="parunits('set','Hseq','$VALUE')"
+        set="$VALUE=Hseq"
+        editable="No"
+        tooltip="H decoupling sequence type"
+        >
+        <mlabel label="none" chval="none" />
+        <mlabel label="TPPM" chval="tppm" />
+        <mlabel label="SPINAL" chval="spinal" />
+        <mlabel label="WALTZ" chval="waltz" />
+      </menu>
+
+      <!-- TPPM Parameters -->
+      <group loc="0 50" size="360 100"
+        vq="Hseq"
+        show="if Hseq='tppm' then $SHOW=1 else $SHOW=0 endif"
+        >
+        <label loc="10 0" size="100 20"
+          style="Label1"
+          label="Amplitude (aHtppm)"
+          justify="Left"
+          />
+        <entry loc="120 0" size="80 20"
+          style="PlainText"
+          vq="aHtppm"
+          vc="aHtppm=$VALUE"
+          set="$VALUE=aHtppm"
+          digits="0"
+          />
+        <label loc="210 0" size="60 20"
+          style="Label1"
+          label="(0-4095)"
+          />
+
+        <label loc="10 25" size="100 20"
+          style="Label1"
+          label="Pulse Width"
+          justify="Left"
+          />
+        <entry loc="120 25" size="80 20"
+          style="PlainText"
+          vq="pwHtppm"
+          vc="pwHtppm=$VALUE"
+          set="$VALUE=pwHtppm"
+          digits="2"
+          />
+        <label loc="210 25" size="30 20"
+          style="Label1"
+          label="µs"
+          />
+
+        <label loc="10 50" size="100 20"
+          style="Label1"
+          label="Phase Angle"
+          justify="Left"
+          />
+        <entry loc="120 50" size="80 20"
+          style="PlainText"
+          vq="phHtppm"
+          vc="phHtppm=$VALUE"
+          set="$VALUE=phHtppm"
+          digits="1"
+          />
+        <label loc="210 50" size="30 20"
+          style="Label1"
+          label="deg"
+          />
+      </group>
+
+      <!-- SPINAL Parameters -->
+      <group loc="0 50" size="360 125"
+        vq="Hseq"
+        show="if Hseq='spinal' then $SHOW=1 else $SHOW=0 endif"
+        >
+        <label loc="10 0" size="100 20"
+          style="Label1"
+          label="Amplitude (aHspinal)"
+          justify="Left"
+          />
+        <entry loc="120 0" size="80 20"
+          style="PlainText"
+          vq="aHspinal"
+          vc="aHspinal=$VALUE"
+          set="$VALUE=aHspinal"
+          digits="0"
+          />
+
+        <label loc="10 25" size="100 20"
+          style="Label1"
+          label="Pulse Width"
+          justify="Left"
+          />
+        <entry loc="120 25" size="80 20"
+          style="PlainText"
+          vq="pwHspinal"
+          vc="pwHspinal=$VALUE"
+          set="$VALUE=pwHspinal"
+          digits="2"
+          />
+        <label loc="210 25" size="30 20"
+          style="Label1"
+          label="µs"
+          />
+
+        <label loc="10 50" size="100 20"
+          style="Label1"
+          label="Phase (phHspinal)"
+          justify="Left"
+          />
+        <entry loc="120 50" size="80 20"
+          style="PlainText"
+          vq="phHspinal"
+          vc="phHspinal=$VALUE"
+          set="$VALUE=phHspinal"
+          digits="1"
+          />
+        <label loc="210 50" size="30 20"
+          style="Label1"
+          label="deg"
+          />
+
+        <label loc="10 75" size="100 20"
+          style="Label1"
+          label="Alpha (alpHspinal)"
+          justify="Left"
+          />
+        <entry loc="120 75" size="80 20"
+          style="PlainText"
+          vq="alpHspinal"
+          vc="alpHspinal=$VALUE"
+          set="$VALUE=alpHspinal"
+          digits="1"
+          />
+        <label loc="210 75" size="30 20"
+          style="Label1"
+          label="deg"
+          />
+      </group>
+
+      <!-- WALTZ Parameters -->
+      <group loc="0 50" size="360 75"
+        vq="Hseq"
+        show="if Hseq='waltz' then $SHOW=1 else $SHOW=0 endif"
+        >
+        <label loc="10 0" size="100 20"
+          style="Label1"
+          label="Amplitude (aHwaltz)"
+          justify="Left"
+          />
+        <entry loc="120 0" size="80 20"
+          style="PlainText"
+          vq="aHwaltz"
+          vc="aHwaltz=$VALUE"
+          set="$VALUE=aHwaltz"
+          digits="0"
+          />
+
+        <label loc="10 25" size="100 20"
+          style="Label1"
+          label="Pulse Width"
+          justify="Left"
+          />
+        <entry loc="120 25" size="80 20"
+          style="PlainText"
+          vq="pwHwaltz"
+          vc="pwHwaltz=$VALUE"
+          set="$VALUE=pwHwaltz"
+          digits="2"
+          />
+        <label loc="210 25" size="30 20"
+          style="Label1"
+          label="µs"
+          />
+      </group>
+    </group>
+
+    <!-- Y Channel Decoupling -->
+    <group loc="380 10" size="360 220"
+      style="Heading2"
+      label="Y Channel Decoupling"
+      border="Etched"
+      side="Top"
+      justify="Left"
+      tab="no"
+      enable="no"
+      useref="no"
+      subtype="Basic"
+      >
+      <label loc="10 20" size="100 20"
+        style="Label1"
+        label="Sequence"
+        justify="Left"
+        />
+      <menu loc="120 20" size="120 20"
+        style="PlainText"
+        vq="Yseq"
+        vc="parunits('set','Yseq','$VALUE')"
+        set="$VALUE=Yseq"
+        editable="No"
+        tooltip="Y decoupling sequence type"
+        >
+        <mlabel label="none" chval="none" />
+        <mlabel label="TPPM" chval="tppm" />
+        <mlabel label="SPINAL" chval="spinal" />
+        <mlabel label="WALTZ" chval="waltz" />
+        <mlabel label="PIPS" chval="pips" />
+      </menu>
+
+      <!-- TPPM Parameters -->
+      <group loc="0 50" size="360 100"
+        vq="Yseq"
+        show="if Yseq='tppm' then $SHOW=1 else $SHOW=0 endif"
+        >
+        <label loc="10 0" size="100 20"
+          style="Label1"
+          label="Amplitude (aYtppm)"
+          justify="Left"
+          />
+        <entry loc="120 0" size="80 20"
+          style="PlainText"
+          vq="aYtppm"
+          vc="aYtppm=$VALUE"
+          set="$VALUE=aYtppm"
+          digits="0"
+          />
+
+        <label loc="10 25" size="100 20"
+          style="Label1"
+          label="Pulse Width"
+          justify="Left"
+          />
+        <entry loc="120 25" size="80 20"
+          style="PlainText"
+          vq="pwYtppm"
+          vc="pwYtppm=$VALUE"
+          set="$VALUE=pwYtppm"
+          digits="2"
+          />
+        <label loc="210 25" size="30 20"
+          style="Label1"
+          label="µs"
+          />
+
+        <label loc="10 50" size="100 20"
+          style="Label1"
+          label="Phase Angle"
+          justify="Left"
+          />
+        <entry loc="120 50" size="80 20"
+          style="PlainText"
+          vq="phYtppm"
+          vc="phYtppm=$VALUE"
+          set="$VALUE=phYtppm"
+          digits="1"
+          />
+        <label loc="210 50" size="30 20"
+          style="Label1"
+          label="deg"
+          />
+      </group>
+
+      <!-- SPINAL Parameters -->
+      <group loc="0 50" size="360 125"
+        vq="Yseq"
+        show="if Yseq='spinal' then $SHOW=1 else $SHOW=0 endif"
+        >
+        <label loc="10 0" size="100 20"
+          style="Label1"
+          label="Amplitude (aYspinal)"
+          justify="Left"
+          />
+        <entry loc="120 0" size="80 20"
+          style="PlainText"
+          vq="aYspinal"
+          vc="aYspinal=$VALUE"
+          set="$VALUE=aYspinal"
+          digits="0"
+          />
+
+        <label loc="10 25" size="100 20"
+          style="Label1"
+          label="Pulse Width"
+          justify="Left"
+          />
+        <entry loc="120 25" size="80 20"
+          style="PlainText"
+          vq="pwYspinal"
+          vc="pwYspinal=$VALUE"
+          set="$VALUE=pwYspinal"
+          digits="2"
+          />
+        <label loc="210 25" size="30 20"
+          style="Label1"
+          label="µs"
+          />
+
+        <label loc="10 50" size="100 20"
+          style="Label1"
+          label="Phase (phYspinal)"
+          justify="Left"
+          />
+        <entry loc="120 50" size="80 20"
+          style="PlainText"
+          vq="phYspinal"
+          vc="phYspinal=$VALUE"
+          set="$VALUE=phYspinal"
+          digits="1"
+          />
+        <label loc="210 50" size="30 20"
+          style="Label1"
+          label="deg"
+          />
+
+        <label loc="10 75" size="100 20"
+          style="Label1"
+          label="Alpha (alpYspinal)"
+          justify="Left"
+          />
+        <entry loc="120 75" size="80 20"
+          style="PlainText"
+          vq="alpYspinal"
+          vc="alpYspinal=$VALUE"
+          set="$VALUE=alpYspinal"
+          digits="1"
+          />
+        <label loc="210 75" size="30 20"
+          style="Label1"
+          label="deg"
+          />
+      </group>
+
+      <!-- PIPS Parameters -->
+      <group loc="0 50" size="360 100"
+        vq="Yseq"
+        show="if Yseq='pips' then $SHOW=1 else $SHOW=0 endif"
+        >
+        <label loc="10 0" size="100 20"
+          style="Label1"
+          label="Amplitude (aYpips)"
+          justify="Left"
+          />
+        <entry loc="120 0" size="80 20"
+          style="PlainText"
+          vq="aYpips"
+          vc="aYpips=$VALUE"
+          set="$VALUE=aYpips"
+          digits="0"
+          />
+
+        <label loc="10 25" size="100 20"
+          style="Label1"
+          label="Pulse Width"
+          justify="Left"
+          />
+        <entry loc="120 25" size="80 20"
+          style="PlainText"
+          vq="pwYpips"
+          vc="pwYpips=$VALUE"
+          set="$VALUE=pwYpips"
+          digits="2"
+          />
+        <label loc="210 25" size="30 20"
+          style="Label1"
+          label="µs"
+          />
+
+        <label loc="10 50" size="100 20"
+          style="Label1"
+          label="Rotor Periods (nYpips)"
+          justify="Left"
+          />
+        <entry loc="120 50" size="80 20"
+          style="PlainText"
+          vq="nYpips"
+          vc="nYpips=$VALUE"
+          set="$VALUE=nYpips"
+          digits="0"
+          />
+      </group>
+    </group>
+
+    <!-- Z Channel Decoupling -->
+    <group loc="10 240" size="360 200"
+      style="Heading2"
+      label="Z Channel Decoupling"
+      vq="dfrq3"
+      show="if dfrq3&gt;0 then $SHOW=1 else $SHOW=0 endif"
+      border="Etched"
+      side="Top"
+      justify="Left"
+      tab="no"
+      enable="no"
+      useref="no"
+      subtype="Basic"
+      >
+      <label loc="10 20" size="100 20"
+        style="Label1"
+        label="Sequence"
+        justify="Left"
+        />
+      <menu loc="120 20" size="120 20"
+        style="PlainText"
+        vq="Zseq"
+        vc="parunits('set','Zseq','$VALUE')"
+        set="$VALUE=Zseq"
+        editable="No"
+        tooltip="Z decoupling sequence type"
+        >
+        <mlabel label="none" chval="none" />
+        <mlabel label="TPPM" chval="tppm" />
+        <mlabel label="SPINAL" chval="spinal" />
+        <mlabel label="WALTZ" chval="waltz" />
+      </menu>
+
+      <!-- TPPM Parameters -->
+      <group loc="0 50" size="360 100"
+        vq="Zseq"
+        show="if Zseq='tppm' then $SHOW=1 else $SHOW=0 endif"
+        >
+        <label loc="10 0" size="100 20"
+          style="Label1"
+          label="Amplitude (aZtppm)"
+          justify="Left"
+          />
+        <entry loc="120 0" size="80 20"
+          style="PlainText"
+          vq="aZtppm"
+          vc="aZtppm=$VALUE"
+          set="$VALUE=aZtppm"
+          digits="0"
+          />
+
+        <label loc="10 25" size="100 20"
+          style="Label1"
+          label="Pulse Width"
+          justify="Left"
+          />
+        <entry loc="120 25" size="80 20"
+          style="PlainText"
+          vq="pwZtppm"
+          vc="pwZtppm=$VALUE"
+          set="$VALUE=pwZtppm"
+          digits="2"
+          />
+        <label loc="210 25" size="30 20"
+          style="Label1"
+          label="µs"
+          />
+
+        <label loc="10 50" size="100 20"
+          style="Label1"
+          label="Phase Angle"
+          justify="Left"
+          />
+        <entry loc="120 50" size="80 20"
+          style="PlainText"
+          vq="phZtppm"
+          vc="phZtppm=$VALUE"
+          set="$VALUE=phZtppm"
+          digits="1"
+          />
+        <label loc="210 50" size="30 20"
+          style="Label1"
+          label="deg"
+          />
+      </group>
+
+      <!-- SPINAL Parameters -->
+      <group loc="0 50" size="360 125"
+        vq="Zseq"
+        show="if Zseq='spinal' then $SHOW=1 else $SHOW=0 endif"
+        >
+        <label loc="10 0" size="100 20"
+          style="Label1"
+          label="Amplitude (aZspinal)"
+          justify="Left"
+          />
+        <entry loc="120 0" size="80 20"
+          style="PlainText"
+          vq="aZspinal"
+          vc="aZspinal=$VALUE"
+          set="$VALUE=aZspinal"
+          digits="0"
+          />
+
+        <label loc="10 25" size="100 20"
+          style="Label1"
+          label="Pulse Width"
+          justify="Left"
+          />
+        <entry loc="120 25" size="80 20"
+          style="PlainText"
+          vq="pwZspinal"
+          vc="pwZspinal=$VALUE"
+          set="$VALUE=pwZspinal"
+          digits="2"
+          />
+        <label loc="210 25" size="30 20"
+          style="Label1"
+          label="µs"
+          />
+
+        <label loc="10 50" size="100 20"
+          style="Label1"
+          label="Phase (phZspinal)"
+          justify="Left"
+          />
+        <entry loc="120 50" size="80 20"
+          style="PlainText"
+          vq="phZspinal"
+          vc="phZspinal=$VALUE"
+          set="$VALUE=phZspinal"
+          digits="1"
+          />
+        <label loc="210 50" size="30 20"
+          style="Label1"
+          label="deg"
+          />
+
+        <label loc="10 75" size="100 20"
+          style="Label1"
+          label="Alpha (alpZspinal)"
+          justify="Left"
+          />
+        <entry loc="120 75" size="80 20"
+          style="PlainText"
+          vq="alpZspinal"
+          vc="alpZspinal=$VALUE"
+          set="$VALUE=alpZspinal"
+          digits="1"
+          />
+        <label loc="210 75" size="30 20"
+          style="Label1"
+          label="deg"
+          />
+      </group>
+    </group>
+
+  </group>
+</template>

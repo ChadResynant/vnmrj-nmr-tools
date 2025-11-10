@@ -1,0 +1,364 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<!--
+  hYXH PulseSequence Tab
+  3D sequence: H→HY CP→[X-dec Y evolution d3]→YX CP→[Y-dec X evolution d2]→XH CP→[optional HH-RFDR]→H acquisition
+-->
+<template name="PulseSequence" element="pages" type="acquisition" >
+  <group size="750 500"
+    style="Heading1"
+    label="Pulse Sequence"
+    vq="panellevel"
+    show="$SHOW=(panellevel&gt;0)"
+    border="None"
+    side="Top"
+    justify="Left"
+    tab="yes"
+    enable="no"
+    reference="PulseSequence"
+    useref="no"
+    subtype="Basic"
+    expanded="yes"
+    >
+
+    <!-- Sequence Control -->
+    <group loc="10 10" size="350 120"
+      style="Heading2"
+      label="Sequence Control"
+      border="Etched"
+      side="Top"
+      justify="Left"
+      tab="no"
+      enable="no"
+      useref="no"
+      subtype="Basic"
+      >
+      <check loc="10 20" size="150 20"
+        label="Soft Pulse (Y evolution)"
+        vq="softpul"
+        vc="softpul='y'"
+        vc2="softpul='n'"
+        set="if softpul='y' then $VALUE=1 else $VALUE=0 endif"
+        tooltip="Enable soft pulse for Y evolution"
+        />
+
+      <check loc="10 50" size="180 20"
+        label="H-H RFDR Mixing"
+        vq="qHrfdr"
+        vc="qHrfdr='y'"
+        vc2="qHrfdr='n'"
+        set="if qHrfdr='y' then $VALUE=1 else $VALUE=0 endif"
+        tooltip="Enable H-H RFDR mixing before acquisition"
+        />
+
+      <check loc="10 80" size="150 20"
+        label="Double Quantum Filter"
+        vq="dqf_flag"
+        vc="dqf_flag='2'"
+        vc2="dqf_flag='n'"
+        set="if dqf_flag='2' then $VALUE=1 else $VALUE=0 endif"
+        tooltip="Enable DQF for H-H mixing"
+        />
+    </group>
+
+    <!-- Cross-Polarization HY -->
+    <group loc="370 10" size="370 120"
+      style="Heading2"
+      label="Cross-Polarization (H → Y)"
+      border="Etched"
+      side="Top"
+      justify="Left"
+      tab="no"
+      enable="no"
+      useref="no"
+      subtype="Basic"
+      >
+      <label loc="10 20" size="100 20"
+        style="Label1"
+        label="Contact Time"
+        justify="Left"
+        />
+      <entry loc="120 20" size="80 20"
+        style="PlainText"
+        vq="tHY"
+        vc="tHY=$VALUE"
+        set="$VALUE=tHY"
+        digits="3"
+        />
+      <label loc="210 20" size="30 20"
+        style="Label1"
+        label="ms"
+        />
+
+      <label loc="10 50" size="100 20"
+        style="Label1"
+        label="H Amplitude"
+        justify="Left"
+        />
+      <entry loc="120 50" size="80 20"
+        style="PlainText"
+        vq="aHhy"
+        vc="aHhy=$VALUE"
+        set="$VALUE=aHhy"
+        digits="0"
+        />
+
+      <label loc="10 80" size="100 20"
+        style="Label1"
+        label="Y Amplitude"
+        justify="Left"
+        />
+      <entry loc="120 80" size="80 20"
+        style="PlainText"
+        vq="aYhy"
+        vc="aYhy=$VALUE"
+        set="$VALUE=aYhy"
+        digits="0"
+        />
+    </group>
+
+    <!-- Cross-Polarization YX -->
+    <group loc="10 140" size="350 120"
+      style="Heading2"
+      label="Cross-Polarization (Y → X)"
+      border="Etched"
+      side="Top"
+      justify="Left"
+      tab="no"
+      enable="no"
+      useref="no"
+      subtype="Basic"
+      >
+      <label loc="10 20" size="100 20"
+        style="Label1"
+        label="Contact Time"
+        justify="Left"
+        />
+      <entry loc="120 20" size="80 20"
+        style="PlainText"
+        vq="tYX"
+        vc="tYX=$VALUE"
+        set="$VALUE=tYX"
+        digits="3"
+        />
+      <label loc="210 20" size="30 20"
+        style="Label1"
+        label="ms"
+        />
+
+      <label loc="10 50" size="100 20"
+        style="Label1"
+        label="Y Amplitude"
+        justify="Left"
+        />
+      <entry loc="120 50" size="80 20"
+        style="PlainText"
+        vq="aYyx"
+        vc="aYyx=$VALUE"
+        set="$VALUE=aYyx"
+        digits="0"
+        />
+
+      <label loc="10 80" size="100 20"
+        style="Label1"
+        label="X Amplitude"
+        justify="Left"
+        />
+      <entry loc="120 80" size="80 20"
+        style="PlainText"
+        vq="aXyx"
+        vc="aXyx=$VALUE"
+        set="$VALUE=aXyx"
+        digits="0"
+        />
+    </group>
+
+    <!-- Cross-Polarization XH -->
+    <group loc="370 140" size="370 120"
+      style="Heading2"
+      label="Cross-Polarization (X → H)"
+      border="Etched"
+      side="Top"
+      justify="Left"
+      tab="no"
+      enable="no"
+      useref="no"
+      subtype="Basic"
+      >
+      <label loc="10 20" size="100 20"
+        style="Label1"
+        label="Contact Time"
+        justify="Left"
+        />
+      <entry loc="120 20" size="80 20"
+        style="PlainText"
+        vq="tXH"
+        vc="tXH=$VALUE"
+        set="$VALUE=tXH"
+        digits="3"
+        />
+      <label loc="210 20" size="30 20"
+        style="Label1"
+        label="ms"
+        />
+
+      <label loc="10 50" size="100 20"
+        style="Label1"
+        label="X Amplitude"
+        justify="Left"
+        />
+      <entry loc="120 50" size="80 20"
+        style="PlainText"
+        vq="aXxh"
+        vc="aXxh=$VALUE"
+        set="$VALUE=aXxh"
+        digits="0"
+        />
+
+      <label loc="10 80" size="100 20"
+        style="Label1"
+        label="H Amplitude"
+        justify="Left"
+        />
+      <entry loc="120 80" size="80 20"
+        style="PlainText"
+        vq="aHxh"
+        vc="aHxh=$VALUE"
+        set="$VALUE=aHxh"
+        digits="0"
+        />
+    </group>
+
+    <!-- H-H RFDR Mixing -->
+    <group loc="10 270" size="730 100"
+      style="Heading2"
+      label="H-H RFDR Mixing"
+      vq="qHrfdr"
+      show="if qHrfdr='y' then $SHOW=1 else $SHOW=0 endif"
+      border="Etched"
+      side="Top"
+      justify="Left"
+      tab="no"
+      enable="no"
+      useref="no"
+      subtype="Basic"
+      >
+      <label loc="10 20" size="100 20"
+        style="Label1"
+        label="Mixing Time"
+        justify="Left"
+        />
+      <entry loc="120 20" size="80 20"
+        style="PlainText"
+        vq="tHmix"
+        vc="tHmix=$VALUE"
+        set="$VALUE=tHmix"
+        digits="3"
+        tooltip="H-H RFDR mixing period (rounded to rotor cycles)"
+        />
+      <label loc="210 20" size="30 20"
+        style="Label1"
+        label="ms"
+        />
+
+      <label loc="10 50" size="100 20"
+        style="Label1"
+        label="Zero-Field Delay"
+        justify="Left"
+        />
+      <entry loc="120 50" size="80 20"
+        style="PlainText"
+        vq="tZF_H"
+        vc="tZF_H=$VALUE"
+        set="$VALUE=tZF_H"
+        digits="3"
+        tooltip="Zero-field delay for RFDR"
+        />
+      <label loc="210 50" size="30 20"
+        style="Label1"
+        label="µs"
+        />
+
+      <label loc="280 20" size="100 20"
+        style="Label1"
+        label="RFDR Amplitude"
+        justify="Left"
+        />
+      <entry loc="390 20" size="80 20"
+        style="PlainText"
+        vq="aHrfdr"
+        vc="aHrfdr=$VALUE"
+        set="$VALUE=aHrfdr"
+        digits="0"
+        tooltip="H amplitude for RFDR"
+        />
+
+      <label loc="280 50" size="100 20"
+        style="Label1"
+        label="RFDR Pulse Width"
+        justify="Left"
+        />
+      <entry loc="390 50" size="80 20"
+        style="PlainText"
+        vq="pwHrfdr"
+        vc="pwHrfdr=$VALUE"
+        set="$VALUE=pwHrfdr"
+        digits="2"
+        tooltip="180-degree pulse for RFDR"
+        />
+      <label loc="480 50" size="30 20"
+        style="Label1"
+        label="µs"
+        />
+    </group>
+
+    <!-- Optional H Echo Parameters -->
+    <group loc="10 380" size="350 110"
+      style="Heading2"
+      label="Optional H Echo Refocusing"
+      border="Etched"
+      side="Top"
+      justify="Left"
+      tab="no"
+      enable="no"
+      useref="no"
+      subtype="Basic"
+      >
+      <label loc="10 20" size="100 20"
+        style="Label1"
+        label="Echo Time"
+        justify="Left"
+        />
+      <entry loc="120 20" size="80 20"
+        style="PlainText"
+        vq="tHecho"
+        vc="tHecho=$VALUE"
+        set="$VALUE=tHecho"
+        digits="3"
+        tooltip="Optional H echo time (0 = disabled)"
+        />
+      <label loc="210 20" size="30 20"
+        style="Label1"
+        label="ms"
+        />
+
+      <label loc="10 50" size="100 20"
+        style="Label1"
+        label="180° Pulse Width"
+        justify="Left"
+        />
+      <entry loc="120 50" size="80 20"
+        style="PlainText"
+        vq="pwH180"
+        vc="pwH180=$VALUE"
+        set="$VALUE=pwH180"
+        digits="2"
+        tooltip="H 180-degree pulse for echo"
+        />
+      <label loc="210 50" size="30 20"
+        style="Label1"
+        label="µs"
+        />
+    </group>
+
+  </group>
+</template>
